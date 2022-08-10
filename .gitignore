@@ -1,0 +1,8 @@
+# Ignore all files except the README
+# NOTE (BNR): A .gitignore file is used in workflow/report because I couldn't get
+#             the top-level gitignore working right.
+resources/
+!resources/README.md
+
+results/
+!results/README.md
