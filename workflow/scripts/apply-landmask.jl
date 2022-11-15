@@ -3,6 +3,7 @@ using IceFloeTracker: create_landmask, apply_landmask, load, @persist
 # using DelimitedFiles: readdlm
 
 # @time begin
+# expecting input images in ARGS[1]
 dir = ARGS[1]
 dir = "resources/input-images"
 # se = readdlm("se_landmask.csv", ',', Bool)
@@ -20,17 +21,23 @@ else
 end
 
 imgs = readdir(dir); total = length(imgs)
+@info "There are $(total-1) images to landmask in $dir"
 
-# look for Land.tif and remove it
+# look for Land.tif in /input_images
     if "Land.tif" in imgs
         @info "`Land.tif` found in $dir. Using it as coastline image for masking land."
+        
+        # Grab coastline
+        coastline = popat!(imgs, findall(x->x=="Land.tif",imgs)[1])
+
+        # Create landmask
+        @time img = load(joinpath(dir,coastline))
+        @time landmask = create_landmask(img)
     else
         error("`Land.tif` not found in $dir. Please ensure a coastline image `Land.tif` exists in $dir.")
     end
 
-    deleteat!(imgs, findall(x->x=="Land.tif",imgs))
-
-# Use a subset for now
+# Use a subset to process for now
     imgs = imgs[1:2]
 
 # for (i, imgname) in enumerate(imgs)
@@ -42,7 +49,8 @@ imgs = readdir(dir); total = length(imgs)
     @time img = load(joinpath(dir,imgname))
     # img = println(i)
     @info "creating landmask for $imgname"
-    # @time landmask = create_landmask(img)
+    
+
     @info "applying landmask and persisting to $fname in $targetsubdir"
     @persist landmasked = apply_landmask(img, landmask) outpath
 # end
