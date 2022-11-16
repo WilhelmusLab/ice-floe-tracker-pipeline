@@ -1,23 +1,19 @@
 #!/usr/bin/env julia
 using IceFloeTracker: create_landmask, apply_landmask, load, @persist
-# using DelimitedFiles: readdlm
 
-# @time begin
+@time begin
 # expecting input images in ARGS[1]
 dir = ARGS[1]
-dir = "resources/input-images"
-# se = readdlm("se_landmask.csv", ',', Bool)
-# se = readdlm("se_landmask.csv", ',', Bool)
+
 targetdir = "results"
 
 targetsubdir = joinpath(targetdir,"landmasked_images")
-pwd()
 
 if !isdir(targetsubdir)
     @info "making directory at $targetsubdir"
     mkdir(targetsubdir)
 else
-    @info "say what to do if directory already exists."
+    @info "$targetsubdir directory already exists. Proceeding..."
 end
 
 imgs = readdir(dir); total = length(imgs)
@@ -31,27 +27,31 @@ imgs = readdir(dir); total = length(imgs)
         coastline = popat!(imgs, findall(x->x=="Land.tif",imgs)[1])
 
         # Create landmask
-        @time img = load(joinpath(dir,coastline))
-        @time landmask = create_landmask(img)
+        @info "creating landmask for $coastline"
+        @time "elapsed time to load coastile image" img = load(joinpath(dir,coastline))
+        # time to load coastile image: 8.500827 seconds (107.31 M allocations: 7.629 GiB, 11.19% gc time) 
+        @time "elapsed time to create landmask" landmask = create_landmask(img)
+        @persist landmask joinpath(targetsubdir,"landmask.png") 
+        # elapsed time to create landmask: 243.185778 seconds (3.82 M allocations: 476.858 MiB, 0.10% gc time, 1.92% compilation time)
+        
+        @info "Landmask from $coastline created successfully. Appling it to $imgs.."
     else
         error("`Land.tif` not found in $dir. Please ensure a coastline image `Land.tif` exists in $dir.")
     end
 
-# Use a subset to process for now
-    imgs = imgs[1:2]
-
-# for (i, imgname) in enumerate(imgs)
-    i=1; imgname = imgs[1]
+for (i, imgname) in enumerate(imgs)
+   
+    # make output filename
     fname = imgname[1:findlast(".",imgname)[1]-1]*"_landmasked.png"
     outpath = joinpath(targetsubdir, fname)
-    @info "Processing $imgname ($i/$total)"
-    # create landmask and apply it
-    @time img = load(joinpath(dir,imgname))
-    # img = println(i)
-    @info "creating landmask for $imgname"
     
+    @info "Processing $imgname ($i/$total)"
 
+    # Apply landmask to img
     @info "applying landmask and persisting to $fname in $targetsubdir"
-    @persist landmasked = apply_landmask(img, landmask) outpath
-# end
-# end
+    @persist landmasked = apply_landmask(load(joinpath(dir,imgname)), .!landmask) outpath
+end
+
+@info "Landmasking completed."
+
+end
