@@ -29,7 +29,7 @@ imgs = readdir(dir); total = length(imgs)
         # Create landmask
         @info "creating landmask for $coastline"
         @time "elapsed time to load coastline image" img = load(joinpath(dir,coastline))
-        # time to load coastile image: 8.500827 seconds (107.31 M allocations: 7.629 GiB, 11.19% gc time) 
+        # time to load coastline image: 8.500827 seconds (107.31 M allocations: 7.629 GiB, 11.19% gc time) 
         @time "elapsed time to create landmask" landmask = create_landmask(img)
         @persist landmask joinpath(targetsubdir,"landmask.png") 
         # elapsed time to create landmask: 243.185778 seconds (3.82 M allocations: 476.858 MiB, 0.10% gc time, 1.92% compilation time)
