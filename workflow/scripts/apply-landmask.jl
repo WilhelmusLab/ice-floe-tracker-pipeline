@@ -34,7 +34,7 @@ imgs = readdir(dir); total = length(imgs)
         @persist landmask joinpath(targetsubdir,"landmask.png") 
         # elapsed time to create landmask: 243.185778 seconds (3.82 M allocations: 476.858 MiB, 0.10% gc time, 1.92% compilation time)
         
-        @info "Landmask from $coastline created successfully. Appling it to $imgs.."
+        @info "Landmask from $coastline created successfully. Applying it to $imgs.."
     else
         error("`Land.tif` not found in $dir. Please ensure a coastline image `Land.tif` exists in $dir.")
     end
