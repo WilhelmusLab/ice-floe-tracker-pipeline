@@ -1,6 +1,7 @@
 using IFTPipeline
 using IFTPipeline: IceFloeTracker
-using IFTPipeline: Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, load_imgs, loadimg, sharpen, sharpen_gray
+using IceFloeTracker: save
+using IFTPipeline: Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, load_imgs, loadimg, sharpen, sharpen_gray, RGB, IceFloeTracker.save
 using ArgParse: @add_arg_table!, ArgParseSettings, add_arg_group!, parse_args
 using DataFrames
 using Dates
@@ -28,7 +29,7 @@ testnames = [n[6:(end-3)] for n in alltests]
 
 to_test = alltests # uncomment this line to run all tests or add individual files below
 [
-# "test-pipeline.jl"
+# "test-overcast.jl"
 ]
 
 # Run the tests
