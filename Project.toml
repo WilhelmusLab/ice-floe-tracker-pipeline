@@ -1,0 +1,9 @@
+name = "IFTPipeline"
+uuid = "c895ed3e-1b7c-4ee4-8f26-b0074f8964c6"
+authors = ["Carlos Paniagua <cpaniaguam@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+IceFloeTracker = "04643c7a-9ac6-48c5-822f-2704f9e70bd3"
+TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
