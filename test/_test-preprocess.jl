@@ -28,10 +28,9 @@
         println("-------------preprocess CLI --------------------")
         # Uses toy test data
         imgsdir = joinpath(test_data_dir, "input_pipeline")
-        soitpath = joinpath(imgsdir, "passtimes.csv")
 
         preprocess(;
-            truedir=imgsdir, refdir=imgsdir, lmdir=imgsdir, soitpath=soitpath, output=imgsdir
+            truedir=imgsdir, refdir=imgsdir, lmdir=imgsdir, passtimesdir=imgsdir, output=imgsdir
         )
 
         segfloes_outfile = joinpath(imgsdir, "segmented_floes.jls")

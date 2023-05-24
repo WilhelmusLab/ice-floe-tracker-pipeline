@@ -1,5 +1,10 @@
-function process_soit(soitpth::String)
-    data, cols = readdlm(soitpth, ','; header=true)
+function process_soit(passtimesdir::String)
+    # check there is a file at passtimesdir starting with "passtimes_lat" with extension .csv
+    pth = filter(x -> occursin(r"^passtimes_lat.*\.csv$", x), readdir(passtimesdir))
+    isempty(pth) && error("No csv file found at $passtimesdir starting with 'passtimes_lat'")
+    length(pth) > 1 && error("More than one csv file found at $passtimesdir starting with 'passtimes_lat'")
+
+    data, cols = readdlm(joinpath(passtimesdir, pth[1]), ','; header=true)
     df = DataFrame(data, vec(cols))
 
     # rename the columns "Aqua pass time" and "Terra pass time" to :aqua and :terra

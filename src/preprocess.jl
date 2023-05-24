@@ -203,7 +203,7 @@ function preprocess(
 end
 
 """
-    preprocess(; truedir::T, refdir::T, lmdir::T, soitdir::T, output::T) where {T<:AbstractString}
+    preprocess(; truedir::T, refdir::T, lmdir::T, passtimesdir::T, output::T) where {T<:AbstractString}
 
 Preprocess and segment floes in all images in `truedir` and `refdir` using the landmasks in `lmdir` according to the ordering in the passtimes obtained from the Soit tool. Save the segmented floes and time deltas between images to `output`.
 
@@ -211,16 +211,15 @@ Preprocess and segment floes in all images in `truedir` and `refdir` using the l
 - `truedir`: directory with truecolor images to be processed
 - `refdir`: directory with reflectance images to be processed
 - `lmdir`: directory with dilated and non-dilated landmask images
-- `soitpath`: path to SOIT file
+- `passtimesdir`: path to SOIT file with satellite passtimes
 - `output`: output directory
 """
-function preprocess(; truedir::T, refdir::T, lmdir::T, soitpath::T, output::T) where {T<:AbstractString}
+function preprocess(; truedir::T, refdir::T, lmdir::T, passtimesdir::T, output::T) where {T<:AbstractString}
 
-    soitdf = process_soit(soitpath)
+    soitdf = process_soit(passtimesdir)
 
     # 1. Get references to images
-    truecolor_refs = [ref for ref in mkfilenames(soitdf, "truecolor")]
-    reflectance_refs = [ref for ref in mkfilenames(soitdf, "reflectance")]
+    reflectance_refs, truecolor_refs = [mkfilenames(soitdf, colorspace) for colorspace in ["reflectance", "truecolor"]]
     landmask_imgs = deserialize(joinpath(lmdir, "generated_landmask.jls"))
     numimgs = length(truecolor_refs)
 
