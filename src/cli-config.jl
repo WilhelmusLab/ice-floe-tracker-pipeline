@@ -12,6 +12,11 @@ function mkclipreprocess!(settings)
         help = "Land mask image directory"
         required = true
 
+        "--passtimesdir", "-p"
+        help = "Pass times directory"
+        required = true
+
+
         "--output", "-o"
         help = "Output directory"
         required = true

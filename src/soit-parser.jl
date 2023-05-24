@@ -1,3 +1,13 @@
+"""
+    process_soit(passtimesdir::String)
+
+Process the [SOIT](https://github.com/WilhelmusLab/SOIT-Satellite-Overpass-Identification-Tool) output file.
+
+The SOIT output file is a csv file with columns :Date, :sat1, :sat2, ... :satn, where each row is a pass time for the satellites listed in the columns. The resulting DataFrame has columns `:sat` and `:pass_time` sorted by :pass_time.
+
+# Arguments
+- `passtimesdir::String`: The directory containing the SOIT output file
+"""
 function process_soit(passtimesdir::String)
     # check there is a file at passtimesdir starting with "passtimes_lat" with extension .csv
     pth = filter(x -> occursin(r"^passtimes_lat.*\.csv$", x), readdir(passtimesdir))
@@ -7,37 +17,40 @@ function process_soit(passtimesdir::String)
     data, cols = readdlm(joinpath(passtimesdir, pth[1]), ','; header=true)
     df = DataFrame(data, vec(cols))
 
-    # rename the columns "Aqua pass time" and "Terra pass time" to :aqua and :terra
-    DataFrames.rename!(df, "Aqua pass time" => :aqua, "Terra pass time" => :terra)
-
     # filter out rows with value "" in the first column
     filter!(row -> row[1] != "", df)
 
-    # stack df on the second and third columns
-    df = stack(df, [:aqua, :terra])
+    # get all but the "Date" column names from df
+    oldsatnames = [nm for nm in names(df) if nm != "Date"]
+    newsatnames = [lowercase(split(nm)[1]) for nm in oldsatnames]
 
-    # rename :value as :pass_time, and :variable as :sat
+    rename!(df, oldsatnames .=> newsatnames)
+
+    df = stack(df, newsatnames)
+
     rename!(df, :value => :pass_time, :variable => :sat, :Date => :date)
-
-    # reorder the columns to put :satellite first
-    df = df[:, [:sat, :date, :pass_time]]
 
     # Convert to dates
     df[!, :date] = Date.(df[:, :date], dateformat"mm-dd-yyyy")
-    df[!, 3] = Time.(df[:, :pass_time])
-    df[!, 3] = DateTime.(df[:, :date], df[:, :pass_time])
+    df[!, :pass_time] = Time.(df[:, :pass_time])
+    df[!, :pass_time] = DateTime.(df[:, :date], df[:, :pass_time])
 
     # drop the date column
     select!(df, Not(:date))
 
-    #sort df by :pass_time
     sort!(df, :pass_time)
 
     return df
 end
 
-getdeltat(dates) = [round(t.value / 6000) for t in abs.(diff(dates))]
+"""
+    getdeltat(dates)
 
+Get the time difference between each date in `dates` in minutes.
+"""
+function getdeltat(dates)
+    return [round(t.value / 6000) for t in abs.(diff(dates))]
+end
 """
     mkfilenames(df, colorspace="truecolor", grid="250m", ext="tiff")
 
