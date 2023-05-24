@@ -28,11 +28,16 @@
         println("-------------preprocess CLI --------------------")
         # Uses toy test data
         imgsdir = joinpath(test_data_dir, "input_pipeline")
-        IFTPipeline.preprocess(;
-            truedir=imgsdir, refdir=imgsdir, lmdir=imgsdir, output=imgsdir
+        soitpath = joinpath(imgsdir, "passtimes.csv")
+
+        preprocess(;
+            truedir=imgsdir, refdir=imgsdir, lmdir=imgsdir, soitpath=soitpath, output=imgsdir
         )
-        outfile = joinpath(imgsdir, "segmented_floes.jls")
-        @test isfile(outfile)
-        rm(outfile)
+
+        segfloes_outfile = joinpath(imgsdir, "segmented_floes.jls")
+        timedeltas_outfile = joinpath(imgsdir, "timedeltas.jls")
+        @test isfile(segfloes_outfile)
+        @test isfile(timedeltas_outfile)
+        rm.([segfloes_outfile, timedeltas_outfile])
     end
 end
