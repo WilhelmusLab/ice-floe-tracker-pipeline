@@ -1,0 +1,58 @@
+[scheduler]
+    allow implicit tasks = True
+[scheduling]
+    cycling mode = integer
+    initial cycle point = 1
+    [[graph]]
+        R1 = """
+            mkpaths => fetchdata => soit #& landmask => preprocess => extractfeatures => tracking
+             """
+[runtime]
+    [[root]]
+        [[[environment]]]
+            # Update these variables with your run parameters
+            startdate = "2022-05-04"
+            enddate = "2022-05-06"
+            crs = "wgs84" #epsg3413 for polar stereographic
+            bounding_box = "78.186394 38.250605 70.749318 15.32373"
+            centroid_x = "80"
+            centroid_y = "-18"
+            minfloearea = "300"
+            maxfloearea = "90000"
+            # Recommend using these default paths for output
+            project_dir = "~/IceFloeTracker.jl"
+            fetchdata_dir = $project_dir/"images"
+            truecolor_dir = "images/truecolor"
+            reflectance_dir = "images/reflectance"
+            landmask_dir = "output/landmasks"
+            preprocess_dir = "output/preprocess"
+            soit_dir = "output/soit"
+            features_dir = "output/features"
+    [[mkpaths]]
+        script = """
+            mkdir -p $project_dir/$soit_dir
+            mkdir -p $project_dir/$landmask_dir
+            mkdir -p $project_dir/$preprocess_dir
+            mkdir -p $project_dir/$features_dir
+        """
+    [[fetchdata]]
+        script = """
+            singularity exec $project_dir/fetchdata.simg fetchdata.sh -o $fetchdata_dir -s $startdate -e $enddate -c $crs $bounding_box
+        """
+    [[soit]]
+        script = """
+            singularity exec $project_dir/fetchdata.simg python3 $project_dir/scripts/pass_time_snakemake.py
+        """
+    [[landmask]]
+        script = """
+            $project_dir/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $project_dir/$landmask_dir
+        """
+    [[preprocess]]
+        script = """
+            julia -t auto $project_dir/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $project_dir/$landmask_dir -o $project_dir/$preprocess_dir
+         """
+    [[extractfeatures]]
+        script = """
+            julia -t auto $project_dir/scripts/ice-floe-tracker.jl extractfeatures -i $project_dir/$preprocess_dir -o $project_dir/$features_dir --minarea 300 --maxarea 90000
+        """
+        

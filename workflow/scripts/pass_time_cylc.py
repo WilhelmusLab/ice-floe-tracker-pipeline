@@ -2,7 +2,7 @@
 # Adapted for use in a snakemake pipeline for IceFloeTracker by Timothy Divoll (2023)
 
 # ACTION REQUIRED FROM YOU:
-# 1. Update the following parameters in the `snakemake-config.yaml`:
+# 1. Update the following parameters in the `flow.cylc` file:
 
 # startdate = YYYY-MM-DD
 # enddate = YYYY-MM-DD
@@ -24,9 +24,8 @@ from skyfield.api import wgs84, load, EarthSatellite
 import numpy as np
 import csv
 import math
-import yaml
 import os
-
+from os.path import expanduser
 
 # URLs for space track login.
 uriBase = "https://www.space-track.org"
@@ -42,20 +41,15 @@ def main():
 
     # Read in username, password, start date, end dates from configuration file.
     
-    def load_conf_file(config_file):
-        with open(config_file, "r") as f:
-            config = yaml.safe_load(f)
-            startdate = config["startdate"]
-            enddate = config["enddate"]
-            csvoutpath = config["soit-outdir"]
-            centroidx = config["centroid-x"]
-            centroidy = config["centroid-y"]
-
-        return startdate, enddate, csvoutpath, centroidx, centroidy
-    
-    startdate, enddate, csvoutpath, centroidx, centroidy = load_conf_file("hpc/snakemake-config.yaml")
-    configUsr = os.environ["SPACEUSER"]
-    configPwd = os.environ["SPACEPSWD"]
+    ProjectHome = expanduser("~")+ "/IceFloeTracker.jl"
+    startdate = os.environ.get("startdate")
+    enddate = os.environ.get("enddate")
+    csvdir = os.environ.get("soit_dir")
+    csvoutpath = f'{ProjectHome}/{csvdir}'
+    centroidx = os.environ.get("centroid_x")
+    centroidy = os.environ.get("centroid_y")
+    configUsr = os.environ.get("SPACEUSER")
+    configPwd = os.environ.get("SPACEPSWD")
     siteCred = {'identity': configUsr, 'password': configPwd}
     end_date = datetime.datetime.strptime(enddate, "%Y-%m-%d").strftime("%m-%d-%Y").split('-')
     start_date = datetime.datetime.strptime(startdate, "%Y-%m-%d").strftime("%m-%d-%Y").split('-')
@@ -434,3 +428,4 @@ def daysInMonth(month, year):
 
 if __name__ == '__main__':
     main()
+    
