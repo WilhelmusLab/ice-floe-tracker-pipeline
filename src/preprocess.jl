@@ -205,7 +205,7 @@ end
 """
     preprocess(; truedir::T, refdir::T, lmdir::T, passtimesdir::T, output::T) where {T<:AbstractString}
 
-Preprocess and segment floes in all images in `truedir` and `refdir` using the landmasks in `lmdir` according to the ordering in the passtimes obtained from the Soit tool. Save the segmented floes and time deltas between images to `output`.
+Preprocess and segment floes in all images in `truedir` and `refdir` using the landmasks in `lmdir` according to the ordering in the passtimes obtained from the SOIT tool. Save the segmented floes and time deltas between images to `output`.
 
 # Arguments
 - `truedir`: directory with truecolor images to be processed
