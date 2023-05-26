@@ -191,7 +191,7 @@ function preprocess(
     watersheds_segB[1] .= IceFloeTracker.watershed_product(watersheds_segB...)
 
     # segmentation_F
-    @info "Segmenting floes 3/3"
+    @info "Segmenting floes part 3/3"
     return IceFloeTracker.segmentation_F(
         segB.not_ice,
         segB.ice_intersect,
@@ -203,36 +203,42 @@ function preprocess(
 end
 
 """
-    preprocess(truedir::T, refdir::T, lmdir::Tuple{T, T}, output::T)
+    preprocess(; truedir::T, refdir::T, lmdir::T, passtimesdir::T, output::T) where {T<:AbstractString}
 
-Preprocess and segment floes in all images in `truedir` and `refdir` using the landmasks in `lmdir`. Saves the segmented floes in `output`.
+Preprocess and segment floes in all images in `truedir` and `refdir` using the landmasks in `lmdir` according to the ordering in the passtimes obtained from the SOIT tool. Save the segmented floes and time deltas between images to `output`.
 
 # Arguments
 - `truedir`: directory with truecolor images to be processed
 - `refdir`: directory with reflectance images to be processed
 - `lmdir`: directory with dilated and non-dilated landmask images
+- `passtimesdir`: path to SOIT file with satellite passtimes
+- `output`: output directory
 """
-function preprocess(; truedir::T, refdir::T, lmdir::T, output::T) where {T<:AbstractString}
+function preprocess(; truedir::T, refdir::T, lmdir::T, passtimesdir::T, output::T) where {T<:AbstractString}
+
+    soitdf = process_soit(passtimesdir)
+
     # 1. Get references to images
-    truecolor_refs = [ref for ref in readdir(truedir) if occursin("truecolor", ref)]
-    reflectance_refs = [ref for ref in readdir(refdir) if occursin("reflectance", ref)]
+    reflectance_refs, truecolor_refs = [mkfilenames(soitdf, colorspace) for colorspace in ["reflectance", "truecolor"]]
     landmask_imgs = deserialize(joinpath(lmdir, "generated_landmask.jls"))
+    numimgs = length(truecolor_refs)
 
     # 2. Preprocess
     @info "Preprocessing"
-    truecolor_container = similar(loadimg(; dir=truedir, fname=truecolor_refs[1]))
-    reflectance_container = similar(truecolor_container)
-    segmented_floes = cache_vector(
-        BitMatrix, length(truecolor_refs), size(truecolor_container)
-    )
-    numimgs = length(truecolor_refs)
+    _img = loadimg(; dir=truedir, fname=truecolor_refs[1])
+    sz = size(_img)
+    truecolor_container = cache_vector(typeof(_img), numimgs, sz)
+    reflectance_container = copy(truecolor_container)
+    segmented_floes = cache_vector(BitMatrix, numimgs, sz)
+
+    @info "Processing images"
     Threads.@threads for i in eachindex(truecolor_refs)
         @info "Processing image $i of $numimgs"
-        truecolor_container .= loadimg(; dir=truedir, fname=truecolor_refs[i])
-        reflectance_container .= loadimg(; dir=refdir, fname=reflectance_refs[i])
+        truecolor_container[i] .= loadimg(; dir=truedir, fname=truecolor_refs[i])
+        reflectance_container[i] .= loadimg(; dir=refdir, fname=reflectance_refs[i])
         try
             segmented_floes[i] .= preprocess(
-                truecolor_container, reflectance_container, landmask_imgs
+                truecolor_container[i], reflectance_container[i], landmask_imgs
             )
         catch e
             if isa(e, ArgumentError)
@@ -243,7 +249,8 @@ function preprocess(; truedir::T, refdir::T, lmdir::T, output::T) where {T<:Abst
     end
 
     # 3. Save
-    @info "Serializing segmented floes"
+    @info "Serializing segmented floes/time deltas"
     serialize(joinpath(output, "segmented_floes.jls"), segmented_floes)
+    serialize(joinpath(output, "timedeltas.jls"), getdeltat(soitdf.pass_time))
     return nothing
 end
