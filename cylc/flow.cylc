@@ -20,7 +20,7 @@
             minfloearea = "300"
             maxfloearea = "90000"
             # Recommend using these default paths for output
-            project_dir = "~/IceFloeTracker.jl"
+            project_dir = "~/ice-floe-tracker-pipeline"
             fetchdata_dir = $project_dir/"images"
             truecolor_dir = "images/truecolor"
             reflectance_dir = "images/reflectance"
@@ -41,18 +41,17 @@
         """
     [[soit]]
         script = """
-            singularity exec $project_dir/fetchdata.simg python3 $project_dir/scripts/pass_time_snakemake.py
+            singularity exec $project_dir/fetchdata.simg python3 $project_dir/workflow/scripts/pass_time_snakemake.py
         """
     [[landmask]]
         script = """
-            $project_dir/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $project_dir/$landmask_dir
+            $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $project_dir/$landmask_dir
         """
     [[preprocess]]
         script = """
-            julia -t auto $project_dir/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $project_dir/$landmask_dir -o $project_dir/$preprocess_dir
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $project_dir/$landmask_dir -o $project_dir/$preprocess_dir
          """
     [[extractfeatures]]
         script = """
-            julia -t auto $project_dir/scripts/ice-floe-tracker.jl extractfeatures -i $project_dir/$preprocess_dir -o $project_dir/$features_dir --minarea 300 --maxarea 90000
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $project_dir/$preprocess_dir -o $project_dir/$features_dir --minarea 300 --maxarea 90000
         """
-        
