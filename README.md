@@ -66,7 +66,8 @@ Remember to remove the `images` and `output` folders from the root project direc
      - maxfloearea
     * run `singularity build fetchdata.simg docker://brownccv/icefloetracker-fetchdata:latest`
         - This will pull the image containing all the dependent software and make it accessible to Cylc
-    * then, build the workflow, run it, and open the text-based user interface (TUI) to monitor the progress of each task
+    * then, build the workflow, run it, and open the text-based user interface (TUI) to monitor the progress of each task. 
+    ![TUI example](./tui-example.png)
 
     ````
     cylc install -n <workflow-name> ./cylc
