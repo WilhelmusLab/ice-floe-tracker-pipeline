@@ -28,9 +28,9 @@ function main(args)
     mkclitrack!(settings)
 
     landmask_cloudmask_args = [
-        "--input",
+        "input",
         Dict(:help => "Input image directory", :required => true),
-        "--output",
+        "output",
         Dict(:help => "Output image directory", :required => true),
     ]
 
