@@ -4,11 +4,14 @@ This repository contains the processing pipeline for IceFloeTracker.jl and ancil
 
 ## SOIT Integration
 
-The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.ZBhat-zMJUe) is called to generate a list of satellite times for both Aqua and Terra in the area of interest. This program is written in Python and it's dependencies are added to the `oscar-env.yaml` that we build in the next section.
+The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.ZBhat-zMJUe) is called to generate a list of satellite times for both Aqua and Terra in the area of interest. This program is written in Python and its dependencies are added to the `oscar-env.yaml` that we build in the next section.
+
+**Note:** the `pass_time_cylc.py` script in this project can be adapted to include additional satellites available in the [space-track.org](https://www.space-track.org/) repository.
+
 
 ## Cylc to run the pipeline
 
-Cylc is used to encode the entire pipeline from start to finish. Cylc relies on the command line scripts to automate the pipeline. The `flow.cylc` file should be suitable for runs on HPC systems. To run cylc locally, there are a few commands to run from a terminal in the root directory of this project:
+Cylc is used to encode the entire pipeline from start to finish. Cylc relies on the command line scripts to automate the pipeline. The `flow.cylc` file should be suitable for runs on HPC systems. To run Cylc locally, there are a few commands to run from a terminal in the root directory of this project:
 
 ```
 cylc install -n <workflow-name> ./cylc
@@ -39,7 +42,6 @@ Remember to remove the `images` and `output` folders from the root project direc
     * `cd IceFloeTracker.jl`
     
 5. Build the package
-    * `julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(url = "https://github.com/HolyLab/HolyLabRegistry.git"))'`
     * `julia -e 'using Pkg; Pkg.activate("."); ENV["PYTHON"]=""; Pkg.instantiate(); Pkg.build()'`
     * `julia -e 'using Pkg; Pkg.activate("scripts"); Pkg.instantiate(); Pkg.build()'`
 6. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
@@ -60,12 +62,13 @@ Remember to remove the `images` and `output` folders from the root project direc
      - enddate
      - crs
      - bounding_box
-     - centroid_x
-     - centroid_y
+     - centroid_x #lat wgs84
+     - centroid_y #lon wgs84
      - minfloearea
      - maxfloearea
+     **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
     * run `singularity build fetchdata.simg docker://brownccv/icefloetracker-fetchdata:latest`
-        - This will pull the image containing all the dependent software and make it accessible to Cylc
+        - This will pull the image containing all the depencies and make them accessible to Cylc
     * then, build the workflow, run it, and open the text-based user interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
 

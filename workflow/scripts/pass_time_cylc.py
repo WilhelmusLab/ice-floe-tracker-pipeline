@@ -1,5 +1,5 @@
 # Code developed by Simon Hatcher (2022)
-# Adapted for use in a snakemake pipeline for IceFloeTracker by Timothy Divoll (2023)
+# Adapted for use in a Cylc pipeline for IceFloeTracker by Timothy Divoll (2023)
 
 # ACTION REQUIRED FROM YOU:
 # 1. Update the following parameters in the `flow.cylc` file:

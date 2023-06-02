@@ -54,6 +54,9 @@ ${BOLD}ARGUMENTS${NORMAL}
   x1, y1${TAB}top-left point of bounding box
   x2, y2${TAB}bottom-right point of bounding box
 
+  Note: for wgs84 input: x, y = lat, lon
+        for epsg3413 input: x, y = easting, northing
+
 ${BOLD}OPTIONS${NORMAL}
   -c${TAB}${TAB}coordinate reference system: epsg3413, wgs84 (default: "wgs84")
   -e${TAB}${TAB}end date in YYY-MM-DD format
@@ -230,7 +233,7 @@ main() {
 
   local bounding_box
   bounding_box="$(sort_xy $x1 $y1 $x2 $y2)"
-
+  # print to test
   mkdir -p "${output}"
   mkdir -p "${output}/reflectance"
   mkdir -p "${output}/truecolor"
