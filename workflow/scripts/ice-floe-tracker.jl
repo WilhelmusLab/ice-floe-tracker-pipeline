@@ -4,7 +4,7 @@ Pkg.activate(joinpath(@__DIR__, "../..")) # activate project environment
 
 using ArgParse
 using IceFloeTracker
-using IFTPipeline: mkclipreprocess!, mkcliextract!, mkclitrack!
+using IFTPipeline
 
 function main(args)
     settings = ArgParseSettings(; autofix_names=true)
@@ -28,9 +28,9 @@ function main(args)
     mkclitrack!(settings)
 
     landmask_cloudmask_args = [
-        "input",
+        "--input",
         Dict(:help => "Input image directory", :required => true),
-        "output",
+        "--output",
         Dict(:help => "Output image directory", :required => true),
     ]
 
@@ -41,7 +41,7 @@ function main(args)
     command = parsed_args[:_COMMAND_]
     command_args = parsed_args[command]
     command_func = getfield(IFTPipeline, Symbol(command))
-    command_func(; command_args...)
+    @time command_func(; command_args...)
     return nothing
 end
 
