@@ -29,5 +29,8 @@ export cache_vector, sharpen,
     load_cloudmask,
     disc_ice_water,
     landmask,
-    track
+    track,
+    mkclipreprocess!,
+    mkcliextract!,
+    mkclitrack!
 end
