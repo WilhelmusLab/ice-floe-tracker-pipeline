@@ -5,6 +5,7 @@ This module contains wrapper functions for IceFloeTracker.jl pipeline.
 """
 module IFTPipeline
 using ArgParse
+using LoggingExtras
 using IceFloeTracker
 using IceFloeTracker: Folds, RGB, Gray, load, float64, imsharpen
 using Dates

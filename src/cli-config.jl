@@ -16,14 +16,12 @@ function mkclipreprocess!(settings)
         help = "Pass times directory"
         required = true
 
-
         "--output", "-o"
         help = "Output directory"
         required = true
     end
     return nothing
 end
-
 
 function mkcliextract!(settings)
     @add_arg_table! settings["extractfeatures"] begin
@@ -56,12 +54,6 @@ end
 Set up command line interface for the `track` command.
 """
 function mkclitrack!(settings)
-    @add_arg_table! settings begin
-        "track"
-        help = "Pair ice floes in day k with ice floes in day k+1"
-        action = :command
-    end
-
     add_arg_group!(settings["track"], "arguments")
     @add_arg_table! settings["track"] begin
         "--imgs"
@@ -180,6 +172,31 @@ function mkclitrack!(settings)
         help = "Small floe area mismatch threshold"
         arg_type = Float64
         default = 0.18
+    end
+    return nothing
+end
+
+function mkclilandmask!(settings)
+    args = [
+        "input",
+        Dict(:help => "Input image directory", :required => true),
+        "output",
+        Dict(:help => "Output image directory", :required => true),
+    ]
+    add_arg_table!(settings["landmask"], args...)
+end
+
+function mkcli!(settings, common_args)
+    d = Dict(
+        "landmask" => mkclilandmask!,
+        "preprocess" => mkclipreprocess!,
+        "extractfeatures" => mkcliextract!,
+        "track" => mkclitrack!
+    )
+
+    for t in keys(d)
+        d[t](settings) # add arguments to settings
+        add_arg_table!(settings[t], common_args...)
     end
     return nothing
 end

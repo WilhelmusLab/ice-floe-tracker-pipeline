@@ -1,5 +1,10 @@
 # include("../src/track-cli-config.jl")
 settings = ArgParseSettings(; autofix_names=true)
+@add_arg_table! settings begin
+    "track"
+    help = "Pair ice floes in day k with ice floes in day k+1"
+    action = :command
+end
 IFTPipeline.mkclitrack!(settings)
 
 params_path = "../config/sample-tracker-params.toml"
