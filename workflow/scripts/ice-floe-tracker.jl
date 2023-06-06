@@ -78,7 +78,7 @@ function main(args)
     logger = setuplogger(logoption, command)
 
     with_logger(logger) do
-        command_func(; command_args...)
+        @time command_func(; command_args...)
     end
     return nothing
 end
