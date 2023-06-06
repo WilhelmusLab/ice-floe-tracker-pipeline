@@ -46,7 +46,7 @@ def main():
     enddate = os.environ.get("enddate")
     csvdir = os.environ.get("soit_dir")
     #csvdir = "/tmpdownload"
-    csvoutpath = {csvdir}
+    csvoutpath = csvdir
     #csvoutpath = f'{ProjectHome}/{csvdir}'
     centroidx = os.environ.get("centroid_x")
     centroidy = os.environ.get("centroid_y")
