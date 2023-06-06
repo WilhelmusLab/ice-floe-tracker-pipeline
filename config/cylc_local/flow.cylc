@@ -12,7 +12,7 @@
         [[[environment]]]
             # Update these variables with your run parameters
             startdate = "2022-05-04"
-            enddate = "2022-05-17"
+            enddate = "2022-05-07"
             crs = "wgs84" #epsg3413 for polar stereographic
             bounding_box = "78.186394 38.250605 70.749318 15.32373"
             centroid_x = "80"
@@ -39,11 +39,11 @@
         """
     [[fetchdata]]
         script = """
-            docker run --mount type=bind,source=$fetchdata_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata:pr-13 -- fetchdata.sh -o /tmpdownload -s $startdate -e $enddate -c $crs $bounding_box
+            docker run --mount type=bind,source=$fetchdata_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata:pr-13 fetchdata.sh -o /tmpdownload -s $startdate -e $enddate -c $crs $bounding_box
         """
     [[soit]]
         script = """
-            docker run --mount type=bind,source=$soit_dir,target=$soit_dir brownccv/icefloetracker-fetchdata:pr-13  python3 $project_dir/workflow/scripts/pass_time_snakemake.py
+            docker run --mount type=bind,source=$soit_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata:pr-13 python3 $project_dir/workflow/scripts/pass_time_snakemake.py
         """
     [[landmask]]
         script = """

@@ -44,7 +44,9 @@ def main():
     ProjectHome = expanduser("~")+ "/IceFloeTracker.jl"
     startdate = os.environ.get("startdate")
     enddate = os.environ.get("enddate")
-    csvdir = os.environ.get("soit_dir")
+    #csvdir = os.environ.get("soit_dir")
+    csvdir = "/tmpdownload"
+
     csvoutpath = f'{ProjectHome}/{csvdir}'
     centroidx = os.environ.get("centroid_x")
     centroidy = os.environ.get("centroid_y")
