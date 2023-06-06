@@ -13,9 +13,7 @@ RUN pip3 install skyfield \
 
 COPY fetchdata.sh /usr/local/bin
 COPY pass_time_cylc.py /usr/local/bin
-COPY icetest.sh /usr/local/bin
 
-RUN chmod a+x /usr/local/bin/icetest.sh
 RUN chmod a+x /usr/local/bin/pass_time_cylc.py
 RUN chmod a+x /usr/local/bin/fetchdata.sh
 
