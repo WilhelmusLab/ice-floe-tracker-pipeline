@@ -12,7 +12,7 @@
         [[[environment]]]
             # Update these variables with your run parameters
             startdate = "2022-05-04"
-            enddate = "2022-05-07"
+            enddate = "2022-05-05"
             crs = "wgs84" #epsg3413 for polar stereographic
             bounding_box = "78.186394 38.250605 70.749318 15.32373"
             centroid_x = "80"
@@ -43,7 +43,7 @@
         """
     [[soit]]
         script = """
-            docker run --mount type=bind,source=$soit_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata:pr-13 python3 $project_dir/workflow/scripts/pass_time_snakemake.py
+            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=$soit_dir brownccv/icefloetracker-fetchdata:pr-13 python3 /usr/local/bin/pass_time_cylc.py
         """
     [[landmask]]
         script = """
