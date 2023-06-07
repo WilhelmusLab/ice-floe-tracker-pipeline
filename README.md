@@ -38,7 +38,7 @@ The text-based user interface provides a simple way to watch the status of each 
 4. Build a virtual environment and install Cylc
    - [ ] `conda env create -f ./config/hpc/oscar-env.yaml`
    - [ ] `conda activate oscar-env`
-   - [ ] `cd IceFloeTracker.jl`
+   - [ ] `cd ice-floe-tracker-pipeline`
     
 5. Build the package
    - [ ] `julia -e 'using Pkg; Pkg.activate("."); ENV["PYTHON"]=""; Pkg.instantiate(); Pkg.build()'`
