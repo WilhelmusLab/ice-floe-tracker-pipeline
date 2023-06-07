@@ -37,14 +37,17 @@
             mkdir -p $preprocess_dir
             mkdir -p $features_dir
         """
+        
     [[fetchdata]]
         script = """
             docker run --mount type=bind,source=$fetchdata_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata:pr-13 fetchdata.sh -o /tmpdownload -s $startdate -e $enddate -c $crs $bounding_box
         """
+
     [[soit]]
         script = """
             docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/IceFloeTracker.jl/None brownccv/icefloetracker-fetchdata:pr-13 python3 /usr/local/bin/pass_time_cylc.py
         """
+        
     [[landmask]]
         script = """
             $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $project_dir/$landmask_dir
