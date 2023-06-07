@@ -41,12 +41,9 @@ def main():
 
     # Read in username, password, start date, end dates from configuration file.
     
-    #ProjectHome = expanduser("~")+ "/IceFloeTracker.jl"
     startdate = os.environ.get("startdate")
     enddate = os.environ.get("enddate")
-    csvdir = os.environ.get("soit_dir")
     csvoutpath = "/IceFloeTracker.jl/None/"
-    #csvoutpath = f'{ProjectHome}/{csvdir}'
     centroidx = os.environ.get("centroid_x")
     centroidy = os.environ.get("centroid_y")
     configUsr = os.environ.get("SPACEUSER")

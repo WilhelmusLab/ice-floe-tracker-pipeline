@@ -12,9 +12,11 @@ RUN pip3 install skyfield \
         requests
 
 COPY fetchdata.sh /usr/local/bin
-COPY pass_time_cylc.py /usr/local/bin
+COPY pass_time_cylc_hpc.py /usr/local/bin
+COPY pass_time_cylc_local.py /usr/local/bin
 
-RUN chmod a+x /usr/local/bin/pass_time_cylc.py
+RUN chmod a+x /usr/local/bin/pass_time_cylc_hpc.py
+RUN chmod a+x /usr/local/bin/pass_time_cylc_local.py
 RUN chmod a+x /usr/local/bin/fetchdata.sh
 
 CMD [ "/bin/bash", "-c" ]
