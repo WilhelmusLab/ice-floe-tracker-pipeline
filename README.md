@@ -10,10 +10,10 @@ The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.
 
 ## Cylc to run the pipeline
 
-Cylc is used to encode the entire pipeline from start to finish. Cylc relies on the command line scripts to automate the pipeline. The `flow.cylc` file should be suitable for runs on HPC systems. To run Cylc locally, there are a few commands to run from a terminal in the root directory of this project:
+Cylc is used to encode the entire pipeline from start to finish and relies on the command line scripts to automate the workflow. The `config/cylc_hpc/flow.cylc` file should be suitable for runs on HPC systems. To run Cylc locally, there are a few commands to run from a terminal in the root directory of this project:
 
 ```
-cylc install -n <workflow-name> ./config/cylc
+cylc install -n <workflow-name> ./config/cylc_local
 cylc graph <workflow-name> #install graphviz locally
 cylc play <workflow-name>
 cylc tui <workflow-name>
@@ -76,7 +76,7 @@ The text-based user interface provides a simple way to watch the status of each 
     ![TUI example](./tui-example.png)
 
     ````
-    cylc install -n <workflow-name> ./config/cylc
+    cylc install -n <workflow-name> ./config/cylc_hpc
     cylc play <workflow-name>
     cylc tui <workflow-name>
     ```
