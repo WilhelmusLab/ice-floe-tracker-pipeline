@@ -8,6 +8,14 @@ The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.
 
 **Note:** the `pass_time_cylc.py` script in this project can be adapted to include additional satellites available in the [space-track.org](https://www.space-track.org/) repository.
 
+Export SOIT username/password to environment variable:
+   - [ ] From your home directory`nano .bash_profile`
+   - [ ] add `export HISTCONTROL=ignoreboth` to the bottom of your .bash_profile
+        * this will ensure that your username/password are not stored in history
+        * when exporting the following environment variables, there must a space in front of each command
+   - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
+   - [ ] ` export SPACEPSWD=<password>`
+
 ## Cylc to run the pipeline
 
 Cylc is used to encode the entire pipeline from start to finish and relies on the command line scripts to automate the workflow. The `config/cylc_hpc/flow.cylc` file should be suitable for runs on HPC systems. To run Cylc locally, there are a few commands to run from a terminal in the root directory of this project:
