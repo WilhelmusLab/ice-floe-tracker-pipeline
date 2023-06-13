@@ -83,7 +83,7 @@ The text-based user interface provides a simple way to watch the status of each 
    - [ ] then, build the workflow, run it, and open the text-based user interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
 
-    ````
+    ```
     cylc install -n <workflow-name> ./config/cylc_hpc
     cylc play <workflow-name>
     cylc tui <workflow-name>
