@@ -54,6 +54,9 @@ ${BOLD}ARGUMENTS${NORMAL}
   x1, y1${TAB}top-left point of bounding box
   x2, y2${TAB}bottom-right point of bounding box
 
+  Note: for wgs84 input: x, y = lat, lon
+        for epsg3413 input: x, y = easting, northing
+
 ${BOLD}OPTIONS${NORMAL}
   -c${TAB}${TAB}coordinate reference system: epsg3413, wgs84 (default: "wgs84")
   -e${TAB}${TAB}end date in YYY-MM-DD format
@@ -78,11 +81,11 @@ sort_xy() {
   local x2="${3}"
   local y2="${4}"
 
-  xmin="$(python -c "print(min(${x1}, ${x2}))")"
-  xmax="$(python -c "print(max(${x1}, ${x2}))")"
+  xmin="$(python3 -c "print(min(${x1}, ${x2}))")"
+  xmax="$(python3 -c "print(max(${x1}, ${x2}))")"
 
-  ymin="$(python -c "print(min(${y1}, ${y2}))")"
-  ymax="$(python -c "print(max(${y1}, ${y2}))")"
+  ymin="$(python3 -c "print(min(${y1}, ${y2}))")"
+  ymax="$(python3 -c "print(max(${y1}, ${y2}))")"
 
   echo "${xmin} ${ymin} ${xmax} ${ymax}"
 }
@@ -95,7 +98,7 @@ add_day() {
     macos='true'
   fi
 
-  if [ "${macos}" = 'true' ]; then
+  if [ "${macos}" = 'true' ] && [ ! -v "${CYLC_VERSION+x}" ]; then
     date -j -v +1d -f "%Y-%m-%d" "${date}" +%Y-%m-%d
   else
     date -d "${date} 1 days" +%Y-%m-%d
@@ -114,7 +117,7 @@ download_landmask() {
   xml="$(echo "${GDAL_WMS_TEMPLATE}" | sed -e "s/%%LAYER%%/${layer}/" -e "s/%%EXT%%/${ext}/" -e "s/%%DATE%%/${date}/" )" 
 
   echo 'downloading landmask'
-  gdalwarp -t_srs "${GDAL_SRS}" -te ${bounding_box} "${xml}" "${output}/landmask.tiff" &> /dev/null
+  gdalwarp -overwrite -t_srs "${GDAL_SRS}" -te ${bounding_box} "${xml}" "${output}/landmask.tiff" &> /dev/null
 }
 
 download_truecolor() {
@@ -134,7 +137,7 @@ download_truecolor() {
       filename="$(echo "${date}" | sed -e 's/-//g').$(echo "${sat}" | tr '[:upper:]' '[:lower:]').truecolor.250m.tiff"
       xml="$(echo "${GDAL_WMS_TEMPLATE}" | sed -e "s/%%LAYER%%/${layer}/" -e "s/%%EXT%%/${ext}/" -e "s/%%DATE%%/${date}/" )" 
 
-      gdalwarp -t_srs "${GDAL_SRS}" -te ${bounding_box} "${xml}" "${output}/${filename}" &> /dev/null
+      gdalwarp -overwrite -t_srs "${GDAL_SRS}" -te ${bounding_box} "${xml}" "${output}/${filename}" &> /dev/null
     done
 
     date="$(add_day "${date}")"
@@ -154,14 +157,15 @@ download_reflectance() {
   local ext="jpeg"
 
 
-  echo "downloading true color images"
+  echo "downloading reflectance color images"
   while [ "${date}" != "${enddate}" ]; do
+    
     for sat in Aqua Terra; do
       layer="MODIS_${sat}_CorrectedReflectance_Bands721"
       filename="$(echo "${date}" | sed -e 's/-//g').$(echo "${sat}" | tr '[:upper:]' '[:lower:]').reflectance.250m.tiff"
 
       xml="$(echo "${GDAL_WMS_TEMPLATE}" | sed -e "s/%%LAYER%%/${layer}/" -e "s/%%EXT%%/${ext}/" -e "s/%%DATE%%/${date}/" )" 
-      gdalwarp -t_srs "${GDAL_SRS}" -te ${bounding_box} "${xml}" "${output}/${filename}" &> /dev/null
+      gdalwarp -overwrite -t_srs "${GDAL_SRS}" -te ${bounding_box} "${xml}" "${output}/${filename}" &> /dev/null
     done
 
     date="$(add_day "${date}")"
@@ -229,12 +233,14 @@ main() {
 
   local bounding_box
   bounding_box="$(sort_xy $x1 $y1 $x2 $y2)"
-
+  # print to test
   mkdir -p "${output}"
+  mkdir -p "${output}/reflectance"
+  mkdir -p "${output}/truecolor"
 
   download_landmask "${bounding_box}" "${startdate}" "${output}"
-  download_truecolor "${bounding_box}" "${startdate}" "${enddate}" "${output}"
-  download_reflectance "${bounding_box}" "${startdate}" "${enddate}" "${output}"
+  download_truecolor "${bounding_box}" "${startdate}" "${enddate}" "${output}/truecolor"
+  download_reflectance "${bounding_box}" "${startdate}" "${enddate}" "${output}/reflectance"
 }
 
 main "$@"

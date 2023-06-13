@@ -14,3 +14,5 @@ workflow/report/*
 Manifest.toml
 
 test/__temp__
+
+icetest.sh

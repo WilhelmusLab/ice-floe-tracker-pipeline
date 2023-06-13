@@ -1,0 +1,7 @@
+name: oscar-env
+
+channels:
+  - conda-forge
+
+dependencies:
+  - cylc-flow=8.1.3
