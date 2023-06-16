@@ -28,11 +28,10 @@ obj = deserialize(data_path)
 
 serialize(joinpath(temp, "segmented_floes.jls"), obj.imgs)
 serialize(joinpath(temp, "floe_props.jls"), obj.props)
-serialize(joinpath(temp, "timedeltas.jls"), [15, 20])
+serialize(joinpath(temp, "timedeltas.jls"), [15.0, 20.0])
 
 argsparam = parse_args(cliparams, settings; as_symbols=true)
 cmd = argsparam[:_COMMAND_]
-argsparam[cmd]
 IFTPipeline.track(; argsparam[cmd]...)
 tracked = deserialize(joinpath(temp, "tracked_floes.jls"))
 @test isfile(joinpath(temp, "tracked_floes.jls"))
