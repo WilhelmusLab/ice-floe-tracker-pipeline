@@ -43,7 +43,7 @@ def main():
     
     startdate = os.environ.get("startdate")
     enddate = os.environ.get("enddate")
-    csvoutpath = "/IceFloeTracker.jl/None/"
+    csvoutpath = "/tmpdownload"
     centroidx = os.environ.get("centroid_x")
     centroidy = os.environ.get("centroid_y")
     configUsr = os.environ.get("SPACEUSER")

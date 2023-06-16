@@ -50,9 +50,13 @@
         """
     [[preprocess]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $project_dir/$landmask_dir -o $project_dir/$preprocess_dir
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $project_dir/$landmask_dir -p $project_dir/$soit_dir -o $project_dir/$preprocess_dir
          """
     [[extractfeatures]]
         script = """
             julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $project_dir/$preprocess_dir -o $project_dir/$features_dir --minarea 300 --maxarea 90000
+        """
+    [[tracking]]
+        script = """
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track
         """
