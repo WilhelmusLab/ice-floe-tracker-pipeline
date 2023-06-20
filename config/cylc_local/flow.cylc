@@ -43,12 +43,12 @@
         
     [[fetchdata]]
         script = """
-            docker run --mount type=bind,source=$fetchdata_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata fetchdata.sh -o /tmpdownload -s $startdate -e $enddate -c $crs $bounding_box
+            docker run --mount type=bind,source=$fetchdata_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata:pr-22 fetchdata.sh -o /tmpdownload -s $startdate -e $enddate -c $crs $bounding_box
         """
 
     [[soit]]
         script = """
-            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata python3 /usr/local/bin/pass_time_cylc_local.py
+            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata:pr-22 python3 /usr/local/bin/pass_time_cylc_local.py
         """
         
     [[landmask]]
@@ -58,7 +58,7 @@
         """
     [[preprocess]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $soit_dir
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $preprocess_dir
          """
     [[extractfeatures]]
         script = """
