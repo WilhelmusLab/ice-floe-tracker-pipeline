@@ -15,7 +15,6 @@ function track(; args...)
     imgs = deserialize(joinpath(vals.imgs, "segmented_floes.jls"))
     props = deserialize(joinpath(vals.props, "floe_props.jls"))
     deltat = deserialize(joinpath(vals.deltat, "timedeltas.jls"))
-    @show vals.output
     serialize(
         joinpath(vals.output, "tracked_floes.jls"),
         IceFloeTracker.pairfloes(imgs, props, deltat, condition_thresholds, mc_thresholds),
