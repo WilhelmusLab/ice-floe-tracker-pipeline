@@ -19,3 +19,5 @@ icetest.sh
 trackplayground.jl
 
 .DS_Store
+
+*.simg

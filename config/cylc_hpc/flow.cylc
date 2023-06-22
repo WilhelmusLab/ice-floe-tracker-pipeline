@@ -22,28 +22,30 @@
             project_dir = "~/ice-floe-tracker-pipeline"
 
             # Recommend using these default paths for output
-            fetchdata_dir = $project_dir/"resources/images"
+            results_dir = $project_dir/"results"
+            fetchdata_dir = $project_dir/"resources"
             truecolor_dir = $fetchdata_dir/"truecolor"
             reflectance_dir = $fetchdata_dir/"reflectance"
-            results_dir = "results/output"
             landmask_dir = $results_dir/"landmasks"
             preprocess_dir = $results_dir/"preprocess"
             soit_dir = $results_dir/"soit"
             features_dir = $results_dir/"features"
+            tracker_dir = $results_dir/"tracker"
     [[mkpaths]]
         script = """
-            mkdir -p $project_dir/$soit_dir
-            mkdir -p $project_dir/$landmask_dir
-            mkdir -p $project_dir/$preprocess_dir
-            mkdir -p $project_dir/$features_dir
+            mkdir -p $soit_dir
+            mkdir -p $landmask_dir
+            mkdir -p $preprocess_dir
+            mkdir -p $features_dir
+            mkdir -p $tracker_dir
         """
     [[fetchdata]]
         script = """
-            singularity exec -B $project_dir:/tmp $project_dir/fetchdata.simg fetchdata.sh -o $fetchdata_dir -s $startdate -e $enddate -c $crs $bounding_box
+            singularity exec $project_dir/fetchdata.simg fetchdata.sh -o $fetchdata_dir -s $startdate -e $enddate -c $crs $bounding_box
         """
     [[soit]]
         script = """
-            singularity exec -B $project_dir:/tmp $project_dir/fetchdata.simg python3 $project_dir/workflow/scripts/pass_time_snakemake_hpc.py
+            singularity exec $project_dir/fetchdata.simg python3 $project_dir/workflow/scripts/pass_time_snakemake_hpc.py
         """
     [[landmask]]
         script = """
