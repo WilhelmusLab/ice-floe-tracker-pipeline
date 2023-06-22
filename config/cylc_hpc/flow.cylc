@@ -5,7 +5,7 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths => fetchdata => soit #& landmask => preprocess => extractfeatures => tracking
+            mkpaths => fetchdata => soit & landmask => preprocess => extractfeatures => tracking
              """
 [runtime]
     [[root]]
@@ -49,15 +49,15 @@
         """
     [[landmask]]
         script = """
-            $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $project_dir/$landmask_dir
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
         """
     [[preprocess]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $project_dir/$landmask_dir -p $project_dir/$soit_dir -o $project_dir/$preprocess_dir
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $preprocess_dir
          """
     [[extractfeatures]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $project_dir/$preprocess_dir -o $project_dir/$features_dir --minarea $minfloearea --maxarea $maxfloearea
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $features_dir --minarea $minfloearea --maxarea $maxfloearea
         """
     [[tracking]]
         script = """

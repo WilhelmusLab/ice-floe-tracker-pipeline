@@ -53,7 +53,6 @@
     
     [[landmask]]
         script = """
-            julia -e 'using Pkg;Pkg.add(url="https://github.com/WilhelmusLab/IceFloeTracker.jl")'
             julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
         """
     [[preprocess]]
