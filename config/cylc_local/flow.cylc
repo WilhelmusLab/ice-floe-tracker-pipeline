@@ -43,12 +43,12 @@
         
     [[fetchdata]]
         script = """
-            docker run --mount type=bind,source=$fetchdata_dir,target=/tmp brownccv/icefloetracker-fetchdata:pr-22 fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
+            docker run --mount type=bind,source=$fetchdata_dir,target=/tmp brownccv/icefloetracker-fetchdata:latest fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
         """
 
     [[soit]]
         script = """
-            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:pr-22 python3 /usr/local/bin/pass_time_cylc_local.py
+            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:latest python3 /usr/local/bin/pass_time_cylc_local.py
         """
     
     [[landmask]]
