@@ -45,7 +45,8 @@ def main():
     startdate = os.environ.get("startdate")
     enddate = os.environ.get("enddate")
     csvdir = os.environ.get("soit_dir")
-    csvoutpath = f'{ProjectHome}/{csvdir}'
+    # csvoutpath = f'{ProjectHome}/{csvdir}'
+    csvoutpath = "/tmp"
     centroidx = os.environ.get("centroid_x")
     centroidy = os.environ.get("centroid_y")
     configUsr = os.environ.get("SPACEUSER")

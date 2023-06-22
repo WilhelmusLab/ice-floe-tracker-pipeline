@@ -41,11 +41,11 @@
         """
     [[fetchdata]]
         script = """
-            singularity exec $project_dir/fetchdata.simg fetchdata.sh -o $fetchdata_dir -s $startdate -e $enddate -c $crs $bounding_box
+            singularity exec --bind $fetchdata_dir:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
         """
     [[soit]]
         script = """
-            singularity exec $project_dir/fetchdata.simg python3 $project_dir/workflow/scripts/pass_time_snakemake_hpc.py
+            singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc_hpc.py
         """
     [[landmask]]
         script = """
