@@ -49,7 +49,7 @@ end
 Get the time difference between each date in `dates` in minutes.
 """
 function getdeltat(dates)
-    return [round(t.value / 6000) for t in abs.(diff(dates))]
+    return [round(t.value / 60_000) for t in abs.(diff(dates))]
 end
 """
     mkfilenames(df, colorspace="truecolor", grid="250m", ext="tiff")
