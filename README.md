@@ -32,7 +32,8 @@ The text-based user interface provides a simple way to watch the status of each 
 ## Running the workflow on Oscar
 #### Python=3.9
 
-1. - [ ]`ssh` to Oscar
+1. - [ ]Connect to Oscar from VS Code
+    * 
 
 2. Move to a compute node
    - [ ] `interact -n 20 -t 24:00:00 -m 16g`
@@ -42,6 +43,7 @@ The text-based user interface provides a simple way to watch the status of each 
 3. Load the latest Anaconda module and Python 3.9.0
    - [ ] `module load anaconda`
    - [ ] `module load python/3.9.0`
+   - [ ] `module load julia/1.9.0`
 
 4. Build a virtual environment and install Cylc
    - [ ] `conda env create -f ./config/hpc/oscar-env.yaml`
@@ -49,7 +51,7 @@ The text-based user interface provides a simple way to watch the status of each 
    - [ ] `cd ice-floe-tracker-pipeline`
     
 5. Build the package
-   - [ ] `julia -e 'using Pkg; Pkg.activate("."); ENV["PYTHON"]=""; Pkg.instantiate(); Pkg.build()'`
+   - [ ] `julia -e 'using Pkg; Pkg.activate("."); ENV["PYTHON"]=""; Pkg.add(url="https://github.com/WilhelmusLab/IceFloeTracker.jl", rev="main"); Pkg.instantiate(); Pkg.build()'`
    - [ ] `julia -e 'using Pkg; Pkg.activate("scripts"); Pkg.instantiate(); Pkg.build()'`
 
 6. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
