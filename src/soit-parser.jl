@@ -15,7 +15,7 @@ function process_soit(passtimesdir::String)
     length(pth) > 1 && error("More than one csv file found at $passtimesdir starting with 'passtimes_lat'")
 
     data, cols = readdlm(joinpath(passtimesdir, pth[1]), ','; header=true)
-    df = DataFrame(data, vec(cols))
+    df = DataFrame(data, vec(cols))[1:end-1, :]
 
     # filter out rows with value "" in the first column
     filter!(row -> row[1] != "", df)

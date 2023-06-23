@@ -16,3 +16,8 @@ Manifest.toml
 test/__temp__
 
 icetest.sh
+trackplayground.jl
+
+.DS_Store
+
+*.simg

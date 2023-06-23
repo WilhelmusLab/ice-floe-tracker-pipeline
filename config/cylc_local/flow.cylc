@@ -5,14 +5,14 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths => fetchdata => soit #& landmask => preprocess => extractfeatures => tracking
+            mkpaths => fetchdata => soit & landmask => preprocess => extractfeatures => tracking
              """
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
             startdate = "2022-05-04"
-            enddate = "2022-05-05"
+            enddate = "2022-05-08"
             crs = "wgs84" #epsg3413 for polar stereographic
             bounding_box = "78.186394 38.250605 70.749318 15.32373"
             centroid_x = "80"
@@ -30,33 +30,40 @@
             preprocess_dir = $results_dir/"preprocess"
             soit_dir = $results_dir/"soit"
             features_dir = $results_dir/"features"
+            tracker_dir = $results_dir/"tracker"
+
     [[mkpaths]]
         script = """
             mkdir -p $soit_dir
             mkdir -p $landmask_dir
             mkdir -p $preprocess_dir
             mkdir -p $features_dir
+            mkdir -p $tracker_dir
         """
         
     [[fetchdata]]
         script = """
-            docker run --mount type=bind,source=$fetchdata_dir,target=/tmpdownload brownccv/icefloetracker-fetchdata:pr-13 fetchdata.sh -o /tmpdownload -s $startdate -e $enddate -c $crs $bounding_box
+            docker run --mount type=bind,source=$fetchdata_dir,target=/tmp brownccv/icefloetracker-fetchdata:latest fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
         """
 
     [[soit]]
         script = """
-            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/root/IceFloeTracker.jl/None brownccv/icefloetracker-fetchdata:pr-13 python3 /usr/local/bin/pass_time_cylc.py
+            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:latest python3 /usr/local/bin/pass_time_cylc_local.py
         """
-        
+    
     [[landmask]]
         script = """
-            $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $project_dir/$landmask_dir
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
         """
     [[preprocess]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $project_dir/$landmask_dir -o $project_dir/$preprocess_dir
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $preprocess_dir
          """
     [[extractfeatures]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $project_dir/$preprocess_dir -o $project_dir/$features_dir --minarea 300 --maxarea 90000
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $features_dir --minarea $minfloearea --maxarea $maxfloearea
+        """
+    [[tracking]]
+        script = """
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $features_dir --deltat $preprocess_dir --output $tracker_dir
         """
