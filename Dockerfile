@@ -3,7 +3,7 @@ FROM julia:1.9.0-bullseye
 ENV TERM=xterm
 
 RUN apt-get clean && apt-get update && \
-apt-get install git
+apt-get install -y git
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git && \ 
 git clone https://github.com/WilhelmusLab/IceFloeTracker.jl.git && \
