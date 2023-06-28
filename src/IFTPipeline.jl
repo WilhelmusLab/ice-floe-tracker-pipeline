@@ -7,9 +7,10 @@ module IFTPipeline
 using ArgParse
 using LoggingExtras
 using IceFloeTracker
-using IceFloeTracker: Folds, RGB, Gray, load, float64, imsharpen
+using IceFloeTracker: Folds, RGB, Gray, load, float64, imsharpen, label_components
 using Dates
 using DataFrames
+using HDF5
 using TOML: parsefile
 using PyCall
 include("cli-config.jl")
@@ -35,6 +36,7 @@ export cache_vector, sharpen,
     cloudmask,
     extractfeatures,
     get_ice_labels,
+    label_components,
     load_imgs,
     load_truecolor_imgs,
     load_reflectance_imgs,
@@ -44,5 +46,6 @@ export cache_vector, sharpen,
     track,
     mkclipreprocess!,
     mkcliextract!,
-    mkclitrack!
+    mkclitrack!,
+    mkfilenames
 end
