@@ -24,8 +24,16 @@ function getiftversion()
     return "v$maj.$min.$patch"
 end
 
-function makeh5filename(imgfname)
-    return replace(imgfname, "truecolor" => "labeled_image", "tiff" => "h5")
+"""
+    makeh5filename(imgfname, ts)
+
+Generate the name of the HDF5 file from the name of the source image and the estimated satellite overpass time. The name of the HDF5 file is of the form `YYYYmmddTHHMM.labeled_image.250m.h5` where `YYYYmmddTHHMM` is the estimated satellite overpass time formatted string.
+
+
+"""
+function makeh5filename(imgfname, ts)
+    fname = Dates.format(ts, "YYYYmmddTHHMM") * "." * split(imgfname, '.'; limit=2)[end]
+    return replace(fname, "truecolor" => "labeled_image", "tiff" => "h5")
 end
 
 """
@@ -90,7 +98,7 @@ This function expects the following files to be present in `resdir`: `filenames.
 Each HDF5 file has the following structure:
 
 ```
-🗂️ HDF5.File: (read-only) YYYYMMDD.sat.labeled_image.250m.h5
+🗂️ HDF5.File: (read-only) YYYYmmddTHHMM.sat.labeled_image.250m.h5
 ├─ 🏷️ contact
 ├─ 🏷️ crs
 ├─ 🏷️ fname_reflectance
@@ -140,7 +148,7 @@ function makeh5file(pathtosampleimg, resdir)
     h5dir = joinpath(resdir, "hdf5-files")
     mkpath(h5dir)
     for (i, fname) in enumerate(truecolor_refs)
-        fname = makeh5filename(fname)
+        fname = makeh5filename(fname, passtimes[i])
         fnamepath = joinpath(h5dir, fname)
         h5open(fnamepath, "w") do file
             # Add top-level attributes
