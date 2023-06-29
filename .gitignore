@@ -21,3 +21,5 @@ trackplayground.jl
 .DS_Store
 
 *.simg
+
+.JuliaFormatter.toml

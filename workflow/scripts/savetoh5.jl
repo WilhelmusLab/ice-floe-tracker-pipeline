@@ -21,12 +21,11 @@ function getiftversion()
     maj = Int(iftversion.major)
     min = Int(iftversion.minor)
     patch = Int(iftversion.patch)
-    "v$maj.$min.$patch"
+    return "v$maj.$min.$patch"
 end
 
-
 function makeh5filename(imgfname)
-    replace(imgfname, "truecolor" => "labeled_image", "tiff" => "h5")
+    return replace(imgfname, "truecolor" => "labeled_image", "tiff" => "h5")
 end
 
 """
@@ -35,15 +34,17 @@ end
 Convert the centroid coordinates from row and column to latitude and longitude. Also drop the columns specified in `colstodrop`.
 """
 function convertcentroid!(propdf, latlondata, colstodrop)
-    latitude, longitude = [
-        [
-            latlondata[c][Int(round(_x)), Int(round(_y))]]
-        for (_x, _y) in zip(propdf.row_centroid, propdf.col_centroid)
-        for c in ["latitude", "longitude"]
+    latitude, longitude, x, y = [
+        [latlondata[c][Int(round(_x)), Int(round(_y))]] for
+        (_x, _y) in zip(propdf.row_centroid, propdf.col_centroid) for
+        c in ["latitude", "longitude", "X", "Y"]
     ]
     propdf.latitude = latitude
     propdf.longitude = longitude
+    propdf.x = x
+    propdf.y = y
     dropcols!(propdf, colstodrop)
+    return nothing
 end
 
 function dropcols!(df, colstodrop)
@@ -99,7 +100,7 @@ Each HDF5 file has the following structure:
 ├─ 📂 floe_properties
 │  ├─ 🏷️ Description of labeled_image
 │  ├─ 🏷️ Description of properties
-│  ├─ 🔢 colunm_names
+│  ├─ 🔢 column_names
 │  ├─ 🔢 labeled_image
 │  └─ 🔢 properties
 └─ 📂 index
@@ -111,13 +112,10 @@ Each HDF5 file has the following structure:
 ```
 # The `floe_properties` and `index` group
 
-The `floe_properties` group contains a floe properties matrix `properties` for `labeled_image` and assciated `colunm_names`.
-
-The `index` group contains the latitude and longitude coordinates (see the description of properties within the file for an account of the units of each property), and satellite pass time `time` in Unix time that captured the source image.
-
+The `floe_properties` group contains a floe properties matrix `properties` for `labeled_image` and associated `column_names`.
+The 'index' group contains the spatial coordinates in the source image coordinate reference system (default NSIDC polar stereographic, meters) and geographic coordinates (latitude and longitude, decimal degrees). Estimated satellite overpass time 'time' is provided in Unix time (seconds since 1970-01-01 00:00 UTC).
 """
 function makeh5file(pathtosampleimg, resdir)
-
     latlondata = getlatlon(pathtosampleimg)
 
     iftversion = getiftversion()
@@ -154,7 +152,7 @@ function makeh5file(pathtosampleimg, resdir)
             attrs(file)["contact"] = "mmwilhelmus@brown.edu"
 
             g = create_group(file, "index")
-            g["time"] = Int64.(Dates.datetime2unix(passtimes[i]))
+            g["time"] = ptsunix[i]
             g["x"] = latlondata["X"]
             g["y"] = latlondata["Y"]
             g["latitude"] = latlondata["latitude"]
@@ -164,10 +162,10 @@ function makeh5file(pathtosampleimg, resdir)
             g["properties"] = Matrix(props[i])
             attrs(g)["Description of properties"] = """Generated using the `regionprops` function from the `skimage` package. See https://scikit-image.org/docs/0.20.x/api/skimage.measure.html#regionprops
 
-            Area units (`area`, `convex_area`) are in sq. kilometers, and length units (`minor_axis_length`, `major_axis_length`, and `perimeter`) are in kilometers, and `orientation` in radians (see the description of properties attribute.). Latitude and longitude coordinates are in degrees.
+            Area units (`area`, `convex_area`) are in sq. kilometers, length units (`minor_axis_length`, `major_axis_length`, and `perimeter`) in kilometers, and `orientation` in radians (see the description of properties attribute.) Latitude and longitude coordinates are in degrees, and the stereographic coordinates`x` and `y` are in meters relative to the NSIDC north polar stereographic projection.
             """
 
-            g["colunm_names"] = names(props[i])
+            g["column_names"] = names(props[i])
             g["labeled_image"] = label_components(floes[i], trues(3, 3))
             attrs(g)["Description of labeled_image"] = "Connected components of the segmented floe image using a 3x3 structuring element. The property matrix consists of the properties of each connected component."
         end
