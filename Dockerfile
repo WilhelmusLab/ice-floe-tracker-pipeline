@@ -6,7 +6,7 @@ RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git && \
 git clone https://github.com/WilhelmusLab/IceFloeTracker.jl.git && \
 cd IceFloeTracker.jl
 
-RUN julia -e 'using Pkg; Pkg.activate("."); ENV["PYTHON"]=""; Pkg.build("PyCall"); Pkg.instantiate()'
+RUN julia -e 'using Pkg; Pkg.activate("/IceFloeTracker.jl"); ENV["PYTHON"]=""; Pkg.build("PyCall"); Pkg.instantiate()'
 
 RUN cd ../ice-floe-tracker-pipeline && \
 julia -e 'using Pkg; Pkg.activate("."); Pkg.rm ("IceFloeTracker.jl"); Pkg.add("../IceFloeTracker.jl"); Pkg.instantiate(); Pkg.build()'
