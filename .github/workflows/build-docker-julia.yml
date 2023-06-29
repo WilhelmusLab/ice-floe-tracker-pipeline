@@ -31,7 +31,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: ccvbot
-          password: ${{ secrets.CCVBOT_DOCKER_PASSWORD }}
+          password: ${{ secrets.CCVBOT_DOCKER_JULIA_PASSWORD }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -46,5 +46,5 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ env.IMAGE_NAME }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
