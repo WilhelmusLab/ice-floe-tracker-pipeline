@@ -8,6 +8,7 @@ using HDF5
 using IFTPipeline
 using PyCall
 using Serialization
+using ArgParse: @add_arg_table, ArgParseSettings, parse_args
 
 function getiftversion()
     deps = Pkg.dependencies()
@@ -42,11 +43,17 @@ end
 Convert the centroid coordinates from row and column to latitude and longitude. Also drop the columns specified in `colstodrop`.
 """
 function convertcentroid!(propdf, latlondata, colstodrop)
-    latitude, longitude, x, y = [
-        [latlondata[c][Int(round(_x)), Int(round(_y))]] for
-        (_x, _y) in zip(propdf.row_centroid, propdf.col_centroid) for
-        c in ["latitude", "longitude", "X", "Y"]
+    latitude, longitude = [
+        [latlondata[c][Int(round(x)), Int(round(y))]] for
+        (x, y) in zip(propdf.row_centroid, propdf.col_centroid) for
+        c in ["latitude", "longitude"]
     ]
+
+    x, y = [
+        [latlondata[c][Int(round(z))] for z in V] for
+        (c, V) in zip(["X", "Y"], [propdf.row_centroid, propdf.col_centroid])
+    ]
+
     propdf.latitude = latitude
     propdf.longitude = longitude
     propdf.x = x
@@ -180,3 +187,37 @@ function makeh5file(pathtosampleimg, resdir)
     end
     return nothing
 end
+
+function parse_commandline()
+    settings = ArgParseSettings()
+
+    @add_arg_table settings begin
+        "--pathtosampleimg", "-p"
+        help = "Path to a sample image with coordinate reference system (CRS) and latitude and longitude coordinates of image pixels"
+        arg_type = String
+
+        "--resdir", "-r"
+        help = "Path to the directory containing the results of the IceFloeTracker pipeline"
+        arg_type = String
+    end
+
+    return parse_args(settings; as_symbols=true)
+end
+
+function main()
+    # Parse command line arguments
+    args = (; parse_commandline()...)
+    for (k, v) in zip(keys(args), args)
+        @info "$(lpad(k, 8)) =>  $v"
+    end
+
+    pathtosampleimg = args.pathtosampleimg
+    resdir = args.resdir
+
+    makeh5file(pathtosampleimg, resdir)
+
+    @info "h5 files written to $(resdir)"
+    @info "Run completed successfully"
+end
+
+main()
