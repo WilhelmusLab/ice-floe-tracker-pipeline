@@ -23,7 +23,6 @@ include("tracker.jl")
 const np = PyNULL()
 const pyproj = PyNULL()
 const rasterio = PyNULL()
-
 function __init__()
     copy!(np, pyimport_conda("numpy", "numpy=1.25.0"))
     copy!(pyproj, pyimport_conda("pyproj", "pyproj=3.6.0"))
