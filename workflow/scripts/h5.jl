@@ -30,16 +30,20 @@ Convert the centroid coordinates from row and column to latitude and longitude. 
 """
 function convertcentroid!(propdf, latlondata, colstodrop)
     latitude, longitude = [
-        [latlondata[c][Int(round(x)), Int(round(y))]] for
-        (x, y) in zip(propdf.row_centroid, propdf.col_centroid) for
+        [latlondata[c][x, y] for
+         (x, y) in zip(propdf.row_centroid, propdf.col_centroid)] for
         c in ["latitude", "longitude"]
     ]
 
     x, y = [
-        [latlondata[c][Int(round(z))] for z in V] for
-        (c, V) in zip(["X", "Y"], [propdf.row_centroid, propdf.col_centroid])
+        [latlondata[c][z] for z in V] for
+        (c, V) in zip(["Y", "X"], [propdf.row_centroid, propdf.col_centroid])
     ]
 
+    # x, y = [
+    #     [latlondata[c][z] for z in V] for
+    #     (c, V) in zip(["X", "Y"], [propdf.row_centroid, propdf.col_centroid])
+    # ]
     propdf.latitude = latitude
     propdf.longitude = longitude
     propdf.x = x
@@ -127,7 +131,7 @@ function makeh5file(pathtosampleimg, resdir)
     fnpath = joinpath(resdir, "filenames.jls")
     truecolor_refs, reflectance_refs = deserialize(fnpath)
 
-    floespath = joinpath(resdir, "segmented_floes.jls")
+    floespath = joinpath(resdir, "segmented_floes.jls") # for labeled_image
     floes = deserialize(floespath)
 
     colstodrop = [:row_centroid, :col_centroid, :min_row, :min_col, :max_row, :max_col]

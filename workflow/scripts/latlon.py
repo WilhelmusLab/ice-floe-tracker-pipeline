@@ -1,6 +1,6 @@
 import numpy as np
 from pyproj import Transformer
-import rasterio, pickle
+import rasterio
 
 
 def getlatlon(imgpath):
@@ -10,8 +10,7 @@ def getlatlon(imgpath):
     """
 
     im = rasterio.open(imgpath)
-    crs = im.crs.__str__()
-    # print('Coordinate reference system code: ', im.crs)
+    crs = im.crs.__str__()  # Coordinate reference system code
     nrows, ncols = im.shape
     rows, cols = np.meshgrid(np.arange(nrows), np.arange(ncols))
     xs, ys = rasterio.transform.xy(im.transform, rows, cols)
@@ -23,5 +22,4 @@ def getlatlon(imgpath):
     # longitude and latitude are 2D index arrays
     longitude = np.reshape(lons, (nrows, ncols))
     latitude = np.reshape(lats, (nrows, ncols))
-    # crs, longitude, latitude, X, Y to a dictionary in a pickle file
     return {"crs": crs, "longitude": longitude, "latitude": latitude, "X": X, "Y": Y}
