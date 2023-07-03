@@ -1,15 +1,25 @@
 function getiftversion()
     deps = Pkg.dependencies()
-    iftversion = ""
+    iftversion = []
     for (_, dep) in deps
         dep.is_direct_dep || continue
         dep.version === nothing && continue
         dep.name != "IceFloeTracker" && continue
-        iftversion = dep.version
+        push!(iftversion, dep.version)
+        break
     end
-    maj = Int(iftversion.major)
-    min = Int(iftversion.minor)
-    patch = Int(iftversion.patch)
+
+    # For CI tests where IceFloeTracker is not a dependency
+    try
+        ift = iftversion[1]
+    catch
+        return "unknown"
+    end
+
+    ift = iftversion[1]
+    maj = Int(ift.major)
+    min = Int(ift.minor)
+    patch = Int(ift.patch)
     return "v$maj.$min.$patch"
 end
 

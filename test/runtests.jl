@@ -1,12 +1,17 @@
 using IFTPipeline
-using IFTPipeline: IceFloeTracker
-using .IceFloeTracker: save
-using IFTPipeline: Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, load_imgs, loadimg, sharpen, sharpen_gray, RGB, IceFloeTracker.save
+using IFTPipeline: Gray, HDF5, IceFloeTracker, IceFloeTracker.save, PyCall, RGB,
+    create_cloudmask, deserialize, float64, imrotate, load, load_imgs, loadimg, serialize,
+    sharpen, sharpen_gray
+using .IceFloeTracker: label_components, save
+using .HDF5
 using ArgParse: @add_arg_table!, ArgParseSettings, add_arg_group!, parse_args
 using DataFrames
 using Dates
 using DelimitedFiles
+using PyCall: @pyinclude, @py_str
+using Pkg
 using Random
+using Serialization
 using Test
 include(joinpath(@__DIR__, "config.jl"))
 
@@ -29,7 +34,7 @@ testnames = [n[6:(end-3)] for n in alltests]
 
 to_test = alltests # uncomment this line to run all tests or add individual files below
 [
-# "test-overcast.jl"
+    "test-h5.jl"
 ]
 
 # Run the tests
