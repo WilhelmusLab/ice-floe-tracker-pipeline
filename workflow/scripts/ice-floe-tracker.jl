@@ -1,4 +1,4 @@
-#!/usr/bin/env julia
+
 # using Pkg
 # Pkg.activate(joinpath(@__DIR__, "../..")) # activate project environment
 
