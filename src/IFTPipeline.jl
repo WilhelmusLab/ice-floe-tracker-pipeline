@@ -7,8 +7,7 @@ module IFTPipeline
 using ArgParse
 using LoggingExtras
 using IceFloeTracker
-using IceFloeTracker: DataFrames, Dates, @dateformat_str, DataFrame, nrow, rename!, Date
-# using DataFrames: nrow, DataFrame
+using IceFloeTracker: DataFrames, Dates, @dateformat_str, DataFrame, nrow, rename!, Not, select!, Date, Time, DateTime
 using IceFloeTracker: Folds, RGB, Gray, load, float64, imsharpen
 using TOML: parsefile
 include("cli-config.jl")
@@ -32,8 +31,8 @@ export cache_vector, sharpen,
     track,
     mkclipreprocess!,
     mkcliextract!,
-    mkclitrack!,
-    DataFrame, nrow, rename!, Date, Time
+    mkclitrack!
+    
 export IceFloeTracker
 
 end
