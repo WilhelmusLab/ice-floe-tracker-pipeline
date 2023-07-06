@@ -1,6 +1,6 @@
-#!/bin/bash
-# using Pkg
-# Pkg.activate(joinpath(@__DIR__, "../..")) # activate project environment
+#!/usr/bin/env julia
+using Pkg
+Pkg.activate(joinpath(@__DIR__, ".")) # activate project environment
 
 using ArgParse
 using LoggingExtras
