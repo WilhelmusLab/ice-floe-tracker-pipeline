@@ -13,6 +13,7 @@ using Pkg
 using Random
 using Serialization
 using Test
+using Conda
 include(joinpath(@__DIR__, "config.jl"))
 
 function test_similarity(imgA::BitMatrix, imgB::BitMatrix, error_rate=0.005)
@@ -34,7 +35,7 @@ testnames = [n[6:(end-3)] for n in alltests]
 
 to_test = alltests # uncomment this line to run all tests or add individual files below
 [
-    "test-h5.jl"
+    "test-pydeps.jl"
 ]
 
 # Run the tests
