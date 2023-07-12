@@ -30,7 +30,6 @@ function parse_params(params::AbstractString)
     t3 = (area=area, dict2nt(params["t3"])...)
     condition_thresholds = (t1=t1, t2=t2, t3=t3)
     d = dict2nt(params["mc_thresholds"])
-    @show d
     mc_thresholds = mkmct(d)
     return condition_thresholds, mc_thresholds
 end

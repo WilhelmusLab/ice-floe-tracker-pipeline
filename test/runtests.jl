@@ -1,10 +1,7 @@
 using IFTPipeline
-using IFTPipeline: IceFloeTracker
-using .IceFloeTracker: save
-using IFTPipeline: Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, load_imgs, loadimg, sharpen, sharpen_gray, RGB, IceFloeTracker.save
+using IFTPipeline: load_imgs, sharpen, sharpen_gray, loadimg
+using .IceFloeTracker: DataFrames, save, Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, loadimg, RGB, DataFrame, nrow, rename!
 using ArgParse: @add_arg_table!, ArgParseSettings, add_arg_group!, parse_args
-using DataFrames
-using Dates
 using DelimitedFiles
 using Random
 using Test
