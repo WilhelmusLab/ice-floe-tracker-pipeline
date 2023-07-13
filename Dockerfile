@@ -18,6 +18,8 @@ RUN julia -e 'using Pkg; Pkg.activate("/opt/ice-floe-tracker-pipeline"); Pkg.rm(
 
 RUN julia --project='/opt/ice-floe-tracker-pipeline'
 
+COPY ./workflow/scripts/ice-floe-tracker.jl /usr/local/bin
+
 RUN chmod a+x /usr/local/bin/ice-floe-tracker.jl
 
 CMD [ "/bin/bash", "-c" ]
