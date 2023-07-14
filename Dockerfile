@@ -16,10 +16,10 @@ RUN julia -e 'using Pkg; Pkg.activate("/opt/IceFloeTracker"); ENV["PYTHON"]=""; 
 
 RUN julia -e 'using Pkg; Pkg.activate("/opt/ice-floe-tracker-pipeline"); Pkg.rm("IceFloeTracker"); Pkg.add(path="/opt/IceFloeTracker"); Pkg.instantiate()'
 
-RUN julia --project='/opt/ice-floe-tracker-pipeline'
+#RUN julia --project='/opt/ice-floe-tracker-pipeline'
 
-COPY ./workflow/scripts/ice-floe-tracker.jl /usr/local/bin
+#COPY ./workflow/scripts/ice-floe-tracker.jl /usr/local/bin
 
-RUN chmod a+x /usr/local/bin/ice-floe-tracker.jl
+#RUN chmod a+x /usr/local/bin/ice-floe-tracker.jl
 
 CMD [ "/bin/bash", "-c" ]
