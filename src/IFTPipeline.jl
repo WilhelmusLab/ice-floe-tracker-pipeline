@@ -7,10 +7,8 @@ module IFTPipeline
 using ArgParse
 using LoggingExtras
 using IceFloeTracker
-using IceFloeTracker: Folds, RGB, Gray, load, float64, imsharpen, label_components
-using Dates
-using DataFrames
-using HDF5
+using IceFloeTracker: DataFrames, Dates, @dateformat_str, DataFrame, nrow, rename!, Not, select!, Date, Time, DateTime
+using IceFloeTracker: Folds, RGB, Gray, load, float64, imsharpen
 using TOML: parsefile
 using PyCall
 include("cli-config.jl")
@@ -45,6 +43,13 @@ export cache_vector, sharpen,
     track,
     mkclipreprocess!,
     mkcliextract!,
+<<<<<<< HEAD
     mkclitrack!,
     mkfilenames
+=======
+    mkclitrack!
+    
+export IceFloeTracker
+
+>>>>>>> main
 end
