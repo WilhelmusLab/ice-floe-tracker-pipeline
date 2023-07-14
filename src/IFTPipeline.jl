@@ -47,13 +47,8 @@ export cache_vector, sharpen,
     track,
     mkclipreprocess!,
     mkcliextract!,
-<<<<<<< HEAD
     mkclitrack!,
     mkfilenames
-=======
-    mkclitrack!
-    
-export IceFloeTracker
 
->>>>>>> main
+export IceFloeTracker
 end
