@@ -3,5 +3,9 @@
     depssoit = ["requests", "skyfield"]
     deps = vcat(depslatlon, depssoit)
     pkgs = Conda._installed_packages()
-    @test all([dep in pkgs for dep in deps])
+    @test "pyproj" in pkgs
+    @test "rasterio" in pkgs
+    @test "requests" in pkgs
+    @test "skyfield" in pkgs
+    # @test all([dep in pkgs for dep in deps])
 end
