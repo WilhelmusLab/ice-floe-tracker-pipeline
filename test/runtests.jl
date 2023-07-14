@@ -1,6 +1,6 @@
 using IFTPipeline
-using IFTPipeline: load_imgs, sharpen, sharpen_gray, loadimg
-using .IceFloeTracker: DataFrames, save, Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, loadimg, RGB, DataFrame, nrow, rename!
+using IFTPipeline: load_imgs, sharpen, sharpen_gray, loadimg, h5open
+using .IceFloeTracker: DataFrames, save, Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, loadimg, RGB, DataFrame, nrow, rename!, Dates, Not, select!
 using ArgParse: @add_arg_table!, ArgParseSettings, add_arg_group!, parse_args
 using DelimitedFiles
 using PyCall: @pyinclude, @py_str
