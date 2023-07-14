@@ -50,10 +50,6 @@ function convertcentroid!(propdf, latlondata, colstodrop)
         (c, V) in zip(["Y", "X"], [propdf.row_centroid, propdf.col_centroid])
     ]
 
-    # x, y = [
-    #     [latlondata[c][z] for z in V] for
-    #     (c, V) in zip(["X", "Y"], [propdf.row_centroid, propdf.col_centroid])
-    # ]
     propdf.latitude = latitude
     propdf.longitude = longitude
     propdf.x = x

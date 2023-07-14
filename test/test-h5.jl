@@ -4,7 +4,12 @@ include(joinpath(@__DIR__, "../workflow/scripts/h5.jl"))
 pathtosampleimg = joinpath(@__DIR__, "test_inputs/input_pipeline/20220914.aqua.reflectance.250m.tiff")
 resdir = joinpath(dirname(pathtosampleimg), "h5")
 
+originalbbox = (latitude=[81, 79], longitude=[-22, -12])
 latlondata = getlatlon(pathtosampleimg)
+
+getcorners(m) = [m[1, 1], m[end, end]]
+latcorners = getcorners(latlondata["latitude"])
+loncorners = getcorners(latlondata["longitude"])
 
 iftversion = "unknown"
 
@@ -29,8 +34,12 @@ h5path = joinpath(resdir, "hdf5-files", "20220914T1244.aqua.labeled_image.250m.h
 
 @testset "h5.jl" begin
 
-    # open h5 file
+    # validate computed lat/lon corners
+    @test all(originalbbox.latitude .≈ round.(latcorners))
+    @test all(originalbbox.longitude .≈ round.(loncorners))
 
+
+    # open h5 file
     fid = h5open(h5path, "r")
 
     @test typeof(fid) == HDF5.File
@@ -75,5 +84,3 @@ end
 
 # clean up
 rm(dirname(h5path), recursive=true)
-
-
