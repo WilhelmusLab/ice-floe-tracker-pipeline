@@ -14,13 +14,7 @@ RUN pip3 install -U scikit-image==0.20.0 pyproj==3.6.0 rasterio==1.3.7 requests=
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
-#RUN julia -e 'using Pkg; Pkg.activate("/opt/IceFloeTracker"); ENV["PYTHON"]=""; Pkg.instantiate(); Pkg.build("PyCall")'
-
-RUN julia -e 'using Pkg; Pkg.activate("/opt/ice-floe-tracker-pipeline"); Pkg.instantiate()'
-
-#RUN julia --project='/opt/ice-floe-tracker-pipeline'
-
-#COPY ./workflow/scripts/ice-floe-tracker.jl /opt/ice-floe-tracker-pipeline/workflow/scripts/
+RUN julia -e 'using Pkg; Pkg.activate("/opt/ice-floe-tracker-pipeline"); ENV["PYTHON"]=""; Pkg.instantiate(); Pkg.build("PyCall")'
 
 RUN chmod a+x /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl
 
