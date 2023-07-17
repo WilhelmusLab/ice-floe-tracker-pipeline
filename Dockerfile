@@ -3,15 +3,14 @@ FROM julia:1.9.0-bullseye
 ENV TERM=xterm 
 
 RUN apt-get clean && apt-get update && \
-apt-get install -y git python3.10
+    apt-get install -y wget python3-pip git python3.10 && \
+    rm -rf /var/lib/apt/list/*
 
 RUN cd opt 
 
 WORKDIR /opt
 
-RUN python -m pip install -U pip
-
-RUN python -m pip install -U scikit-image==0.20.0 pyproj==3.6.0 rasterio==1.3.7 requests==2.31.0 skyfield==1.45.0
+RUN pip3 install -U scikit-image==0.20.0 pyproj==3.6.0 rasterio==1.3.7 requests==2.31.0 skyfield==1.45.0
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
