@@ -249,8 +249,10 @@ function preprocess(; truedir::T, refdir::T, lmdir::T, passtimesdir::T, output::
     end
 
     # 3. Save
-    @info "Serializing segmented floes/time deltas"
+    @info "Serializing segmented floes/time deltas/image file names/pass times"
     serialize(joinpath(output, "segmented_floes.jls"), segmented_floes)
     serialize(joinpath(output, "timedeltas.jls"), getdeltat(soitdf.pass_time))
+    serialize(joinpath(output, "filenames.jls"), (truecolor=truecolor_refs, reflectance=reflectance_refs))
+    serialize(joinpath(output, "passtimes.jls"), soitdf.pass_time)
     return nothing
 end

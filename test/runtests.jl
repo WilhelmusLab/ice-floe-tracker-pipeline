@@ -1,10 +1,14 @@
 using IFTPipeline
-using IFTPipeline: load_imgs, sharpen, sharpen_gray, loadimg
-using .IceFloeTracker: DataFrames, save, Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, loadimg, RGB, DataFrame, nrow, rename!
+using IFTPipeline: load_imgs, sharpen, sharpen_gray, loadimg, h5open
+using .IceFloeTracker: DataFrames, save, Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, loadimg, RGB, DataFrame, nrow, rename!, Dates, Not, select!
 using ArgParse: @add_arg_table!, ArgParseSettings, add_arg_group!, parse_args
 using DelimitedFiles
+using PyCall: @pyinclude, @py_str
+using Pkg
 using Random
+using Serialization
 using Test
+using Conda
 include(joinpath(@__DIR__, "config.jl"))
 
 function test_similarity(imgA::BitMatrix, imgB::BitMatrix, error_rate=0.005)
@@ -26,7 +30,7 @@ testnames = [n[6:(end-3)] for n in alltests]
 
 to_test = alltests # uncomment this line to run all tests or add individual files below
 [
-# "test-overcast.jl"
+    "test-pydeps.jl"
 ]
 
 # Run the tests

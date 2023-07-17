@@ -21,3 +21,7 @@ trackplayground.jl
 .DS_Store
 
 *.simg
+
+.JuliaFormatter.toml
+
+test/test_inputs/input_pipeline/*.jls
