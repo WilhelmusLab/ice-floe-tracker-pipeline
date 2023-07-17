@@ -11,7 +11,7 @@ WORKDIR /opt
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
-RUN julia -e 'using Pkg; Pkg.activate("/opt/IceFloeTracker"); ENV["PYTHON"]=""; Pkg.instantiate(); Pkg.build("PyCall")'
+#RUN julia -e 'using Pkg; Pkg.activate("/opt/IceFloeTracker"); ENV["PYTHON"]=""; Pkg.instantiate(); Pkg.build("PyCall")'
 
 RUN julia -e 'using Pkg; Pkg.activate("/opt/ice-floe-tracker-pipeline"); Pkg.instantiate()'
 
