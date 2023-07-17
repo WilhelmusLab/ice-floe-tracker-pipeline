@@ -51,7 +51,7 @@ The text-based user interface provides a simple way to watch the status of each 
    - [ ] `cd ice-floe-tracker-pipeline`
     
 5. Build the package
-   - [ ] run `singularity build icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:latest`
+   - [ ] run `apptainer -v -d build icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:pr-27`
    * This will build the Julia environment and make the software package accessible to Cylc.
 
 6. Register an account with [space-track.org](https://www.space-track.org/) for SOIT

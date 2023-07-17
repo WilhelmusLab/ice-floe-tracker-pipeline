@@ -49,7 +49,7 @@
         """
     [[landmask]]
         script = """
-            singularity exec $project_dir/icefloetracker-julia.simg julia --project='opt/ice-floe-tracker-pipeline' /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
+            singularity exec $project_dir/icefloetracker-julia.simg /usr/local/bin/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
         """
     [[preprocess]]
         script = """
