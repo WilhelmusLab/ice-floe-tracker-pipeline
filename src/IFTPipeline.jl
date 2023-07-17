@@ -11,6 +11,7 @@ using IceFloeTracker: DataFrames, Dates, @dateformat_str, DataFrame, nrow, renam
 using IceFloeTracker: Folds, RGB, Gray, load, float64, imsharpen
 using HDF5
 using TOML: parsefile
+using Conda
 using PyCall
 include("cli-config.jl")
 include("soit-parser.jl")
@@ -25,11 +26,11 @@ include("tracker.jl")
 Initialize the Python dependencies for the pipeline. This function is called automatically when the module is loaded for the first time. See the help for `__init__` for more information.
 """
 function __init__()
-    pyimport_conda("numpy", "numpy=1.25.0")
-    pyimport_conda("pyproj", "pyproj=3.6.0")
-    pyimport_conda("rasterio", "rasterio=1.3.7")
-    pyimport_conda("requests", "requests=2.31.0")
-    pyimport_conda("skyfield", "skyfield=1.45.0")
+    Conda.add("numpy==1.25.0", channel="conda-forge")
+    Conda.add("pyproj==3.6.0", channel="conda-forge")
+    Conda.add("rasterio==1.3.7", channel="conda-forge")
+    Conda.add("requests==2.31.0", channel="conda-forge")
+    Conda.add("skyfield==1.45.0", channel="conda-forge")
 end
 
 export cache_vector, sharpen,
