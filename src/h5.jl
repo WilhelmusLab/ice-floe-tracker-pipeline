@@ -81,9 +81,6 @@ function converttounits!(propdf, latlondata, colstodrop)
     return nothing
 end
 
-@pyinclude(joinpath(@__DIR__, "latlon.py"))
-getlatlon = py"getlatlon"
-
 """
     makeh5file(pathtosampleimg, resdir)
 
@@ -126,6 +123,8 @@ The `floe_properties` group contains a floe properties matrix `properties` for `
 The `index` group contains the spatial coordinates in the source image coordinate reference system (default NSIDC polar stereographic, meters) and geographic coordinates (latitude and longitude, decimal degrees). Estimated satellite overpass time `time` is provided in Unix timestamp format (seconds since 1970-01-01 00:00 UTC).
 """
 function makeh5file(pathtosampleimg, resdir)
+    @pyinclude(joinpath(@__DIR__, "latlon.py"))
+    getlatlon = py"getlatlon"
     latlondata = getlatlon(pathtosampleimg)
 
     iftversion = getiftversion()

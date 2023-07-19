@@ -12,13 +12,13 @@ using IceFloeTracker: Folds, RGB, Gray, load, float64, imsharpen
 using HDF5
 using TOML: parsefile
 using PyCall
+using Pkg
 include("cli-config.jl")
 include("soit-parser.jl")
 include("landmask.jl")
 include("preprocess.jl")
 include("feature-extraction.jl")
 include("tracker.jl")
-include("h5.jl")
 
 """
     __init__()
@@ -26,12 +26,14 @@ include("h5.jl")
 Initialize the Python dependencies for the pipeline. This function is called automatically when the module is loaded for the first time. See the help for `__init__` for more information.
 """
 function __init__()
-    pyimport_conda("numpy", "numpy=1.25.0")
     pyimport_conda("pyproj", "pyproj=3.6.0")
     pyimport_conda("rasterio", "rasterio=1.3.7")
     pyimport_conda("requests", "requests=2.31.0")
     pyimport_conda("skyfield", "skyfield=1.45.0")
+    return nothing
 end
+
+include("h5.jl")
 
 export cache_vector, sharpen,
     sharpen_gray,
