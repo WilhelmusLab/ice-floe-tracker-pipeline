@@ -29,7 +29,7 @@ props = deserialize(propspath)
 
 lb = label_components(floes[1])
 
-makeh5files(pathtosampleimg, resdir)
+makeh5files(; pathtosampleimg, resdir)
 
 h5path = joinpath(resdir, "hdf5-files", "20220914T1244.aqua.labeled_image.250m.h5")
 

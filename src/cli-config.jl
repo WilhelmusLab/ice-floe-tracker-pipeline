@@ -49,7 +49,7 @@ function mkcliextract!(settings)
 end
 
 function mkclimakeh5!(settings)
-    @add_arg_table settings["makeh5files"] begin
+    @add_arg_table! settings["makeh5files"] begin
         "--pathtosampleimg", "-p"
         help = "Path to a sample image with coordinate reference system (CRS) and latitude and longitude coordinates of image pixels"
         arg_type = String
