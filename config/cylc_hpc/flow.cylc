@@ -62,4 +62,4 @@
     [[tracking]]
         script = """
             julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $features_dir --deltat $preprocess_dir --output $tracker_dir
-        """
+        """ 
