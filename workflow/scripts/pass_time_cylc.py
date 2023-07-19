@@ -441,18 +441,6 @@ def daysInMonth(month, year):
     return 30
 
 
-def myfunc(
-    startdate, enddate, csvoutpath, centroid_x, centroid_y, SPACEUSER, SPACEPSWD
-):
-    print("Start date: ", startdate)
-    print("End date: ", enddate)
-    print("CSV output path: ", csvoutpath)
-    print("Centroid x: ", centroid_x)
-    print("Centroid y: ", centroid_y)
-    print("Space-Track username: ", SPACEUSER)
-    print("Space-Track password: ", SPACEPSWD)
-
-
 def main():
     parser = argparse.ArgumentParser(description="Overpass time tool")
     parser.add_argument(
