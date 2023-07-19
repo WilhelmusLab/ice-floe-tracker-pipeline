@@ -7,6 +7,8 @@ using LoggingExtras
 using IceFloeTracker
 using IFTPipeline
 using IFTPipeline: mkclipreprocess!, mkcliextract!, mkclitrack!, mkclilandmask!, mkcli!
+using Serialization
+
 
 """
     setuplogger(option::Int64, path::String)
@@ -50,6 +52,10 @@ function main(args)
 
         "extractfeatures"
         help = "Extract ice floe features from segmented floe image"
+        action = :command
+
+        "makeh5files"
+        help = "Make HDF5 files from extracted floe features"
         action = :command
 
         "track"

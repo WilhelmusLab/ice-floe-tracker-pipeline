@@ -48,6 +48,19 @@ function mkcliextract!(settings)
     return nothing
 end
 
+function mkclimakeh5!(settings)
+    @add_arg_table settings["makeh5files"] begin
+        "--pathtosampleimg", "-p"
+        help = "Path to a sample image with coordinate reference system (CRS) and latitude and longitude coordinates of image pixels"
+        arg_type = String
+
+        "--resdir", "-r"
+        help = "Path to the directory containing serialized results of the IceFloeTracker pipeline"
+        arg_type = String
+    end
+    return nothing
+end
+
 """
     mkclitrack!(settings)
 
@@ -191,6 +204,7 @@ function mkcli!(settings, common_args)
         "landmask" => mkclilandmask!,
         "preprocess" => mkclipreprocess!,
         "extractfeatures" => mkcliextract!,
+        "makeh5files" => mkclimakeh5!,
         "track" => mkclitrack!
     )
 

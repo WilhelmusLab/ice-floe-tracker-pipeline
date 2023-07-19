@@ -53,7 +53,7 @@ export cache_vector, sharpen,
     mkcliextract!,
     mkclitrack!,
     mkfilenames,
-    makeh5file
+    makeh5files
 
 export IceFloeTracker
 end
