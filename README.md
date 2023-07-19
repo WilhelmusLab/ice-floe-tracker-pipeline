@@ -43,9 +43,9 @@ The text-based user interface provides a simple way to watch the status of each 
    - [ ] `module load julia/1.9.0`
 
 4. Build a virtual environment and install Cylc
+   - [ ] `cd ice-floe-tracker-pipeline`
    - [ ] `conda env create -f ./config/hpc/oscar-env.yaml`
    - [ ] `conda activate oscar-env`
-   - [ ] `cd ice-floe-tracker-pipeline`
 
 5. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
 
