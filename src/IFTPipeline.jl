@@ -18,6 +18,7 @@ include("landmask.jl")
 include("preprocess.jl")
 include("feature-extraction.jl")
 include("tracker.jl")
+include("h5.jl")
 
 """
     __init__()
@@ -50,10 +51,7 @@ export cache_vector, sharpen,
     mkcliextract!,
     mkclitrack!,
     mkfilenames,
-    HDF5,
-    h5open,
-    attrs,
-    create_group
+    makeh5file
 
 export IceFloeTracker
 end
