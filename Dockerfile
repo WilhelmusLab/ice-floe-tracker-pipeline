@@ -17,7 +17,7 @@ git clone https://github.com/WilhelmusLab/IceFloeTracker.jl.git IceFloeTracker
 
 RUN julia -e 'using Pkg; Pkg.activate("/opt/IceFloeTracker"); ENV["PYTHON"]=""; Pkg.instantiate(); Pkg.build("PyCall")'
 
-RUN julia -e 'using Pkg; Pkg.activate("/opt/ice-floe-tracker-pipeline"); Pkg.rm("IceFloeTracker"); Pkg.add(path="/opt/IceFloeTracker"); Pkg.build(path="/opt/IceFloeTracker"); Pkg.instantiate()'
+RUN julia -e 'using Pkg; Pkg.activate("/opt/ice-floe-tracker-pipeline"); Pkg.rm("IceFloeTracker"); Pkg.add(path="/opt/IceFloeTracker"); Pkg.instantiate()'
 
 RUN chmod a+x /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl
 
