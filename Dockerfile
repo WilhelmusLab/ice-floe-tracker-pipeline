@@ -10,7 +10,7 @@ RUN cd opt
 
 WORKDIR /opt
 
-RUN pip3 install -U scikit-image==0.20.0 pyproj==3.6.0 rasterio==1.3.7 requests==2.31.0 skyfield==1.45.0
+#RUN pip3 install -U scikit-image==0.20.0 pyproj==3.6.0 rasterio==1.3.7 requests==2.31.0 skyfield==1.45.0
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
