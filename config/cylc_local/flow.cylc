@@ -5,7 +5,7 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths => fetchdata => soit & landmask => preprocess => extractfeatures => tracking
+            mkpaths => fetchdata & soit #=> landmask => preprocess => extractfeatures => tracking
              """
 [runtime]
     [[root]]
@@ -53,17 +53,17 @@
     
     [[landmask]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
+            docker run --mount type=bind,source=$project_dir,target=/tmp brownccv/icefloetracker-julia:pr-27 julia -t auto ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
         """
     [[preprocess]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $preprocess_dir
+            docker run --mount type=bind,source=$project_dir,target=/tmp brownccv/icefloetracker-julia:pr-27 julia -t auto ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $preprocess_dir
          """
     [[extractfeatures]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $features_dir --minarea $minfloearea --maxarea $maxfloearea
+            docker run --mount type=bind,source=$project_dir,target=/tmp brownccv/icefloetracker-julia:pr-27 julia -t auto ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $features_dir --minarea $minfloearea --maxarea $maxfloearea
         """
     [[tracking]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $features_dir --deltat $preprocess_dir --output $tracker_dir
+            docker run --mount type=bind,source=$project_dir,target=/tmp brownccv/icefloetracker-julia:pr-27 julia -t auto ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $features_dir --deltat $preprocess_dir --output $tracker_dir
         """
