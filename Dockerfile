@@ -10,7 +10,7 @@ WORKDIR /opt
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
-RUN julia --project /opt/ice-floe-tracker-pipeline/workflow/scripts -e 'Pkg.build()'
+RUN julia --project=/opt/ice-floe-tracker-pipeline/workflow/scripts -e 'Pkg.build()'
 
 RUN chmod a+x /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl
 
