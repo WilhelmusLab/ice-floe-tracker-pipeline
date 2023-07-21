@@ -30,39 +30,34 @@ The text-based user interface provides a simple way to watch the status of each 
 ![tui](tui-example.png)
 
 ## Running the workflow on Oscar
-#### Python=3.9
 
-1. - [ ]`ssh` to Oscar
+1. - [ ]Connect to Oscar from VS Code
+    * [use this guide](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/remote-ide)
 
 2. Move to a compute node
-   - [ ] `interact -n 20 -t 24:00:00 -m 16g`
-    * this will start a compute session for 1 day with 16 GB memory and 20 cores
+   - [ ] `interact -n 20 -t 24:00:00 -m 32g`
+    * this will start a compute session for 1 day with 32 GB memory and 20 cores
     * see [here](https://docs.ccv.brown.edu/oscar/submitting-jobs/interact) for more options
 
-3. Load the latest Anaconda module and Python 3.9.0
-   - [ ] `module load anaconda`
-   - [ ] `module load python/3.9.0`
+3. Load the Julia module
+   - [ ] `module load julia/1.9.0`
 
 4. Build a virtual environment and install Cylc
+   - [ ] `cd ice-floe-tracker-pipeline`
    - [ ] `conda env create -f ./config/hpc/oscar-env.yaml`
    - [ ] `conda activate oscar-env`
-   - [ ] `cd ice-floe-tracker-pipeline`
-    
-5. Build the package
-   - [ ] `julia -e 'using Pkg; Pkg.activate("."); ENV["PYTHON"]=""; Pkg.instantiate(); Pkg.build()'`
-   - [ ] `julia -e 'using Pkg; Pkg.activate("scripts"); Pkg.instantiate(); Pkg.build()'`
 
-6. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
+5. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
 
-7. Export SOIT username/password to environment variable
+6. Export SOIT username/password to environment variable
    - [ ] From your home directory`nano .bash_profile`
    - [ ] add `export HISTCONTROL=ignoreboth` to the bottom of your .bash_profile
         * this will ensure that your username/password are not stored in history
-        * when exporting the following environment variables, there must a space in front of each command
+        * when exporting the following environment variables, there __must__ be a space in front of each command
    - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
    - [ ] ` export SPACEPSWD=<password>`
 
-8. Prepare the runtime environment 
+7. Prepare the runtime environment 
 
     Cylc will use software dependencies inside a Singularity container to fetch images and satellite times from external APIs. 
    - [ ] It is a good idea to reset the Singularity cache dir as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images)

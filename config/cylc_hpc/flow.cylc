@@ -5,7 +5,7 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths => fetchdata => soit & landmask => preprocess => extractfeatures => tracking
+            mkpaths => fetchdata => soit & landmask => preprocess => extractfeatures => tracking 
              """
 [runtime]
     [[root]]
@@ -45,7 +45,7 @@
         """
     [[soit]]
         script = """
-            singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc_hpc.py
+            singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py
         """
     [[landmask]]
         script = """
@@ -54,7 +54,7 @@
     [[preprocess]]
         script = """
             julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $preprocess_dir
-         """
+        """
     [[extractfeatures]]
         script = """
             julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $features_dir --minarea $minfloearea --maxarea $maxfloearea
