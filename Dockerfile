@@ -1,4 +1,4 @@
-FROM julia:1.9.0-bookworm
+FROM julia:1.9.0-bullseye
 
 ENV TERM=xterm 
 
