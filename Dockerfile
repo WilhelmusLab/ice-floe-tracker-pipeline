@@ -2,8 +2,7 @@ FROM julia:1.9.0-bullseye
 
 ENV TERM=xterm 
 
-RUN apt-get install -y wget python3-pip git python3.10 && \
-    rm -rf /var/lib/apt/list/*
+RUN apt-get install -y wget python3-pip git python3.10
 
 WORKDIR /opt
 
