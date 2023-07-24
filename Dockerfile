@@ -10,7 +10,7 @@ WORKDIR /opt
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
-RUN julia --project=/opt/ice-floe-tracker-pipeline --compiled-modules=yes -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()' using IFTPipeline
+RUN julia --project=/opt/ice-floe-tracker-pipeline --compiled-modules=yes -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); using IFTPipeline' 
 
 RUN chmod a+x /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl
 
