@@ -12,7 +12,7 @@ RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
 RUN julia --project=/opt/ice-floe-tracker-pipeline --compiled-modules=yes -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.build("PyCall")' 
 
-COPY /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl /usr/local/bin/ice-floe-tracker.jl
+COPY ./worflow/scripts/ice-floe-tracker.jl /usr/local/bin/ice-floe-tracker.jl
 RUN chmod a+x /usr/local/bin/ice-floe-tracker.jl
 
 CMD [ "/bin/bash", "-c" ]
