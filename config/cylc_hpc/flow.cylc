@@ -5,7 +5,7 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths => fetchdata => soit & landmask => preprocess => extractfeatures => tracking 
+            mkpaths => fetchdata => soit & landmask #=> preprocess => extractfeatures => tracking 
              """
 [runtime]
     [[root]]
@@ -49,7 +49,7 @@
         """
     [[landmask]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
+            singularity exec --bind $project_dir:/opt $project_dir/icefloetracker-julia.simg julia -t auto /opt/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
         """
     [[preprocess]]
         script = """
