@@ -2,7 +2,8 @@ FROM julia:1.9-bookworm
 
 ENV TERM=xterm 
 
-RUN apt-get install -y wget git && \
+RUN apt-get -y update && \
+    apt-get install -y git && \
     rm -rf /var/lib/apt/list/*
 
 WORKDIR /opt
