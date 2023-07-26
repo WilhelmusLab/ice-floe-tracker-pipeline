@@ -5,7 +5,7 @@ ENV JULIA_PROJECT=/opt/ice-floe-tracker-pipeline
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
 
-RUN chmod -R 777 /opt/julia/conda/3/x86_64
+RUN chmod -R 777 /opt/julia
 
 RUN apt-get -y update && \
     apt-get install -y git python3.10 && \
