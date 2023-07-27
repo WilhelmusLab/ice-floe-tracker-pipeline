@@ -19,7 +19,7 @@
             centroid_y = "-18"
             minfloearea = "300"
             maxfloearea = "90000"
-            project_dir="/Users/tdivoll/Projects/Wilhelmus/ice-floe-tracker-pipeline"
+            project_dir="/Users/tdivoll/Projects/Wilhelmus/ice-floe-tracker-pipeline" #the location where you cloned the pipeline repo
 
             # Recommend using these default paths for output
             results_dir = $project_dir/"results"

@@ -1,7 +1,7 @@
-name: oscar-env
+name: ift-env
 
 channels:
   - conda-forge
 
 dependencies:
-  - cylc-flow=8.1.3
+  - cylc-flow=8.2

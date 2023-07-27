@@ -20,8 +20,14 @@ Export SOIT username/password to environment variable:
 
 Cylc is used to encode the entire pipeline from start to finish and relies on the command line scripts to automate the workflow. The `config/cylc_hpc/flow.cylc` file should be suitable for runs on HPC systems. To run Cylc locally, there are a few commands to run from a terminal in the root directory of this project:
 
+
+Build a virtual environment and install Cylc
+   - [ ] `cd <your-project-path>/ice-floe-tracker-pipeline`
+   - [ ] `conda env create -f ./config/ift-env.yaml`
+   - [ ] `conda activate ift-env`
+
 ```
-cylc install -n <workflow-name> ./config/cylc_local
+cylc install -n <your-workflow-name> ./config/cylc_local
 cylc graph <workflow-name> #install graphviz locally
 cylc play <workflow-name>
 cylc tui <workflow-name>
@@ -44,8 +50,8 @@ The text-based user interface provides a simple way to watch the status of each 
 
 4. Build a virtual environment and install Cylc
    - [ ] `cd ice-floe-tracker-pipeline`
-   - [ ] `conda env create -f ./config/hpc/oscar-env.yaml`
-   - [ ] `conda activate oscar-env`
+   - [ ] `conda env create -f ./config/ift-env.yaml`
+   - [ ] `conda activate ift-env`
 
 5. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
 
@@ -87,8 +93,8 @@ The text-based user interface provides a simple way to watch the status of each 
    - [ ] If you need to change parameters and re-run a workflow, first do:
     
     ```
-    cylc stop --now cylc/<workflow-name>
-    cylc clean cylc/<workflow-name>
+    cylc stop --now <workflow-name>
+    cylc clean <workflow-name>
     ```
    - [ ] Then, proceed to install, play, and open the TUI
 
