@@ -25,6 +25,7 @@ import numpy as np
 import csv
 import math
 import argparse
+import os
 
 # URLs for space track login.
 uriBase = "https://www.space-track.org"
@@ -43,22 +44,15 @@ class MyError(Exception):
 def get_passtimes(
     startdate, enddate, csvoutpath, centroid_x, centroid_y, SPACEUSER, SPACEPSWD
 ):
-    enddate = enddate
-    startdate = startdate
+    #enddate = os.environ.get("enddate")
+    #startdate = os.environ.get("startdate")
     centroidx = centroid_x
     centroidy = centroid_y
     configUsr = SPACEUSER
     configPwd = SPACEPSWD
     siteCred = {"identity": configUsr, "password": configPwd}
-    end_date = (
-        datetime.datetime.strptime(
-            enddate, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
-    )
-    start_date = (
-        datetime.datetime.strptime(startdate, "%Y-%m-%d")
-        .strftime("%m-%d-%Y")
-        .split("-")
-    )
+    end_date = datetime.datetime.strptime(enddate, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
+    start_date = datetime.datetime.strptime(startdate, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
     lat = int(centroidx)
     long = int(centroidy)
     print(f"Outpath {csvoutpath}")
