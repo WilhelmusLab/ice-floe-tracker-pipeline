@@ -50,7 +50,7 @@
         script = """
             docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:pr-46 python3 /usr/local/bin/pass_time_cylc.py
         """
-    
+ 
     [[landmask]]
         script = """
             julia --project=$project_dir -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
