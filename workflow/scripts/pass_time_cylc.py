@@ -44,8 +44,8 @@ class MyError(Exception):
 def get_passtimes(
     startdate, enddate, csvoutpath, centroid_x, centroid_y, SPACEUSER, SPACEPSWD
 ):
-    #enddate = os.environ.get("enddate")
-    #startdate = os.environ.get("startdate")
+    enddate = os.environ.get("enddate")
+    startdate = os.environ.get("startdate")
     centroidx = centroid_x
     centroidy = centroid_y
     configUsr = SPACEUSER
