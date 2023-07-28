@@ -22,6 +22,7 @@
             project_dir="/Users/tdivoll/Projects/Wilhelmus/ice-floe-tracker-pipeline" #the location where you cloned the pipeline repo
 
             # Recommend using these default paths for output
+            soit_csvoutpath = "/tmp"
             results_dir = $project_dir/"results"
             fetchdata_dir = $project_dir/"resources"
             truecolor_dir = $fetchdata_dir/"truecolor"
@@ -48,7 +49,7 @@
 
     [[soit]]
         script = """
-            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:pr-46 python3 /usr/local/bin/pass_time_cylc.py
+            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --env soit_csvoutpath --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:pr-46 python3 /usr/local/bin/pass_time_cylc.py
         """
  
     [[landmask]]
