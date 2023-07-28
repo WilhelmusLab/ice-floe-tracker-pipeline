@@ -50,7 +50,7 @@ def get_passtimes(
     centroidy = os.environ.get("centroid_y")
     configUsr = os.environ.get("SPACEUSER")
     configPwd = os.environ.get("SPACEPSWD")
-    csvoutpath = os.environ.get("soit_outpath")
+    csvoutpath = "/tmp"
     siteCred = {"identity": configUsr, "password": configPwd}
     end_date = datetime.datetime.strptime(enddate, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
     start_date = datetime.datetime.strptime(startdate, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
