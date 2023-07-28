@@ -30,6 +30,7 @@
             preprocess_dir = $results_dir/"preprocess"
             soit_dir = $results_dir/"soit"
             tracker_dir = $results_dir/"tracker"
+            
     [[mkpaths]]
         script = """
             mkdir -p $soit_dir
