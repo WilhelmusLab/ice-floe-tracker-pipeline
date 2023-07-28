@@ -25,7 +25,6 @@ Build a virtual environment and install Cylc
    - [ ] `cd <your-project-path>/ice-floe-tracker-pipeline`
    - [ ] `conda env create -f ./config/ift-env.yaml`
    - [ ] `conda activate ift-env`
-
 ```
 cylc install -n <your-workflow-name> ./config/cylc_local
 cylc graph <workflow-name> #install graphviz locally
@@ -77,9 +76,10 @@ The text-based user interface provides a simple way to watch the status of each 
      - centroid_y #lon wgs84
      - minfloearea
      - maxfloearea
+     - project_dir
      **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
 
-   - [ ] run `singularity build fetchdata.simg docker://brownccv/icefloetracker-fetchdata:latest`
+   - [ ] run `singularity build fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main`
         * This will pull the image containing all the depencies and make them accessible to Cylc
    - [ ] then, build the workflow, run it, and open the text-based user interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
