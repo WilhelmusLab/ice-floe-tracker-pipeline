@@ -4,7 +4,7 @@ This repository contains the processing pipeline for IceFloeTracker.jl and ancil
 
 ## SOIT Integration
 
-The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.ZBhat-zMJUe) is called to generate a list of satellite times for both Aqua and Terra in the area of interest. This program is written in Python and its dependencies are pulled from a docker container at `docker://brownccv/icefloetracker-fetchdata:latest`.
+The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.ZBhat-zMJUe) is called to generate a list of satellite times for both Aqua and Terra in the area of interest. This program is written in Python and its dependencies are pulled from a docker container at `docker://brownccv/icefloetracker-fetchdata:main`. When running locally, make sure Docker Desktop client is running. When running on a HPC, Singularity will be used to pull the image. 
 
 **Note:** the `pass_time_cylc.py` script in this project can be adapted to include additional satellites available in the [space-track.org](https://www.space-track.org/) repository.
 
