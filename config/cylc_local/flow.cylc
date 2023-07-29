@@ -5,7 +5,7 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths => fetchdata => soit & landmask => preprocess => extractfeatures => tracking & exportH5
+            mkpaths => fetchdata => soit #& landmask => preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]
@@ -46,7 +46,7 @@
 
     [[soit]]
         script = """
-            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py
+            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:pr-46 python3 /usr/local/bin/pass_time_cylc.py $startdate $enddate /tmp $centroid_x $centroid_y SPACEUSER SPACEPSWD
         """
  
     [[landmask]]
