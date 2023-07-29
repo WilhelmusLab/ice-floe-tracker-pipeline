@@ -46,7 +46,7 @@
 
     [[soit]]
         script = """
-            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:pr-46 python3 /usr/local/bin/pass_time_cylc.py $startdate $enddate /tmp $centroid_x $centroid_y SPACEUSER SPACEPSWD
+            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:pr-46 python3 /usr/local/bin/pass_time_cylc.py --startdate $startdate --enddate $enddate --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
  
     [[landmask]]

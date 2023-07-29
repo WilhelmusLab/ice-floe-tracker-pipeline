@@ -44,7 +44,7 @@
         """
     [[soit]]
         script = """
-            singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py
+            singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate $startdate --enddate $enddate --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
     [[landmask]]
         script = """

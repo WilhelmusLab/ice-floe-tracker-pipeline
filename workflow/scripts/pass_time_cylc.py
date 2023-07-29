@@ -25,7 +25,6 @@ import numpy as np
 import csv
 import math
 import argparse
-import os
 
 # URLs for space track login.
 uriBase = "https://www.space-track.org"
