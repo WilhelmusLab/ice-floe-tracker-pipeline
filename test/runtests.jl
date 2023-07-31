@@ -1,5 +1,6 @@
 using IFTPipeline
-using IFTPipeline: load_imgs, sharpen, sharpen_gray, loadimg, h5open
+using IFTPipeline: load_imgs, sharpen, sharpen_gray, loadimg
+using IFTPipeline: HDF5, h5open, attrs
 using .IceFloeTracker: DataFrames, save, Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, loadimg, RGB, DataFrame, nrow, rename!, Dates, Not, select!
 using ArgParse: @add_arg_table!, ArgParseSettings, add_arg_group!, parse_args
 using DelimitedFiles
@@ -30,7 +31,7 @@ testnames = [n[6:(end-3)] for n in alltests]
 
 to_test = alltests # uncomment this line to run all tests or add individual files below
 [
-    "test-pydeps.jl"
+    "test-h5.jl"
 ]
 
 # Run the tests

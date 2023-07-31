@@ -81,11 +81,8 @@ function converttounits!(propdf, latlondata, colstodrop)
     return nothing
 end
 
-@pyinclude(joinpath(@__DIR__, "latlon.py"))
-getlatlon = py"getlatlon"
-
 """
-    makeh5file(pathtosampleimg, resdir)
+    makeh5files(pathtosampleimg, resdir)
 
 Package the results of the IceFloeTracker pipeline in `resdir` into individual HDF5 files in `resdir/hdf5-files`. 
 
@@ -125,7 +122,9 @@ Each HDF5 file has the following structure:
 The `floe_properties` group contains a floe properties matrix `properties` for `labeled_image` and associated `column_names`.
 The `index` group contains the spatial coordinates in the source image coordinate reference system (default NSIDC polar stereographic, meters) and geographic coordinates (latitude and longitude, decimal degrees). Estimated satellite overpass time `time` is provided in Unix timestamp format (seconds since 1970-01-01 00:00 UTC).
 """
-function makeh5file(pathtosampleimg, resdir)
+function makeh5files(; pathtosampleimg::String, resdir::String)
+    @pyinclude(joinpath(@__DIR__, "latlon.py"))
+    getlatlon = py"getlatlon"
     latlondata = getlatlon(pathtosampleimg)
 
     iftversion = getiftversion()
