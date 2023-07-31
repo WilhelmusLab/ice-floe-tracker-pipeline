@@ -5,7 +5,6 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths => fetchdata => soit & landmask #=> preprocess => extractfeatures => tracking 
             mkpaths => fetchdata => soit & landmask #=> preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
@@ -23,6 +22,7 @@
             project_dir = "~/ice-floe-tracker-pipeline"
 
             # Recommend using these default paths for output
+            julia_exec = "/usr/local/julia/bin/julia"
             results_dir = $project_dir/"results"
             fetchdata_dir = $project_dir/"resources"
             truecolor_dir = $fetchdata_dir/"truecolor"
@@ -49,21 +49,21 @@
         """
     [[landmask]]
         script = """
-            singularity exec $project_dir/icefloetracker-julia.simg /usr/local/julia/bin/julia -t auto /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
+            singularity exec --bind $landmask_dir:/tmp $project_dir/icefloetracker-julia.simg $julia_exec -t auto /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir /tmp
         """
     [[preprocess]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $preprocess_dir
+            singularity exec $project_dir/icefloetracker-julia.simg $julia_exec -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $preprocess_dir
         """
     [[extractfeatures]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $preprocess_dir --minarea $minfloearea --maxarea $maxfloearea
+            singularity exec $project_dir/icefloetracker-julia.simg $julia_exec -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $preprocess_dir --minarea $minfloearea --maxarea $maxfloearea
         """
     [[tracking]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output $tracker_dir
+            singularity exec $project_dir/icefloetracker-julia.simg $julia_exec -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output $tracker_dir
         """
     [[exportH5]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/savetoh5.jl --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir $preprocess_dir
+            singularity exec $project_dir/icefloetracker-julia.simg $julia_exec -t auto $project_dir/workflow/scripts/savetoh5.jl --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir $preprocess_dir
         """
