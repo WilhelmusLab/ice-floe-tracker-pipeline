@@ -6,6 +6,7 @@
     [[graph]]
         R1 = """
             mkpaths => fetchdata => soit & landmask #=> preprocess => extractfeatures => tracking 
+            mkpaths => fetchdata => soit & landmask #=> preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]
@@ -29,14 +30,13 @@
             landmask_dir = $results_dir/"landmasks"
             preprocess_dir = $results_dir/"preprocess"
             soit_dir = $results_dir/"soit"
-            features_dir = $results_dir/"features"
             tracker_dir = $results_dir/"tracker"
+            
     [[mkpaths]]
         script = """
             mkdir -p $soit_dir
             mkdir -p $landmask_dir
             mkdir -p $preprocess_dir
-            mkdir -p $features_dir
             mkdir -p $tracker_dir
         """
     [[fetchdata]]
@@ -45,7 +45,7 @@
         """
     [[soit]]
         script = """
-            singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py
+            singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate $startdate --enddate $enddate --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
     [[landmask]]
         script = """
@@ -57,9 +57,13 @@
         """
     [[extractfeatures]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $features_dir --minarea $minfloearea --maxarea $maxfloearea
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $preprocess_dir --minarea $minfloearea --maxarea $maxfloearea
         """
     [[tracking]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $features_dir --deltat $preprocess_dir --output $tracker_dir
+            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output $tracker_dir
+        """
+    [[exportH5]]
+        script = """
+            julia -t auto $project_dir/workflow/scripts/savetoh5.jl --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir $preprocess_dir
         """

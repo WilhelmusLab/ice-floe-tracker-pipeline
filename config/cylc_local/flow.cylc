@@ -19,17 +19,16 @@
             centroid_y = "-18"
             minfloearea = "300"
             maxfloearea = "90000"
-            project_dir="/Users/tdivoll/Projects/Wilhelmus/ice-floe-tracker-pipeline"
+            project_dir="/Users/tdivoll/Projects/Wilhelmus/ice-floe-tracker-pipeline" #the location where you cloned the pipeline repo
 
             # Recommend using these default paths for output
             results_dir = $project_dir/"results"
-            fetchdata_dir=$project_dir/"resources"
+            fetchdata_dir = $project_dir/"resources"
             truecolor_dir = $fetchdata_dir/"truecolor"
             reflectance_dir = $fetchdata_dir/"reflectance"
             landmask_dir = $results_dir/"landmasks"
             preprocess_dir = $results_dir/"preprocess"
             soit_dir = $results_dir/"soit"
-            features_dir = $results_dir/"features"
             tracker_dir = $results_dir/"tracker"
 
     [[mkpaths]]
@@ -37,20 +36,19 @@
             mkdir -p $soit_dir
             mkdir -p $landmask_dir
             mkdir -p $preprocess_dir
-            mkdir -p $features_dir
             mkdir -p $tracker_dir
         """
         
     [[fetchdata]]
         script = """
-            docker run --mount type=bind,source=$fetchdata_dir,target=/tmp brownccv/icefloetracker-fetchdata:latest fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
+            docker run --mount type=bind,source=$fetchdata_dir,target=/tmp brownccv/icefloetracker-fetchdata:main fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
         """
 
     [[soit]]
         script = """
-            docker run --env SPACEUSER --env SPACEPSWD --env enddate --env startdate --env centroid_x --env centroid_y --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:latest python3 /usr/local/bin/pass_time_cylc.py
+            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate $startdate --enddate $enddate --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
-    
+ 
     [[landmask]]
         script = """
             docker run --mount type=bind,source=$project_dir,target=/tmp brownccv/icefloetracker-julia:pr-27 julia -t auto ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir

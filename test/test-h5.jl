@@ -1,17 +1,18 @@
 testlisteq = (a, b) -> @test Set(a) == Set(b)
-
-include(joinpath(@__DIR__, "../workflow/scripts/h5.jl"))
 pathtosampleimg = joinpath(@__DIR__, "test_inputs/input_pipeline/20220914.aqua.reflectance.250m.tiff")
 resdir = joinpath(dirname(pathtosampleimg), "h5")
 
 originalbbox = (latitude=[81, 79], longitude=[-22, -12])
+
+@pyinclude(joinpath(@__DIR__, "../src/latlon.py"))
+getlatlon = py"getlatlon"
 latlondata = getlatlon(pathtosampleimg)
 
 getcorners(m) = [m[1, 1], m[end, end]]
 latcorners = getcorners(latlondata["latitude"])
 loncorners = getcorners(latlondata["longitude"])
 
-iftversion = "unknown"
+iftversion = IFTPipeline.getiftversion()
 
 ptpath = joinpath(resdir, "passtimes.jls")
 passtimes = deserialize(ptpath)
@@ -28,7 +29,7 @@ props = deserialize(propspath)
 
 lb = label_components(floes[1])
 
-makeh5file(pathtosampleimg, resdir)
+makeh5files(; pathtosampleimg, resdir)
 
 h5path = joinpath(resdir, "hdf5-files", "20220914T1244.aqua.labeled_image.250m.h5")
 
