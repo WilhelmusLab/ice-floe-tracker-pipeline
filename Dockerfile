@@ -7,17 +7,15 @@ ENV JULIA_PKGDIR=/opt/julia
 
 RUN apt-get -y update && \
     apt-get install -y git python3.10 && \
-    rm -rf /var/lib/apt/list/*
-
-USER root 
+    rm -rf /var/lib/apt/list/* 
 
 WORKDIR /opt
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
-RUN ln -fs /opt/julia /usr/local/julia/bin/julia
+#RUN ln -fs /usr/local/julia/bin/julia /usr/local/bin/julia
 
-RUN julia --project="/opt/ice-floe-tracker-pipeline" -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate(); Pkg.precompile(); Pkg.build("PyCall")' 
+RUN /usr/local/julia/bin/julia --project="/opt/ice-floe-tracker-pipeline" -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate(); Pkg.precompile(); Pkg.build("PyCall")' 
 
 RUN chmod a+x /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl
 
