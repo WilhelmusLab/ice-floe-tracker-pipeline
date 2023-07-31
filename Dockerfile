@@ -9,11 +9,13 @@ RUN apt-get -y update && \
     apt-get install -y git python3.10 && \
     rm -rf /var/lib/apt/list/*
 
+USER root 
+
 WORKDIR /opt
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
-RUN ln -fs /opt/julia-*/bin/julia /usr/local/julia/bin/julia
+RUN ln -fs /opt/julia /usr/local/julia/bin/julia
 
 RUN julia --project="/opt/ice-floe-tracker-pipeline" -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate(); Pkg.precompile(); Pkg.build("PyCall")' 
 
