@@ -64,5 +64,5 @@
         """
     [[exportH5]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/savetoh5.jl --pathtosampleimg $fetchdata_dir/truecolor/20220504.aqua.truecolor.250m.tiff --resdir $preprocess_dir
+            julia -t auto $project_dir/workflow/scripts/savetoh5.jl --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir $preprocess_dir
         """

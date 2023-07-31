@@ -5,7 +5,8 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths => fetchdata => soit & landmask => preprocess => extractfeatures => tracking & exportH5
+            soit
+            #mkpaths => fetchdata => soit & landmask => preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]
@@ -67,5 +68,5 @@
         """
     [[exportH5]]
         script = """
-            julia --project=$project_dir -t auto $project_dir/workflow/scripts/savetoh5.jl --pathtosampleimg $fetchdata_dir/truecolor/20220504.aqua.truecolor.250m.tiff --resdir $preprocess_dir
+            julia --project=$project_dir -t auto $project_dir/workflow/scripts/savetoh5.jl --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir $preprocess_dir
         """

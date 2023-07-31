@@ -43,8 +43,6 @@ class MyError(Exception):
 def get_passtimes(
     startdate, enddate, csvoutpath, centroid_x, centroid_y, SPACEUSER, SPACEPSWD
 ):
-    enddate = enddate
-    startdate = startdate
     centroidx = centroid_x
     centroidy = centroid_y
     configUsr = SPACEUSER

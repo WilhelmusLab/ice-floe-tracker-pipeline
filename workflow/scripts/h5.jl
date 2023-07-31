@@ -93,7 +93,7 @@ This function expects the following files to be present in `resdir`: `filenames.
 
 # Arguments:
 
-  * `pathtosampleimg`: Path to a sample image. This is used to extract the coordinate reference system (CRS) and the latitude and longitude coordinates of the image pixels.
+  * `pathtosampleimg`: Path to a sample image in the truecolor resource folder. This is used to extract the coordinate reference system (CRS) and the latitude and longitude coordinates of the image pixels.
   * `resdir`: Path to the directory containing the results of the IceFloeTracker pipeline.
 
 # File structure
