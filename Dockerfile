@@ -15,9 +15,11 @@ RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
 RUN /usr/local/julia/bin/julia --project="/opt/ice-floe-tracker-pipeline" -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate(); Pkg.precompile(); Pkg.build("PyCall")' 
 
-RUN chmod a+x /opt/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl
+COPY workflow/scripts/ice-floe-tracker.jl /tmp/ice-floe-tracker.jl
 
-COPY workflow /tmp/workflow
+RUN chmod a+x /tmp/ice-floe-tracker.jl
+
+
 
 ENV JULIA_DEPOT_PATH="$HOME/.julia:$JULIA_DEPOT_PATH"
 
