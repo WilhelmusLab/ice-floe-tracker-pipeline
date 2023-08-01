@@ -77,17 +77,14 @@ The Terminal-based user interface provides a simple way to watch the status of e
     * this will start a compute session for 1 day with 32 GB memory and 20 cores
     * see [here](https://docs.ccv.brown.edu/oscar/submitting-jobs/interact) for more options
 
-3. Load the Julia module
-   - [ ] `module load julia/1.9.0`
-
-4. Build a virtual environment and install Cylc
+3. Build a virtual environment and install Cylc
    - [ ] `cd ice-floe-tracker-pipeline`
    - [ ] `conda env create -f ./config/ift-env.yaml`
    - [ ] `conda activate ift-env`
 
-5. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
+4. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
 
-6. Export SOIT username/password to environment variable
+5. Export SOIT username/password to environment variable
    - [ ] From your home directory`nano .bash_profile`
    - [ ] add `export HISTCONTROL=ignoreboth` to the bottom of your .bash_profile
         * this will ensure that your username/password are not stored in history
@@ -95,12 +92,12 @@ The Terminal-based user interface provides a simple way to watch the status of e
    - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
    - [ ] ` export SPACEPSWD=<password>`
 
-7. Prepare the runtime environment 
+6. Prepare the runtime environment 
 
     Cylc will use software dependencies inside a Singularity container to fetch images and satellite times from external APIs. 
    - [ ] It is a good idea to reset the Singularity cache dir as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images)
 
-   - [ ] first update the parameters at the top of the `flow.cylc` file:
+   - [ ] First update the parameters at the top of the `flow.cylc` file:
      - startdate
      - enddate
      - crs
@@ -112,9 +109,7 @@ The Terminal-based user interface provides a simple way to watch the status of e
      - project_dir
      **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
 
-   - [ ] run `singularity build fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main`
-        * This will pull the image containing all the depencies and make them accessible to Cylc
-   - [ ] then, build the workflow, run it, and open the text-based user interface (TUI) to monitor the progress of each task. 
+   - [ ] Next, build the workflow, run it, and open the terminal-based user interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
 
     ```
