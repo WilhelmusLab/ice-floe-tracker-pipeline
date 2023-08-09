@@ -33,7 +33,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
 5. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
 
 6. Export SOIT username/password to environment variable
-   - [ ] From your home directory`nano .bash_profile`
+   - [ ] From your home directory `nano .bash_profile`
    - [ ] add `export HISTCONTROL=ignoreboth` to the bottom of your .bash_profile
         * this will ensure that your username/password are not stored in history
         * when exporting the following environment variables, there __must__ be a space in front of each command
@@ -59,7 +59,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
 
    - [ ] run `singularity build fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main`
         * This will pull the image containing all the depencies and make them accessible to Cylc
-   - [ ] then, build the workflow, run it, and open the text-based user interface (TUI) to monitor the progress of each task. 
+   - [ ] then, build the workflow, run it, and open the terminal-based user interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
 
     ```
@@ -104,7 +104,7 @@ To use the Cylc pipeline locally, also make sure Docker Desktop client is runnin
    - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
    - [ ] ` export SPACEPSWD=<password>`
 
-4. Install your workflow, run it, and monitor with the Terminal user interface (TUI)
+4. Install your workflow, run it, and monitor with the Terminal User Interface (TUI)
 
    - [ ] first update the parameters at the top of the `flow.cylc` file:
      - startdate
