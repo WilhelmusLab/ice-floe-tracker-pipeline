@@ -125,7 +125,8 @@ To use the Cylc pipeline locally, also make sure Docker Desktop client is runnin
 
 The Terminal-based user interface provides a simple way to watch the status of each task called in the `flow.cylc` workflow. Use arrow keys to investigate each task (see more [here](https://cylc.github.io/cylc-doc/latest/html/7-to-8/major-changes/ui.html#cylc-tui).
 ![TUI](tui-example.png)).
-   - [ ] If you need to change parameters and re-run a workflow, first do:
+
+If you need to change parameters and re-run a workflow, first do:
     
     ```
     cylc stop --now <workflow-name>
