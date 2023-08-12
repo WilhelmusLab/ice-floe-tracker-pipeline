@@ -5,7 +5,7 @@
 resources/*
 !resources/README.md
 
-results/*
+results*/*
 !results/README.md
 
 workflow/report/*
@@ -25,3 +25,5 @@ trackplayground.jl
 .JuliaFormatter.toml
 
 test/test_inputs/input_pipeline/*.jls
+
+explorations/
