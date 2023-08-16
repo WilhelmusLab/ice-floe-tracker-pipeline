@@ -4,8 +4,6 @@ resdir = joinpath(dirname(pathtosampleimg), "h5")
 
 originalbbox = (latitude=[81, 79], longitude=[-22, -12])
 
-@pyinclude(joinpath(@__DIR__, "../src/latlon.py"))
-getlatlon = py"getlatlon"
 latlondata = getlatlon(pathtosampleimg)
 
 getcorners(m) = [m[1, 1], m[end, end]]
