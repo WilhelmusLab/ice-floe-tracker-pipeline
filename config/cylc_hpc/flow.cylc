@@ -53,7 +53,7 @@
         """
     [[pulljuliaimage]]
         script = """
-            apptainer build $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:pr-45
+            apptainer build $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:pr-53
         """
     [[landmask]]
         script = """

@@ -19,6 +19,14 @@ include("landmask.jl")
 include("preprocess.jl")
 include("feature-extraction.jl")
 include("tracker.jl")
+
+const getlatlon = PyNULL()
+function __init__()
+    @pyinclude(joinpath(@__DIR__, "latlon.py"))
+    copy!(getlatlon, py"getlatlon")
+    return nothing
+end
+
 include("h5.jl")
 
 export cache_vector, sharpen,
@@ -39,7 +47,8 @@ export cache_vector, sharpen,
     mkcliextract!,
     mkclitrack!,
     mkfilenames,
-    makeh5files
+    makeh5files,
+    getlatlon
 
 export IceFloeTracker
 end

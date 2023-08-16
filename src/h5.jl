@@ -123,30 +123,29 @@ The `floe_properties` group contains a floe properties matrix `properties` for `
 The `index` group contains the spatial coordinates in the source image coordinate reference system (default NSIDC polar stereographic, meters) and geographic coordinates (latitude and longitude, decimal degrees). Estimated satellite overpass time `time` is provided in Unix timestamp format (seconds since 1970-01-01 00:00 UTC).
 """
 function makeh5files(; pathtosampleimg::String, resdir::String)
-    @pyinclude(joinpath(@__DIR__, "latlon.py"))
-    getlatlon = py"getlatlon"
+    joinpth(p) = joinpath(resdir, p)
     latlondata = getlatlon(pathtosampleimg)
 
     iftversion = getiftversion()
 
-    ptpath = joinpath(resdir, "passtimes.jls")
+    ptpath = joinpth("passtimes.jls")
     passtimes = deserialize(ptpath)
     ptsunix = Int64.(Dates.datetime2unix.(passtimes))
 
-    fnpath = joinpath(resdir, "filenames.jls")
+    fnpath = joinpth("filenames.jls")
     truecolor_refs, reflectance_refs = deserialize(fnpath)
 
-    floespath = joinpath(resdir, "segmented_floes.jls") # for labeled_image
+    floespath = joinpth("segmented_floes.jls") # for labeled_image
     floes = deserialize(floespath)
 
     colstodrop = [:row_centroid, :col_centroid, :min_row, :min_col, :max_row, :max_col]
-    propspath = joinpath(resdir, "floe_props.jls")
+    propspath = joinpth("floe_props.jls")
     props = deserialize(propspath)
     for df in props
         converttounits!(df, latlondata, colstodrop)
     end
 
-    h5dir = joinpath(resdir, "hdf5-files")
+    h5dir = joinpth("hdf5-files")
     mkpath(h5dir)
     for (i, fname) in enumerate(truecolor_refs)
         fname = makeh5filename(fname, passtimes[i])
