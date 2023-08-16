@@ -5,7 +5,7 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths & pullfetchimage => fetchdata & soit & pulljuliaimage => landmask => preprocess => extractfeatures => tracking & exportH5
+            mkpaths & pullfetchimage & pulljuliaimage => fetchdata & soit => landmask => preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]
@@ -41,7 +41,7 @@
         """
     [[pullfetchimage]]
         script = """
-            apptainer build $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
+            apptainer build --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
         """
     [[fetchdata]]
         script = """
@@ -53,7 +53,7 @@
         """
     [[pulljuliaimage]]
         script = """
-            apptainer build $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:pr-53
+            apptainer build --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:pr-45
         """
     [[landmask]]
         script = """
