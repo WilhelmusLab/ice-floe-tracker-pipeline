@@ -14,7 +14,7 @@ WORKDIR /opt
 
 RUN git clone https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git
 
-RUN /usr/local/julia/bin/julia --project="/opt/ice-floe-tracker-pipeline" -e 'ENV["PYTHON"]="/usr/local/bin/python"; using Pkg; Pkg.build()' 
+RUN /usr/local/julia/bin/julia --project="/opt/ice-floe-tracker-pipeline" -e 'ENV["PYTHON"]="/lib/python3"; using Pkg; Pkg.build()' 
 
 COPY workflow/scripts/ice-floe-tracker.jl /usr/local/bin/ice-floe-tracker.jl
 
