@@ -8,10 +8,10 @@ using ArgParse
 using LoggingExtras
 using IceFloeTracker
 using IceFloeTracker: DataFrames, Dates, @dateformat_str, DataFrame, nrow, rename!, Not, select!, Date, Time, DateTime
-using IceFloeTracker: Folds, RGB, Gray, load, float64, imsharpen
+using IceFloeTracker: RGB, Gray, load, float64, imsharpen, getlatlon
+using Folds
 using HDF5
 using TOML: parsefile
-using PyCall
 using Pkg
 include("cli-config.jl")
 include("soit-parser.jl")
@@ -39,7 +39,8 @@ export cache_vector, sharpen,
     mkcliextract!,
     mkclitrack!,
     mkfilenames,
-    makeh5files
+    makeh5files,
+    getlatlon
 
 export IceFloeTracker
 end
