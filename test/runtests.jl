@@ -1,15 +1,13 @@
 using IFTPipeline
 using IFTPipeline: load_imgs, sharpen, sharpen_gray, loadimg
 using IFTPipeline: HDF5, h5open, attrs
-using .IceFloeTracker: DataFrames, save, Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, loadimg, RGB, DataFrame, nrow, rename!, Dates, Not, select!
+using .IceFloeTracker: DataFrames, save, Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, loadimg, RGB, DataFrame, nrow, rename!, Dates, Not, select!, getlatlon
 using ArgParse: @add_arg_table!, ArgParseSettings, add_arg_group!, parse_args
 using DelimitedFiles
-using PyCall: @pyinclude, @py_str
 using Pkg
 using Random
 using Serialization
 using Test
-using Conda
 include(joinpath(@__DIR__, "config.jl"))
 
 function test_similarity(imgA::BitMatrix, imgB::BitMatrix, error_rate=0.005)
