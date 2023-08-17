@@ -9,6 +9,7 @@ using LoggingExtras
 using IceFloeTracker
 using IceFloeTracker: DataFrames, Dates, @dateformat_str, DataFrame, nrow, rename!, Not, select!, Date, Time, DateTime
 using IceFloeTracker: RGB, Gray, load, float64, imsharpen, getlatlon
+using Folds
 using HDF5
 using TOML: parsefile
 using Pkg
