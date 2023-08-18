@@ -1,28 +1,3 @@
-function getiftversion()
-    deps = Pkg.dependencies()
-    iftversion = []
-    for (_, dep) in deps
-        dep.is_direct_dep || continue
-        dep.version === nothing && continue
-        dep.name != "IceFloeTracker" && continue
-        push!(iftversion, dep.version)
-        break
-    end
-
-    # For CI tests where IceFloeTracker is not a dependency
-    try
-        ift = iftversion[1]
-    catch
-        return "unknown"
-    end
-
-    ift = iftversion[1]
-    maj = Int(ift.major)
-    min = Int(ift.minor)
-    patch = Int(ift.patch)
-    return "v$maj.$min.$patch"
-end
-
 """
     makeh5filename(imgfname, ts)
 
@@ -125,7 +100,7 @@ The `index` group contains the spatial coordinates in the source image coordinat
 function makeh5files(; pathtosampleimg::String, resdir::String)
     latlondata = getlatlon(pathtosampleimg)
 
-    iftversion = getiftversion()
+    iftver = iftversion[1]
 
     ptpath = joinpath(resdir, "passtimes.jls")
     passtimes = deserialize(ptpath)
@@ -153,7 +128,7 @@ function makeh5files(; pathtosampleimg::String, resdir::String)
             # Add top-level attributes
             attrs(file)["fname_reflectance"] = reflectance_refs[i]
             attrs(file)["fname_truecolor"] = truecolor_refs[i]
-            attrs(file)["iftversion"] = iftversion
+            attrs(file)["iftversion"] = iftver
             attrs(file)["crs"] = latlondata["crs"]
             attrs(file)["reference"] = "https://doi.org/10.1016/j.rse.2019.111406"
             attrs(file)["contact"] = "mmwilhelmus@brown.edu"
