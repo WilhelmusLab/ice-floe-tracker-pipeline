@@ -11,8 +11,6 @@ results/*
 workflow/report/*
 !workflow/report/README.md
 
-Manifest.toml
-
 test/__temp__
 
 icetest.sh

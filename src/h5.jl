@@ -100,7 +100,7 @@ The `index` group contains the spatial coordinates in the source image coordinat
 function makeh5files(; pathtosampleimg::String, resdir::String)
     latlondata = getlatlon(pathtosampleimg)
 
-    iftver = iftversion[1]
+    iftver = iftversion[]
 
     ptpath = joinpath(resdir, "passtimes.jls")
     passtimes = deserialize(ptpath)

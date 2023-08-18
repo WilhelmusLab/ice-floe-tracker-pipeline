@@ -10,7 +10,7 @@ getcorners(m) = [m[1, 1], m[end, end]]
 latcorners = getcorners(latlondata["latitude"])
 loncorners = getcorners(latlondata["longitude"])
 
-_iftversion = IFTPipeline.iftversion[1]
+_iftversion = IFTPipeline.iftversion[]
 
 ptpath = joinpath(resdir, "passtimes.jls")
 passtimes = deserialize(ptpath)

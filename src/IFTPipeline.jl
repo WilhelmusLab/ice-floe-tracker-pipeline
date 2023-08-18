@@ -36,12 +36,12 @@ function __init__()
 
         # For CI tests where IceFloeTracker is not a dependency
         try
-            ift = iftversion[1]
+            ift = iftversion[]
         catch
             return "unknown"
         end
 
-        ift = iftversion[1]
+        ift = iftversion[]
         maj = Int(ift.major)
         min = Int(ift.minor)
         patch = Int(ift.patch)
