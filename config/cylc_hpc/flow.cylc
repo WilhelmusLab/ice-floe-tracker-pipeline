@@ -6,7 +6,7 @@
     [[graph]]
         R1 = """
             #mkpaths & pullfetchimage & pulljuliaimage => fetchdata & soit => landmask => preprocess => extractfeatures => tracking & exportH5
-            mkpaths => exportH5
+            pulljuliaimage & mkpaths => exportH5
              """
 [runtime]
     [[root]]

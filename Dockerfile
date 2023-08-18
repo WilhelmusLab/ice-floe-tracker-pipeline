@@ -7,7 +7,6 @@ ENV JULIA_PKGDIR=/opt/julia
 
 RUN apt-get -y update && \
     apt-get install -y git python3.10 && \
-    apt-get install -y python3-pyproj python3-rasterio && \
     rm -rf /var/lib/apt/list/* 
 
 WORKDIR /opt
