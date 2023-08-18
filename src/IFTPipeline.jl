@@ -21,6 +21,37 @@ include("feature-extraction.jl")
 include("tracker.jl")
 include("h5.jl")
 
+const iftversion = []
+function __init__()
+    function getiftversion()
+        deps = Pkg.dependencies()
+        iftversion = []
+        for (_, dep) in deps
+            dep.is_direct_dep || continue
+            dep.version === nothing && continue
+            dep.name != "IceFloeTracker" && continue
+            push!(iftversion, dep.version)
+            break
+        end
+
+        # For CI tests where IceFloeTracker is not a dependency
+        try
+            ift = iftversion[1]
+        catch
+            return "unknown"
+        end
+
+        ift = iftversion[1]
+        maj = Int(ift.major)
+        min = Int(ift.minor)
+        patch = Int(ift.patch)
+        return "v$maj.$min.$patch"
+    end
+
+    push!(iftversion, getiftversion())
+    return nothing
+end
+
 export cache_vector, sharpen,
     sharpen_gray,
     preprocess,
@@ -40,7 +71,8 @@ export cache_vector, sharpen,
     mkclitrack!,
     mkfilenames,
     makeh5files,
-    getlatlon
+    getlatlon,
+    iftversion
 
 export IceFloeTracker
 end
