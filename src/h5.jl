@@ -100,7 +100,7 @@ The `index` group contains the spatial coordinates in the source image coordinat
 function makeh5files(; pathtosampleimg::String, resdir::String)
     latlondata = getlatlon(pathtosampleimg)
 
-    iftversion = iftversion[1]
+    iftver = iftversion[1]
 
     ptpath = joinpath(resdir, "passtimes.jls")
     passtimes = deserialize(ptpath)
@@ -128,7 +128,7 @@ function makeh5files(; pathtosampleimg::String, resdir::String)
             # Add top-level attributes
             attrs(file)["fname_reflectance"] = reflectance_refs[i]
             attrs(file)["fname_truecolor"] = truecolor_refs[i]
-            attrs(file)["iftversion"] = iftversion
+            attrs(file)["iftversion"] = iftver
             attrs(file)["crs"] = latlondata["crs"]
             attrs(file)["reference"] = "https://doi.org/10.1016/j.rse.2019.111406"
             attrs(file)["contact"] = "mmwilhelmus@brown.edu"
