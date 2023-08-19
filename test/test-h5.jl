@@ -10,7 +10,7 @@ getcorners(m) = [m[1, 1], m[end, end]]
 latcorners = getcorners(latlondata["latitude"])
 loncorners = getcorners(latlondata["longitude"])
 
-_iftversion = IFTPipeline.iftversion[]
+iftversion = IFTPipeline.getiftversion()
 
 ptpath = joinpath(resdir, "passtimes.jls")
 passtimes = deserialize(ptpath)
@@ -44,7 +44,7 @@ h5path = joinpath(resdir, "hdf5-files", "20220914T1244.aqua.labeled_image.250m.h
     @test typeof(fid) == HDF5.File
 
     # top level attributes
-    @test attrs(fid)["iftversion"] == _iftversion
+    @test attrs(fid)["iftversion"] == iftversion
     @test attrs(fid)["fname_reflectance"] == reflectance_refs[1]
     @test attrs(fid)["fname_truecolor"] == truecolor_refs[1]
     @test attrs(fid)["crs"] == latlondata["crs"]
