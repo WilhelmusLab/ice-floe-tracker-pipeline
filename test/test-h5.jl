@@ -10,8 +10,6 @@ getcorners(m) = [m[1, 1], m[end, end]]
 latcorners = getcorners(latlondata["latitude"])
 loncorners = getcorners(latlondata["longitude"])
 
-iftversion = IFTPipeline.getiftversion()
-
 ptpath = joinpath(resdir, "passtimes.jls")
 passtimes = deserialize(ptpath)
 ptsunix = Int64.(Dates.datetime2unix.(passtimes))
