@@ -126,7 +126,7 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
             # Add top-level attributes
             attrs(file)["fname_reflectance"] = reflectance_refs[i]
             attrs(file)["fname_truecolor"] = truecolor_refs[i]
-            attrs(file)["iftversion"] = iftversion
+            attrs(file)["iftversion"] = string(iftversion)
             attrs(file)["crs"] = latlondata["crs"]
             attrs(file)["reference"] = "https://doi.org/10.1016/j.rse.2019.111406"
             attrs(file)["contact"] = "mmwilhelmus@brown.edu"
