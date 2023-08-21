@@ -5,8 +5,7 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            #mkpaths & pullfetchimage & pulljuliaimage => fetchdata & soit => landmask => preprocess => extractfeatures => tracking & exportH5
-            pulljuliaimage & mkpaths => exportH5
+            mkpaths & pullfetchimage & pulljuliaimage => fetchdata & soit => landmask => preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]
@@ -76,5 +75,5 @@
         """
     [[exportH5]]
         script = """
-          singularity exec --bind $h5_dir:/tmp $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir /tmp
+          singularity exec --bind $preprocess_dir:/tmp $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir /tmp
         """
