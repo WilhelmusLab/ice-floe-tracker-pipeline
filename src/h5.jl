@@ -1,28 +1,3 @@
-function getiftversion()
-    deps = Pkg.dependencies()
-    iftversion = []
-    for (_, dep) in deps
-        dep.is_direct_dep || continue
-        dep.version === nothing && continue
-        dep.name != "IceFloeTracker" && continue
-        push!(iftversion, dep.version)
-        break
-    end
-
-    # For CI tests where IceFloeTracker is not a dependency
-    try
-        ift = iftversion[1]
-    catch
-        return "unknown"
-    end
-
-    ift = iftversion[1]
-    maj = Int(ift.major)
-    min = Int(ift.minor)
-    patch = Int(ift.patch)
-    return "v$maj.$min.$patch"
-end
-
 """
     makeh5filename(imgfname, ts)
 
@@ -122,10 +97,8 @@ Each HDF5 file has the following structure:
 The `floe_properties` group contains a floe properties matrix `properties` for `labeled_image` and associated `column_names`.
 The `index` group contains the spatial coordinates in the source image coordinate reference system (default NSIDC polar stereographic, meters) and geographic coordinates (latitude and longitude, decimal degrees). Estimated satellite overpass time `time` is provided in Unix timestamp format (seconds since 1970-01-01 00:00 UTC).
 """
-function makeh5files(; pathtosampleimg::String, resdir::String)
+function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFloeTracker.IFTVERSION)
     latlondata = getlatlon(pathtosampleimg)
-
-    iftversion = getiftversion()
 
     ptpath = joinpath(resdir, "passtimes.jls")
     passtimes = deserialize(ptpath)
@@ -153,7 +126,7 @@ function makeh5files(; pathtosampleimg::String, resdir::String)
             # Add top-level attributes
             attrs(file)["fname_reflectance"] = reflectance_refs[i]
             attrs(file)["fname_truecolor"] = truecolor_refs[i]
-            attrs(file)["iftversion"] = iftversion
+            attrs(file)["iftversion"] = string(iftversion)
             attrs(file)["crs"] = latlondata["crs"]
             attrs(file)["reference"] = "https://doi.org/10.1016/j.rse.2019.111406"
             attrs(file)["contact"] = "mmwilhelmus@brown.edu"
