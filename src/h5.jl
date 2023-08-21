@@ -105,14 +105,14 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
     passtimes = deserialize(ptpath)
     ptsunix = Int64.(Dates.datetime2unix.(passtimes))
 
-    fnpath = joinpath("filenames.jls")
+    fnpath = joinpath(resdir, "filenames.jls")
     truecolor_refs, reflectance_refs = deserialize(fnpath)
 
-    floespath = joinpath("segmented_floes.jls") # for labeled_image
+    floespath = joinpath(resdir, "segmented_floes.jls") # for labeled_image
     floes = deserialize(floespath)
 
     colstodrop = [:row_centroid, :col_centroid, :min_row, :min_col, :max_row, :max_col]
-    propspath = joinpath("floe_props.jls")
+    propspath = joinpath(resdir, "floe_props.jls")
     props = deserialize(propspath)
     for df in props
         converttounits!(df, latlondata, colstodrop)
