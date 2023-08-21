@@ -1,6 +1,4 @@
-# Ignore all files except the README
-# NOTE (BNR): A .gitignore file is used in workflow/report because I couldn't get
-#             the top-level gitignore working right.
+Manifest.toml
 
 resources/*
 !resources/README.md
@@ -10,8 +8,6 @@ results/*
 
 workflow/report/*
 !workflow/report/README.md
-
-Manifest.toml
 
 test/__temp__
 
