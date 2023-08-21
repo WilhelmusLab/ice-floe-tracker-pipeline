@@ -67,6 +67,7 @@ This function expects the following files to be present in `resdir`: `filenames.
 
   * `pathtosampleimg`: Path to a sample image in the truecolor resource folder. This is used to extract the coordinate reference system (CRS) and the latitude and longitude coordinates of the image pixels.
   * `resdir`: Path to the directory containing the results of the IceFloeTracker pipeline.
+  * `iftversion`: This is automatically pulled into the function from an environment variable.
 
 # File structure
 Each HDF5 file has the following structure:
@@ -104,21 +105,21 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
     passtimes = deserialize(ptpath)
     ptsunix = Int64.(Dates.datetime2unix.(passtimes))
 
-    fnpath = joinpth("filenames.jls")
+    fnpath = joinpath("filenames.jls")
     truecolor_refs, reflectance_refs = deserialize(fnpath)
 
-    floespath = joinpth("segmented_floes.jls") # for labeled_image
+    floespath = joinpath("segmented_floes.jls") # for labeled_image
     floes = deserialize(floespath)
 
     colstodrop = [:row_centroid, :col_centroid, :min_row, :min_col, :max_row, :max_col]
-    propspath = joinpth("floe_props.jls")
+    propspath = joinpath("floe_props.jls")
     props = deserialize(propspath)
     for df in props
         converttounits!(df, latlondata, colstodrop)
     end
 
-    h5dir = joinpth("hdf5-files")
-    #mkpath(h5dir)
+    h5dir = joinpath("hdf5-files")
+    mkpath(h5dir)
     for (i, fname) in enumerate(truecolor_refs)
         fname = makeh5filename(fname, passtimes[i])
         fnamepath = joinpath(h5dir, fname)
