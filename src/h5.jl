@@ -118,7 +118,7 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
         converttounits!(df, latlondata, colstodrop)
     end
 
-    h5dir = joinpath("hdf5-files")
+    h5dir = joinpath(resdir, "hdf5-files")
     mkpath(h5dir)
     for (i, fname) in enumerate(truecolor_refs)
         fname = makeh5filename(fname, passtimes[i])
