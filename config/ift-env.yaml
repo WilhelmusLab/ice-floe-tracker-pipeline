@@ -4,4 +4,4 @@ channels:
   - conda-forge
 
 dependencies:
-  - cylc-flow=8.2
+  - cylc-flow=8.3
