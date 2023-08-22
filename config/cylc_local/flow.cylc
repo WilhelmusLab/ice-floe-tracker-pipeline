@@ -63,9 +63,9 @@
         """
     [[tracking]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output $tracker_dir
+            julia --project=$project_dir -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output $tracker_dir
         """
     [[exportH5]]
         script = """
-            julia -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir $preprocess_dir
+            julia --project=$project_dir -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir $preprocess_dir
         """
