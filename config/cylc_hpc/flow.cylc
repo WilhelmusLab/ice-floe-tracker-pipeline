@@ -23,6 +23,7 @@
 
             # Recommend using these default paths for output
             julia_exec = "/usr/local/julia/bin/julia"
+            report_dir = $project_dir/"workflow/report"
             results_dir = $project_dir/"results"
             fetchdata_dir = $project_dir/"resources"
             truecolor_dir = $fetchdata_dir/"truecolor"
@@ -59,21 +60,21 @@
         """
     [[landmask]]
         script = """
-            singularity exec --bind $landmask_dir:/tmp $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl landmask $fetchdata_dir /tmp
+            singularity exec --bind $landmask_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl landmask $fetchdata_dir /tmp
         """
     [[preprocess]]
         script = """
-            singularity exec --bind $preprocess_dir:/tmp $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o /tmp
+            singularity exec --bind $preprocess_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o /tmp
         """
     [[extractfeatures]]
         script = """
-            singularity exec --bind $preprocess_dir:/tmp $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o /tmp --minarea $minfloearea --maxarea $maxfloearea
+            singularity exec --bind $preprocess_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o /tmp --minarea $minfloearea --maxarea $maxfloearea
         """
     [[tracking]]
         script = """
-            singularity exec --bind $tracker_dir:/tmp $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output /tmp
+            singularity exec --bind $tracker_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output /tmp
         """
     [[exportH5]]
         script = """
-            singularity exec --bind $preprocess_dir:/tmp $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir /tmp
+            singularity exec --bind $preprocess_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir /tmp
         """

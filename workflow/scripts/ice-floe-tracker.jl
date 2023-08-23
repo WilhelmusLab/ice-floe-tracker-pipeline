@@ -79,11 +79,11 @@ function main(args)
     # delete log option from command_args so it doesn't get passed to command_func
     delete!(command_args, :log)
 
-     logger = setuplogger(logoption, command)
+    logger = setuplogger(logoption, command)
 
-     with_logger(logger) do
+    with_logger(logger) do
          @time command_func(; command_args...)
-     end
+    end
     return nothing
 end
 
