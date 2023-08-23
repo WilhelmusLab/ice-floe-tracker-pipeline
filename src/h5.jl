@@ -67,6 +67,7 @@ This function expects the following files to be present in `resdir`: `filenames.
 
   * `pathtosampleimg`: Path to a sample image in the truecolor resource folder. This is used to extract the coordinate reference system (CRS) and the latitude and longitude coordinates of the image pixels.
   * `resdir`: Path to the directory containing the results of the IceFloeTracker pipeline.
+  * `iftversion`: This is automatically pulled into the function from an environment variable.
 
 # File structure
 Each HDF5 file has the following structure:

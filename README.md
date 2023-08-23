@@ -22,17 +22,14 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
     * this will start a compute session for 1 day with 32 GB memory and 20 cores
     * see [here](https://docs.ccv.brown.edu/oscar/submitting-jobs/interact) for more options
 
-3. Load the Julia module
-   - [ ] `module load julia/1.9.0`
-
-4. Build a virtual environment and install Cylc
+3. Build a virtual environment and install Cylc
    - [ ] `cd <your-project-path>/ice-floe-tracker-pipeline`
    - [ ] `conda env create -f ./config/ift-env.yaml`
    - [ ] `conda activate ift-env`
 
-5. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
+4. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
 
-6. Export SOIT username/password to environment variable
+5. Export SOIT username/password to environment variable
    - [ ] From your home directory `nano .bash_profile`
    - [ ] add `export HISTCONTROL=ignoreboth` to the bottom of your .bash_profile
         * this will ensure that your username/password are not stored in history
@@ -40,7 +37,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
    - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
    - [ ] ` export SPACEPSWD=<password>`
 
-7. Prepare the runtime environment 
+6. Prepare the runtime environment 
 
     Cylc will use software dependencies inside a Singularity container to fetch images and satellite times from external APIs. 
    - [ ] It is a good idea to reset the Singularity cache dir as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images)
@@ -56,10 +53,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
      - maxfloearea
      - project_dir
      **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
-
-   - [ ] run `singularity build fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main`
-        * This will pull the image containing all the depencies and make them accessible to Cylc
-   - [ ] then, build the workflow, run it, and open the terminal-based user interface (TUI) to monitor the progress of each task. 
+   - [ ] then, build the workflow, run it, and open the Terminal-based User Interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
 
     ```
@@ -83,9 +77,9 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
    
 ### Running the Cylc pipeline locally
 
-When running locally, make sure you have at least Julia 1.9.0 installed with the correct architecture for your local machine. (https://julialang.org/downloads/)
-To use the Cylc pipeline locally, also make sure Docker Desktop client is running in the background. (https://www.docker.com/products/docker-desktop/)
-
+#### Prerequisites
+__Julia:__ When running locally, make sure you have at least Julia 1.9.0 installed with the correct architecture for your local machine. (https://julialang.org/downloads/)
+__Docker Desktop:__ Also make sure Docker Desktop client is running in the background to use the Cylc pipeline locally. (https://www.docker.com/products/docker-desktop/)
 
 1. Build a virtual environment and install Cylc
    - [ ] `cd <your-project-path>/ice-floe-tracker-pipeline`
@@ -123,7 +117,7 @@ To use the Cylc pipeline locally, also make sure Docker Desktop client is runnin
    - [ ] `cylc play <workflow-name>`
    - [ ] `cylc tui <workflow-name>`
 
-The Terminal-based user interface provides a simple way to watch the status of each task called in the `flow.cylc` workflow. Use arrow keys to investigate each task (see more [here](https://cylc.github.io/cylc-doc/latest/html/7-to-8/major-changes/ui.html#cylc-tui).
+The Terminal-based User Interface provides a simple way to watch the status of each task called in the `flow.cylc` workflow. Use arrow keys to investigate each task (see more [here](https://cylc.github.io/cylc-doc/latest/html/7-to-8/major-changes/ui.html#cylc-tui).
 ![TUI](tui-example.png)).
 
 If you need to change parameters and re-run a workflow, first do:
@@ -151,10 +145,10 @@ Open a Julia REPL and build the package
 Enter Pkg mode and precompile
 - [ ] `]`
 - [ ] `activate .`
-- [ ] `precompile`
+- [ ] `build`
 
 Use the backspace to go back to the Julia REPL and start running Julia code!
 
 __Note__ Use the help for wrapper scripts to learn about available options in each wrapper function
 For example, from a bash prompt: 
-`julia --project=. ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl extractfeatures --help`
+`julia --project=. ./workflow/scripts/ice-floe-tracker.jl extractfeatures --help`

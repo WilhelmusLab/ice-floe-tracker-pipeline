@@ -13,3 +13,14 @@ LoggingExtras = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+
+[compat]
+ArgParse = "1.1.4"
+Folds = "0.2.8"  
+HDF5 = "0.16.15"
+IceFloeTracker = "0.2.1"
+LoggingExtras = "1.0.1"
+PyCall = "1.96.1"
+Pkg = "1.9.0"
+TOML = "1.0.3"
+
