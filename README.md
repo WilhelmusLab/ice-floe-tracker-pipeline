@@ -152,3 +152,39 @@ Use the backspace to go back to the Julia REPL and start running Julia code!
 __Note__ Use the help for wrapper scripts to learn about available options in each wrapper function
 For example, from a bash prompt: 
 `julia --project=. ./workflow/scripts/ice-floe-tracker.jl extractfeatures --help`
+
+## Sample workflows to read in data stored in hdf5 files with Python
+
+Due to differences in multidimensional array representation between Julia and Python, special handling might be necessary.
+
+### Read floe properties table to a pandas dataframe
+
+```python
+import h5py
+import pandas as pd
+from os.path import join
+
+dataloc = "results/hdf5-files"
+filename = "20220914T1244.aqua.labeled_image.250m.h5"
+
+ift_data = h5py.File(join(dataloc, filename))
+df = pd.DataFrame(
+    data=ift_data["floe_properties"]["properties"][:].T, # note the transposition
+    columns=ift_data["floe_properties"]["column_names"][:].astype(str),
+)
+
+df.head()
+
+```
+
+### Simple visualization of a segmented image
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+ift_segmented = ift_data['floe_properties']['labeled_image'][:,:].T # note the transposition
+ift_segmented = np.ma.masked_array(ift_segmented, mask=ift_segmented==0)
+
+fig, ax = plt.subplots()
+ax.imshow(ift_segmented, cmap='prism')
+```
