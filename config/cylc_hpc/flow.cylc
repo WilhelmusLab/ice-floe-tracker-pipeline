@@ -1,5 +1,9 @@
 [scheduler]
     allow implicit tasks = True
+[task parameters]
+    # Update these variables with your run parameters
+    startdate = 2022-05-04, 2022-05-05, 2022-05-06
+    enddate = 2022-05-06, 2022-05-07, 2022-05-08
 [scheduling]
     cycling mode = integer
     initial cycle point = 1
@@ -11,8 +15,8 @@
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            startdate = "2022-05-04"
-            enddate = "2022-05-06"
+            startdate = $startdate
+            enddate = $enddate
             crs = "wgs84" #epsg3413 for polar stereographic
             bounding_box = "78.186394 38.250605 70.749318 15.32373"
             centroid_x = "75"
@@ -46,7 +50,7 @@
         script = """
             apptainer build --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
         """
-    [[fetchdata]]
+    [[fetchdata<startdate>]]
         script = """
             singularity exec --bind $fetchdata_dir:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
         """
