@@ -9,14 +9,14 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths & pullfetchimage & pulljuliaimage => fetchdata & soit => landmask => preprocess => extractfeatures => tracking & exportH5
+            mkpaths & pullfetchimage & pulljuliaimage => fetchdata<startdate,enddate> & soit<startdate,enddate> #=> landmask => preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            startdate = $startdate
-            enddate = $enddate
+            #startdate = $startdate
+            #enddate = $enddate
             crs = "wgs84" #epsg3413 for polar stereographic
             bounding_box = "78.186394 38.250605 70.749318 15.32373"
             centroid_x = "75"
@@ -50,11 +50,11 @@
         script = """
             apptainer build --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
         """
-    [[fetchdata<startdate>]]
+    [[fetchdata<startdate><enddate>]]
         script = """
             singularity exec --bind $fetchdata_dir:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
         """
-    [[soit]]
+    [[soit<startdate><enddate>]]
         script = """
             singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate $startdate --enddate $enddate --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
