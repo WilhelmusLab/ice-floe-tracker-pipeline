@@ -35,16 +35,26 @@
             h5_dir = $preprocess_dir/"hdf5-files"
             
     [[mkpaths]]
+        platform = slurm_platform
+        execution time limit = PT1H
+        [[[directives]]]
+            --mem = 4G
+            --nodes = 6
         script = """
-            mkdir -p $soit_dir
-            mkdir -p $landmask_dir
-            mkdir -p $preprocess_dir
-            mkdir -p $tracker_dir
-            mkdir -p $h5_dir
+            srun mkdir -p $soit_dir
+            srun mkdir -p $landmask_dir
+            srun mkdir -p $preprocess_dir
+            srun mkdir -p $tracker_dir
+            srun mkdir -p $h5_dir
         """
     [[pullfetchimage]]
+        platform = slurm_platform
+        execution time limit = PT1H
+        [[[directives]]]
+            --mem = 4G
+            --nodes = 6
         script = """
-            apptainer build --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
+            srun apptainer build --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
         """
     [[fetchdata]]
         script = """
