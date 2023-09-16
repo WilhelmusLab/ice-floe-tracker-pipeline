@@ -9,7 +9,7 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths<startdate> & pullfetchimage & pulljuliaimage => fetchdata<startdate,enddate> & soit<startdate,enddate> # landmask => preprocess => extractfeatures => tracking & exportH5
+            mkpaths<startdate> => fetchdata<startdate,enddate> & soit<startdate,enddate> # landmask => preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]

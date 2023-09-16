@@ -9,14 +9,12 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths & pullfetchimage & pulljuliaimage => fetchdata<startdate,enddate> & soit<startdate,enddate> #=> landmask => preprocess => extractfeatures => tracking & exportH5
+            mkpaths<startdate> & pullfetchimage & pulljuliaimage => fetchdata<startdate,enddate> & soit<startdate,enddate> #=> landmask => preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            #startdate = $startdate
-            #enddate = $enddate
             crs = "wgs84" #epsg3413 for polar stereographic
             bounding_box = "78.186394 38.250605 70.749318 15.32373"
             centroid_x = "75"
@@ -38,9 +36,10 @@
             tracker_dir = $results_dir/"tracker"
             h5_dir = $preprocess_dir/"hdf5-files"
             
-    [[mkpaths]]
+    [[mkpaths<startdate>]]
         script = """
-            mkdir -p $soit_dir
+            mkdir -p $fetchdata_dir/${CYLC_TASK_PARAM_startdate}
+            mkdir -p $soit_dir/${CYLC_TASK_PARAM_startdate}
             mkdir -p $landmask_dir
             mkdir -p $preprocess_dir
             mkdir -p $tracker_dir
@@ -52,11 +51,11 @@
         """
     [[fetchdata<startdate><enddate>]]
         script = """
-            singularity exec --bind $fetchdata_dir:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
+            singularity exec --bind $fetchdata_dir/${CYLC_TASK_PARAM_startdate}:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${CYLC_TASK_PARAM_startdate} -e ${CYLC_TASK_PARAM_enddate} -c $crs $bounding_box
         """
     [[soit<startdate><enddate>]]
         script = """
-            singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate $startdate --enddate $enddate --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+            singularity exec --bind $soit_dir/${CYLC_TASK_PARAM_startdate}:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${CYLC_TASK_PARAM_startdate} --enddate ${CYLC_TASK_PARAM_enddate} --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
     [[pulljuliaimage]]
         script = """
