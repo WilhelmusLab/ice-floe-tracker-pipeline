@@ -5,13 +5,12 @@
     # Update these variables with your run parameters
     startdate = 2022-05-04, 2022-05-05
     enddate = 2022-05-07, 2022-05-08
-    bounding_box = 0..1
 [scheduling]
     cycling mode = integer
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths<startdate> => fetchdata<startdate,enddate>,<bounding_box> & soit<startdate,enddate> # landmask => preprocess => extractfeatures => tracking & exportH5
+            mkpaths<startdate> => fetchdata<startdate,enddate> & soit<startdate,enddate> # landmask => preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]
@@ -20,7 +19,6 @@
             startdate = "2022-05-04"
             enddate = "2022-05-06"
             crs = "wgs84" #epsg3413 for polar stereographic
-            foo = ${CYLC_TASK_PARAM_bounding_box}["78,38,70,15", "76,37,70,15"]
             centroid_x = "75"
             centroid_y = "20"
             minfloearea = "300"
@@ -49,7 +47,7 @@
         
     [[fetchdata]]
         script = """
-            docker run --mount type=bind,source=$fetchdata_dir/${CYLC_TASK_PARAM_startdate},target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s ${CYLC_TASK_PARAM_startdate} -e ${CYLC_TASK_PARAM_enddate} -c $crs $foo
+            docker run --mount type=bind,source=$fetchdata_dir/${CYLC_TASK_PARAM_startdate},target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s ${CYLC_TASK_PARAM_startdate} -e ${CYLC_TASK_PARAM_enddate} -c $crs $bounding_box
         """
     [[soit]]
         script = """
