@@ -14,7 +14,7 @@
             startdate = "2022-05-04"
             enddate = "2022-05-06"
             crs = "wgs84" #epsg3413 for polar stereographic
-            bounding_box = "78.186394 38.250605 70.749318 15.32373"
+            bounding_box = "78.186394,38.250605,70.749318,15.32373"
             centroid_x = "75"
             centroid_y = "20"
             minfloearea = "300"
@@ -53,27 +53,27 @@
         execution time limit = PT1H
         [[[directives]]]
             --mem = 4G
-            --nodes = 6
+            --cpus-per-task = 6
     
     [[pullfetchimage]]
         script = """
-            apptainer build --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
+            apptainer pull --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
         """
         platform = oscar
         execution time limit = PT1H
         [[[directives]]]
             --mem = 12G
-            --nodes = 8
+            --cpus-per-task = 8
     
     [[fetchdata]]
         script = """
-            singularity exec --bind $fetchdata_dir:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
+            singularity exec --bind $fetchdata_dir:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs -b $bounding_box
         """
         platform = oscar
         execution time limit = PT1H
         [[[directives]]]
             --mem = 12G
-            --nodes = 8
+            --cpus-per-task = 8
     
     [[soit]]
         script = """
@@ -83,17 +83,17 @@
         execution time limit = PT1H
         [[[directives]]]
             --mem = 12G
-            --nodes = 8
+            --cpus-per-task = 8
     
     [[pulljuliaimage]]
         script = """
-            apptainer build --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:pr-45
+            apptainer pull --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:pr-45
         """
         platform = oscar
         execution time limit = PT1H
         [[[directives]]]
             --mem = 16G
-            --nodes = 8
+            --cpus-per-task = 8
     
     [[landmask]]
         script = """
@@ -103,7 +103,7 @@
         execution time limit = PT1H
         [[[directives]]]
             --mem = 20G
-            --nodes = 8
+            --cpus-per-task = 16
     
     [[preprocess]]
         script = """
@@ -113,7 +113,7 @@
         execution time limit = PT1H
         [[[directives]]]
             --mem = 36G
-            --nodes = 40
+            --cpus-per-task = 40
     
     [[extractfeatures]]
         script = """
@@ -123,7 +123,7 @@
         execution time limit = PT1H
         [[[directives]]]
             --mem = 20G
-            --nodes = 8
+            --cpus-per-task = 8
     
     [[tracking]]
         script = """
@@ -133,7 +133,7 @@
         execution time limit = PT1H
         [[[directives]]]
             --mem = 20G
-            --nodes = 8
+            --cpus-per-task = 8
     
     [[exportH5]]
         script = """
@@ -143,5 +143,5 @@
         execution time limit = PT1H
         [[[directives]]]
             --mem = 32G
-            --nodes = 24
+            --cpus-per-task = 24
         

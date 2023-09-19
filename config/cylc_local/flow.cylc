@@ -14,7 +14,7 @@
             startdate = "2022-05-04"
             enddate = "2022-05-06"
             crs = "wgs84" #epsg3413 for polar stereographic
-            bounding_box = "78.186394 38.250605 70.749318 15.32373"
+            bounding_box = "78.186394,38.250605,70.749318,15.32373"
             centroid_x = "75"
             centroid_y = "20"
             minfloearea = "300"
@@ -43,7 +43,7 @@
         
     [[fetchdata]]
         script = """
-            docker run --mount type=bind,source=$fetchdata_dir,target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs $bounding_box
+            docker run --mount type=bind,source=$fetchdata_dir,target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs -b $bounding_box
         """
     [[soit]]
         script = """
