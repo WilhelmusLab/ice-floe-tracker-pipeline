@@ -49,11 +49,7 @@
             mkdir -p $tracker_dir
             mkdir -p $h5_dir
         """
-        platform = oscar
-        execution time limit = PT1H
-        [[[directives]]]
-            --mem = 4G
-            --cpus-per-task = 6
+        
     
     [[pullfetchimage]]
         script = """

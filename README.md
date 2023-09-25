@@ -10,7 +10,7 @@ The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.
 
 ## Cylc to run the pipeline
 
-Cylc is used to encode the entire pipeline from start to finish and relies on the command line scripts to automate the workflow. The `config/cylc_hpc/flow.cylc` file should be suitable for runs on HPC systems. The default pipeline is built to run on Brown's Oscar HPC and each task is submitted as it's own batch job. To run Cylc locally, the `config/cylc_local_flow.cylc` file is used.
+Cylc is used to encode the entire pipeline from start to finish and relies on the command line scripts to automate the workflow. The `config/cylc_hpc/flow.cylc` file should be suitable for runs on HPC systems. The default pipeline is built to run on Brown's Oscar HPC and each task is submitted as its own batch job. To run Cylc locally, the `config/cylc_local_flow.cylc` file is used.
 
 ### Running the Cylc pipeline on Oscar
 
@@ -53,6 +53,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
 
     ```
     cylc install -n <workflow-name> ./config/cylc_hpc
+    cylc validate <workflow-name>
     cylc play <workflow-name>
     cylc tui <workflow-name>
     ```
@@ -109,6 +110,7 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
 
    - [ ] `cylc install -n <your-workflow-name> ./config/cylc_local`
    - [ ] `cylc graph <workflow-name> #install graphviz locally`
+   - [ ] `cylc validate <workflow-name>`
    - [ ] `cylc play <workflow-name>`
    - [ ] `cylc tui <workflow-name>`
 
@@ -122,7 +124,7 @@ If you need to change parameters and re-run a workflow, first do:
     cylc clean <workflow-name>
     ```
    - [ ] Then, proceed to install, play, and open the TUI
-   - [ ] To rerun in one line: ```cylc stop --now <workflow-name> && cylc clean <workflow-name> && cylc install -n <workflow-name> ./config/cylc_hpc && cylc play <workflow-name> && cylc tui <workflow-name>```
+   - [ ] To rerun in one line: ```cylc stop --now <workflow-name> && cylc clean <workflow-name> && cylc install -n <workflow-name> ./config/cylc_hpc && cylc validate <workflow-name> && cylc play <workflow-name> && cylc tui <workflow-name>```
 
     __Note__ Error logs are available for each task:
     ```
