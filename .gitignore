@@ -1,5 +1,7 @@
 Manifest.toml
 
+config/cylc_template/param_set*
+
 resources/*
 !resources/README.md
 

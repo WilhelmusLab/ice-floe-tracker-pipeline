@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 Folds = "41a02a25-b8f0-4f67-bc48-60067656b558"
 HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 IceFloeTracker = "04643c7a-9ac6-48c5-822f-2704f9e70bd3"
@@ -13,14 +14,13 @@ LoggingExtras = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [compat]
 ArgParse = "1.1.4"
-Folds = "0.2.8"  
+Folds = "0.2.8"
 HDF5 = "0.16.15"
-IceFloeTracker = "0.2.1"
 LoggingExtras = "1.0.1"
-PyCall = "1.96.1"
 Pkg = "1.9.0"
+PyCall = "1.96.1"
 TOML = "1.0.3"
-
