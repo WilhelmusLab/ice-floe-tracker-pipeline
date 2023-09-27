@@ -2,21 +2,23 @@
     allow implicit tasks = True
 [task parameters]
     # Update these variables with your run parameters
-    startdate = 2022-05-04, 2022-05-05, 2022-05-06
-    enddate = 2022-05-06, 2022-05-07, 2022-05-08
+    startdate = 2022-05-04, 2022-05-08
+    enddate = 2022-05-09, 2022-05-12
+    bbindex = 0..1
 [scheduling]
     cycling mode = integer
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths<startdate> & pullfetchimage & pulljuliaimage => fetchdata<startdate,enddate> & soit<startdate,enddate> #=> landmask => preprocess => extractfeatures => tracking & exportH5
-             """
+            fetchdata<startdate,enddate,bbindex>
+            #mkpaths<startdate> & pullfetchimage & pulljuliaimage => fetchdata<startdate,enddate> & soit<startdate,enddate> #=> landmask => preprocess => extractfeatures => tracking & exportH5
+        """
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
             crs = "wgs84" #epsg3413 for polar stereographic
-            bounding_box = "78.186394 38.250605 70.749318 15.32373"
+            #bounding_box=("78,38,70,15" "77,37,69,14")
             centroid_x = "75"
             centroid_y = "20"
             minfloearea = "300"
@@ -45,14 +47,21 @@
             mkdir -p $tracker_dir
             mkdir -p $h5_dir
         """
+
     [[pullfetchimage]]
         script = """
             apptainer build --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
         """
-    [[fetchdata<startdate><enddate>]]
+
+    [[fetchdata<startdate,enddate,bbindex>]]
         script = """
-            singularity exec --bind $fetchdata_dir/${CYLC_TASK_PARAM_startdate}:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${CYLC_TASK_PARAM_startdate} -e ${CYLC_TASK_PARAM_enddate} -c $crs $bounding_box
+            bounding_box=("78.1,38.2,70.3,15.4" "77.1,37.2,69.3,14.4")
+            i=${CYLC_TASK_PARAM_bbindex}
+            echo ${bounding_box[i]}
+
+            singularity exec --bind $fetchdata_dir/${CYLC_TASK_PARAM_startdate}:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${CYLC_TASK_PARAM_startdate} -e ${CYLC_TASK_PARAM_enddate} -c $crs -b ${bounding_box[i]}
         """
+
     [[soit<startdate><enddate>]]
         script = """
             singularity exec --bind $soit_dir/${CYLC_TASK_PARAM_startdate}:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${CYLC_TASK_PARAM_startdate} --enddate ${CYLC_TASK_PARAM_enddate} --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
