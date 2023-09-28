@@ -2,28 +2,30 @@
     allow implicit tasks = True
 [task parameters]
     # Update these variables with your run parameters
-    startdate = 2022-05-04, 2022-05-08
-    enddate = 2022-05-09, 2022-05-12
-    bbindex = 0..1
+    job_id = 0..1
+
 [scheduling]
     cycling mode = integer
     initial cycle point = 1
     [[graph]]
         R1 = """
-            fetchdata<startdate,enddate,bbindex>
-            #mkpaths<startdate> & pullfetchimage & pulljuliaimage => fetchdata<startdate,enddate> & soit<startdate,enddate> #=> landmask => preprocess => extractfeatures => tracking & exportH5
+            
+            mkpaths<job_id> => fetchdata<job_id> #& pullfetchimage & pulljuliaimage => fetchdata<job_id> #& soit<job_id> #=> landmask => preprocess => extractfeatures => tracking & exportH5
         """
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
+            startdate = ("2022-05-04" "2022-05-08")
+            enddate = ("2022-05-09" "2022-05-12")
             crs = "wgs84" #epsg3413 for polar stereographic
-            #bounding_box=("78,38,70,15" "77,37,69,14")
+            bounding_box=("78,38,70,15" "77,37,69,14")
             centroid_x = "75"
             centroid_y = "20"
             minfloearea = "300"
             maxfloearea = "90000"
             project_dir = "~/ice-floe-tracker-pipeline"
+            #input_data = (())
 
             # Recommend using these default paths for output
             julia_exec = "/usr/local/julia/bin/julia"
@@ -38,10 +40,10 @@
             tracker_dir = $results_dir/"tracker"
             h5_dir = $preprocess_dir/"hdf5-files"
             
-    [[mkpaths<startdate>]]
+    [[mkpaths<job_id>]]
         script = """
-            mkdir -p $fetchdata_dir/${CYLC_TASK_PARAM_startdate}
-            mkdir -p $soit_dir/${CYLC_TASK_PARAM_startdate}
+            mkdir -p $fetchdata_dir/${CYLC_TASK_PARAM_job_id}
+            mkdir -p $soit_dir/${CYLC_TASK_PARAM_job_id}
             mkdir -p $landmask_dir
             mkdir -p $preprocess_dir
             mkdir -p $tracker_dir
@@ -53,16 +55,23 @@
             apptainer build --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
         """
 
-    [[fetchdata<startdate,enddate,bbindex>]]
+    [[fetchdata<job_id>]]
         script = """
-            bounding_box=("78.1,38.2,70.3,15.4" "77.1,37.2,69.3,14.4")
-            i=${CYLC_TASK_PARAM_bbindex}
-            echo ${bounding_box[i]}
+            i=${CYLC_TASK_PARAM_job_id}
 
-            singularity exec --bind $fetchdata_dir/${CYLC_TASK_PARAM_startdate}:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${CYLC_TASK_PARAM_startdate} -e ${CYLC_TASK_PARAM_enddate} -c $crs -b ${bounding_box[i]}
+            bounding_box_test=("78,38,70,15" "77,37,69,14")
+            bounding_box_env=${bounding_box[0]} #from cylc env var
+            echo "bounding_box = ${bounding_box[0]}" #from env directly
+            echo "bounding_box_env = ${bounding_box_env}" #from env unpacked
+            echo "bounding_box_test = ${bounding_box_test[0]}" #from this script block
+
+            startdate_env=$startdate
+            enddate_env=$enddate
+            
+            singularity exec --bind $fetchdata_dir/${CYLC_TASK_PARAM_job_id}:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_env[$i]} -e ${enddate_env[$i]} -c $crs -b ${bounding_box_env}
         """
 
-    [[soit<startdate><enddate>]]
+    [[soit<job_id>]]
         script = """
             singularity exec --bind $soit_dir/${CYLC_TASK_PARAM_startdate}:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${CYLC_TASK_PARAM_startdate} --enddate ${CYLC_TASK_PARAM_enddate} --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
