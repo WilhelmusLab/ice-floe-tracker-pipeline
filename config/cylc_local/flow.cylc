@@ -16,7 +16,7 @@
         [[[environment]]]
             # Update these variables with your run parameters
             crs = "wgs84" #epsg3413 for polar stereographic
-            bounding_box = "78.186394 38.250605 70.749318 15.32373"
+            bounding_box = "78.186394,38.250605,70.749318,15.32373"
             centroid_x = "75"
             centroid_y = "20"
             minfloearea = "300"

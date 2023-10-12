@@ -48,16 +48,12 @@ usage() {
 ${PROGRAM_NAME}: Ice Floe Tracker data fetch utility
 
 ${BOLD}USAGE${NORMAL}
-  $ ./${PROGRAM_NAME} [OPTIONS] x1 y1 x2 y2
-
-${BOLD}ARGUMENTS${NORMAL}
-  x1, y1${TAB}top-left point of bounding box
-  x2, y2${TAB}bottom-right point of bounding box
-
-  Note: for wgs84 input: x, y = lat, lon
-        for epsg3413 input: x, y = easting, northing
+  $ ./${PROGRAM_NAME} [OPTIONS]
 
 ${BOLD}OPTIONS${NORMAL}
+  -b${TAB}${TAB}bounding box of interest in form "x1,y1,x2,y2"
+  ${TAB}${TAB}Note: for wgs84 input: x, y = lat, lon
+  ${TAB}${TAB}      for epsg3413 input: x, y = easting, northing
   -c${TAB}${TAB}coordinate reference system: epsg3413, wgs84 (default: "wgs84")
   -e${TAB}${TAB}end date in YYY-MM-DD format
   -h${TAB}${TAB}print this help message
@@ -66,13 +62,29 @@ ${BOLD}OPTIONS${NORMAL}
 
 ${BOLD}EXAMPLES${NORMAL}
   Download data from 2022-05-01 through today using lat/lon
-    $ ./${PROGRAM_NAME} -o data -s 2022-05-01 81 -22 79 -12
+    $ ./${PROGRAM_NAME} -o data -s 2022-05-01 -b "81,-22,79,-12"
 EOF
 }
 
 convert_to_epsg3413() {
   local input="${1}"
   echo "${input}" | cs2cs ${PROJ_WGS84} +to ${PROJ_EPSG3413} -r | awk '{ print $1 " " $2 }'
+}
+
+get_topleft() {
+  local bounding_box="${1}"
+  local x="$(echo ${bounding_box} | cut -d, -f1 )"
+  local y="$(echo ${bounding_box} | cut -d, -f2 )"
+
+  echo "${x} ${y}"
+}
+
+get_bottomright() {
+  local bounding_box="${1}"
+  local x="$(echo ${bounding_box} | cut -d, -f3 )"
+  local y="$(echo ${bounding_box} | cut -d, -f4 )"
+
+  echo "${x} ${y}"
 }
 
 sort_xy() {
@@ -180,10 +192,14 @@ main() {
   local startdate="$(date "+%Y-%m-%d")"
   local enddate="$(date "+%Y-%m-%d")"
   local output='.'
+  local raw_bounding_box=''
 
   local opt
-  while getopts ":c:e:ho:s:" opt; do
+  while getopts ":b:c:e:ho:s:" opt; do
     case $opt in
+      b)
+        raw_bounding_box="${OPTARG}"
+        ;;
       c)
         crs="${OPTARG}"
         ;;
@@ -212,14 +228,12 @@ main() {
     die "unknown coordinate reference system: \"${crs}\""
   fi
 
-  shift $((${OPTIND} - 1))
-
-  if [ "$#" -lt 4 ]; then
-    die "missing bounding box coordinates"
+  if [ "x${raw_bounding_box}" = 'x' ]; then
+    die "undefined bounding box"
   fi
 
-  local topleft="${1} ${2}"
-  local bottomright="${3} ${4}"
+  local topleft="$(get_topleft "${raw_bounding_box}")"
+  local bottomright="$(get_bottomright "${raw_bounding_box}")"
   local x1 y1 x2 y2
 
   if [ "${crs}" == "wgs84" ]; then
