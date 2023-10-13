@@ -51,7 +51,7 @@ ${BOLD}USAGE${NORMAL}
   $ ./${PROGRAM_NAME} [OPTIONS]
 
 ${BOLD}OPTIONS${NORMAL}
-  -b${TAB}${TAB}bounding box of interest in form "x1,y1,x2,y2"
+  -b${TAB}${TAB}bounding box of interest in form "x1@y1@x2@y2"
   ${TAB}${TAB}Note: for wgs84 input: x, y = lat, lon
   ${TAB}${TAB}      for epsg3413 input: x, y = easting, northing
   -c${TAB}${TAB}coordinate reference system: epsg3413, wgs84 (default: "wgs84")
@@ -62,7 +62,7 @@ ${BOLD}OPTIONS${NORMAL}
 
 ${BOLD}EXAMPLES${NORMAL}
   Download data from 2022-05-01 through today using lat/lon
-    $ ./${PROGRAM_NAME} -o data -s 2022-05-01 -b "81,-22,79,-12"
+    $ ./${PROGRAM_NAME} -o data -s 2022-05-01 -b "81@-22@79@-12"
 EOF
 }
 
@@ -73,16 +73,16 @@ convert_to_epsg3413() {
 
 get_topleft() {
   local bounding_box="${1}"
-  local x="$(echo ${bounding_box} | cut -d, -f1 )"
-  local y="$(echo ${bounding_box} | cut -d, -f2 )"
+  local x="$(echo ${bounding_box} | cut -d@ -f1 )"
+  local y="$(echo ${bounding_box} | cut -d@ -f2 )"
 
   echo "${x} ${y}"
 }
 
 get_bottomright() {
   local bounding_box="${1}"
-  local x="$(echo ${bounding_box} | cut -d, -f3 )"
-  local y="$(echo ${bounding_box} | cut -d, -f4 )"
+  local x="$(echo ${bounding_box} | cut -d@ -f3 )"
+  local y="$(echo ${bounding_box} | cut -d@ -f4 )"
 
   echo "${x} ${y}"
 }

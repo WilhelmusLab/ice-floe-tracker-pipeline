@@ -4,3 +4,7 @@
         install target = localhost
         job runner = slurm
         retrieve job logs = True
+[install]
+    [[symlink dirs]]
+        [[[localhost]]]
+            run = ~/ice-floe-tracker-pipeline/workflow

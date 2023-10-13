@@ -9,17 +9,16 @@
     initial cycle point = 1
     [[graph]]
         R1 = """
-            
             global_setup => mkpaths<job_id> => fetchdata<job_id> #& pullfetchimage & pulljuliaimage => fetchdata<job_id> #& soit<job_id> #=> landmask => preprocess => extractfeatures => tracking & exportH5
         """
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            startdate = ("2022-05-04" "2022-05-08")
-            enddate = ("2022-05-09" "2022-05-12")
+            startdate = 2022-05-04,2022-05-08
+            enddate = 2022-05-09,2022-05-12
             crs = "wgs84" #epsg3413 for polar stereographic
-            bounding_box=("78,38,70,15" "77,37,69,14")
+            bounding_box=78.2@38.2@70.2@15.2,77.2@37.2@69.2@14.2
             centroid_x = "75"
             centroid_y = "20"
             minfloearea = "300"
@@ -57,8 +56,6 @@
             mkdir -p $h5_dir
         """
         
-    
-
     [[pullfetchimage]]
         script = """
             apptainer pull --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
@@ -72,18 +69,15 @@
     [[fetchdata<job_id>]]
         script = """
             i=${CYLC_TASK_PARAM_job_id}
+            bbox_array=( $(echo $bounding_box | sed -e 's/,/ /g') )
+            startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
+            enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
+            echo "bbox array = ${bbox_array[1]}"
+            echo "sdate array = ${startdate_array[1]}"
 
-            bounding_box_test=("78,38,70,15" "77,37,69,14")
-            bounding_box_env=${bounding_box[0]} #from cylc env var
-            echo "bounding_box = ${bounding_box[0]}" #from env directly
-            echo "bounding_box_env = ${bounding_box_env}" #from env unpacked
-            echo "bounding_box_test = ${bounding_box_test[0]}" #from this script block
-
-            startdate_env=$startdate
-            enddate_env=$enddate
-            
-            singularity exec --bind $fetchdata_dir/${CYLC_TASK_PARAM_job_id}:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_env[$i]} -e ${enddate_env[$i]} -c $crs -b -b ${bounding_box_env}
+            singularity exec --bind $fetchdata_dir/${CYLC_TASK_PARAM_job_id}:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_array[0]} -e ${enddate_array[0]} -c $crs -b ${bbox_array[0]}
         """
+        #
         platform = oscar
         execution time limit = PT1H
         [[[directives]]]
