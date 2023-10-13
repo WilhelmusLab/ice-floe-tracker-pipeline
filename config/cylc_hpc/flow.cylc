@@ -1,7 +1,7 @@
 [scheduler]
     allow implicit tasks = True
 [task parameters]
-    # Update these variables with your run parameters
+    # Update this variable to match the range of parameter sets
     job_id = 0..1
 
 [scheduling]
