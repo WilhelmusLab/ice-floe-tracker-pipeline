@@ -15,9 +15,9 @@ function track(; args...)
     imgs = deserialize(joinpath(vals.imgs, "segmented_floes.jls"))
     props = deserialize(joinpath(vals.props, "floe_props.jls"))
     passtimes = deserialize(joinpath(vals.passtimes, "passtimes.jls"))
-    deltat = deserialize(joinpath(vals.deltat, "timedeltas.jls")) 
-    props, tracked = pairfloes(imgs, props, passtimes, deltat, condition_thresholds, mc_thresholds)
-    [serialize(joinpath(vals.output, name), obj) for (name, obj) in zip(["floe_props.jls", "track_data.jls"], [props, tracked])]
+    deltat = deserialize(joinpath(vals.deltat, "timedeltas.jls"))
+    labeledfloes, tracked = pairfloes(imgs, props, passtimes, deltat, condition_thresholds, mc_thresholds)
+    [serialize(joinpath(vals.output, name), obj) for (name, obj) in zip(["labeled_floes.jls", "track_data.jls"], [labeledfloes, tracked])]
     return nothing
 end
 
