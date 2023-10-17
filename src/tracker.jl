@@ -14,11 +14,10 @@ function track(; args...)
     vals = values(args)
     imgs = deserialize(joinpath(vals.imgs, "segmented_floes.jls"))
     props = deserialize(joinpath(vals.props, "floe_props.jls"))
-    deltat = deserialize(joinpath(vals.deltat, "timedeltas.jls"))
-    serialize(
-        joinpath(vals.output, "tracked_floes.jls"),
-        IceFloeTracker.pairfloes(imgs, props, deltat, condition_thresholds, mc_thresholds),
-    )
+    passtimes = deserialize(joinpath(vals.passtimes, "passtimes.jls"))
+    deltat = deserialize(joinpath(vals.deltat, "timedeltas.jls")) 
+    props, tracked = pairfloes(imgs, props, passtimes, deltat, condition_thresholds, mc_thresholds)
+    [serialize(joinpath(vals.output, name), obj) for (name, obj) in zip(["floe_props.jls", "track_data.jls"], [props, tracked])]
     return nothing
 end
 
