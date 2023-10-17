@@ -1,24 +1,29 @@
 [scheduler]
     allow implicit tasks = True
+[task parameters]
+    # Update this variable to match the range of parameter sets
+    job_id = 0..1
+
 [scheduling]
     cycling mode = integer
     initial cycle point = 1
     [[graph]]
         R1 = """
-            global_setup => mkpaths & pullfetchimage & pulljuliaimage => fetchdata & soit => landmask => preprocess => extractfeatures => tracking & exportH5
-             """
+            global_setup => soit<job_id>
+            #global_setup => mkpaths<job_id> => pullfetchimage & pulljuliaimage => fetchdata<job_id> & soit<job_id> => landmask<job_id> => preprocess<job_id> => extractfeatures<job_id> => tracking<job_id> & exportH5<job_id>
+        """
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            startdate = "2022-05-04"
-            enddate = "2022-05-06"
-            crs = "wgs84" #epsg3413 for polar stereographic
-            bounding_box = "78.186394,38.250605,70.749318,15.32373"
-            centroid_x = "75"
-            centroid_y = "20"
-            minfloearea = "300"
-            maxfloearea = "90000"
+            startdate = 2022-05-04,2022-05-08
+            enddate = 2022-05-09,2022-05-12
+            crs = wgs84 #epsg3413 for polar stereographic
+            bounding_box=78.2@38.2@70.2@15.2,77.2@37.2@69.2@14.2
+            centroid_x = 75,74
+            centroid_y = 20,19
+            minfloearea = 300
+            maxfloearea = 90000
             project_dir = "~/ice-floe-tracker-pipeline"
 
             # Recommend using these default paths for output
@@ -41,39 +46,53 @@
             cp $project_dir/config/cylc_hpc/global.cylc ~/.cylc/flow
         """
     
-    [[mkpaths]]
+    [[mkpaths<job_id>]]
         script = """
-            mkdir -p $soit_dir
-            mkdir -p $landmask_dir
-            mkdir -p $preprocess_dir
-            mkdir -p $tracker_dir
-            mkdir -p $h5_dir
+            i=${CYLC_TASK_PARAM_job_id}
+            mkdir -p $fetchdata_dir/$i
+            mkdir -p $soit_dir/$i
+            mkdir -p $landmask_dir/$i
+            mkdir -p $preprocess_dir/$i
+            mkdir -p $tracker_dir/$i
+            mkdir -p $h5_dir/$i
         """
         
-    
     [[pullfetchimage]]
         script = """
-            apptainer pull --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
+            apptainer pull --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:pr-70
         """
         platform = oscar
         execution time limit = PT1H
         [[[directives]]]
             --mem = 12G
             --cpus-per-task = 8
-    
-    [[fetchdata]]
+
+    [[fetchdata<job_id>]]
         script = """
-            singularity exec --bind $fetchdata_dir:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs -b $bounding_box
+            i=${CYLC_TASK_PARAM_job_id}
+
+            bbox_array=( $(echo $bounding_box | sed -e 's/,/ /g') )
+            startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
+            enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
+
+            singularity exec --bind $fetchdata_dir/$i:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_array[$i]} -e ${enddate_array[$i]} -c $crs -b ${bbox_array[$i]}
         """
         platform = oscar
         execution time limit = PT1H
         [[[directives]]]
             --mem = 12G
             --cpus-per-task = 8
-    
-    [[soit]]
+
+    [[soit<job_id>]]
         script = """
-            singularity exec --bind $soit_dir:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate $startdate --enddate $enddate --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+            i=${CYLC_TASK_PARAM_job_id}
+
+            startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
+            enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
+            centroid_x_array=( $(echo $centroid_x| sed -e 's/,/ /g') )
+            centroid_y_array=( $(echo $centroid_y | sed -e 's/,/ /g') )
+
+            singularity exec --bind $soit_dir/$i:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid_x ${centroid_x_array[$i]} --centroid_y ${centroid_y_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
         platform = oscar
         execution time limit = PT1H
@@ -91,9 +110,11 @@
             --mem = 16G
             --cpus-per-task = 8
     
-    [[landmask]]
+    [[landmask<job_id>]]
         script = """
-            singularity exec --bind $landmask_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl landmask $fetchdata_dir /tmp
+            i=${CYLC_TASK_PARAM_job_id}
+
+            singularity exec --bind $landmask_dir/$i:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl landmask $fetchdata_dir/$i /tmp
         """
         platform = oscar
         execution time limit = PT1H
@@ -101,19 +122,23 @@
             --mem = 20G
             --cpus-per-task = 16
     
-    [[preprocess]]
+    [[preprocess<job_id>]]
         script = """
-            singularity exec --bind $preprocess_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o /tmp
+            i=${CYLC_TASK_PARAM_job_id}
+
+            singularity exec --bind $preprocess_dir/$i:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/$i/truecolor -r $fetchdata_dir/$i/reflectance -l $landmask_dir/$i -p $soit_dir/$i -o /tmp
         """
         platform = oscar
         execution time limit = PT1H
         [[[directives]]]
-            --mem = 36G
+            --mem = 60G
             --cpus-per-task = 40
     
-    [[extractfeatures]]
+    [[extractfeatures<job_id>]]
         script = """
-            singularity exec --bind $preprocess_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o /tmp --minarea $minfloearea --maxarea $maxfloearea
+            i=${CYLC_TASK_PARAM_job_id}
+
+            singularity exec --bind $preprocess_dir/$i:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl extractfeatures -i $preprocess_dir/$i -o /tmp --minarea $minfloearea --maxarea $maxfloearea
         """
         platform = oscar
         execution time limit = PT1H
@@ -121,9 +146,11 @@
             --mem = 20G
             --cpus-per-task = 8
     
-    [[tracking]]
+    [[tracking<job_id>]]
         script = """
-            singularity exec --bind $tracker_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output /tmp
+            i=${CYLC_TASK_PARAM_job_id}
+
+            singularity exec --bind $tracker_dir/$i:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl track --imgs $preprocess_dir/$i --props $preprocess_dir/$i --deltat $preprocess_dir/$i --output /tmp
         """
         platform = oscar
         execution time limit = PT1H
@@ -131,9 +158,11 @@
             --mem = 20G
             --cpus-per-task = 8
     
-    [[exportH5]]
+    [[exportH5<job_id>]]
         script = """
-            singularity exec --bind $preprocess_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir /tmp
+            i=${CYLC_TASK_PARAM_job_id}
+
+            singularity exec --bind $preprocess_dir/$i:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/$i/truecolor/$(ls $fetchdata_dir/$i/truecolor | head -1) --resdir /tmp
         """
         platform = oscar
         execution time limit = PT1H

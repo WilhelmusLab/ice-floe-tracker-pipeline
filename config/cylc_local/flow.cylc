@@ -1,18 +1,20 @@
 [scheduler]
     allow implicit tasks = True
+[task parameters]
+    # Update these variables with your run parameters
+    startdate = 2022-05-04, 2022-05-05
+    enddate = 2022-05-07, 2022-05-08
 [scheduling]
     cycling mode = integer
     initial cycle point = 1
     [[graph]]
         R1 = """
-            mkpaths => fetchdata & soit => landmask => preprocess => extractfeatures => tracking & exportH5
+            mkpaths<startdate> => fetchdata<startdate,enddate> & soit<startdate,enddate> # landmask => preprocess => extractfeatures => tracking & exportH5
              """
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            startdate = "2022-05-04"
-            enddate = "2022-05-06"
             crs = "wgs84" #epsg3413 for polar stereographic
             bounding_box = "78.186394,38.250605,70.749318,15.32373"
             centroid_x = "75"
@@ -32,22 +34,23 @@
             tracker_dir = $results_dir/"tracker"
             h5_dir = $preprocess_dir/"hdf5-files"
 
-    [[mkpaths]]
+    [[mkpaths<startdate>]]
         script = """
-            mkdir -p $soit_dir
+            mkdir -p $fetchdata_dir/${CYLC_TASK_PARAM_startdate}
+            mkdir -p $soit_dir/${CYLC_TASK_PARAM_startdate}
             mkdir -p $landmask_dir
             mkdir -p $preprocess_dir
             mkdir -p $tracker_dir
             mkdir -p $h5_dir
         """
         
-    [[fetchdata]]
+    [[fetchdata<startdate><enddate>]]
         script = """
-            docker run --mount type=bind,source=$fetchdata_dir,target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s $startdate -e $enddate -c $crs -b $bounding_box
+            docker run --mount type=bind,source=$fetchdata_dir/${CYLC_TASK_PARAM_startdate},target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s ${CYLC_TASK_PARAM_startdate} -e ${CYLC_TASK_PARAM_enddate} -c $crs $bounding_box
         """
-    [[soit]]
+    [[soit<startdate><enddate>]]
         script = """
-            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$soit_dir,target=/tmp brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate $startdate --enddate $enddate --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$soit_dir/${CYLC_TASK_PARAM_startdate},target=/tmp brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate ${CYLC_TASK_PARAM_startdate} --enddate ${CYLC_TASK_PARAM_enddate} --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
     [[landmask]]
         script = """
