@@ -56,7 +56,7 @@
             mkdir -p $tracker_dir/$i
             mkdir -p $h5_dir/$i
         """
-        
+
     [[pullfetchimage]]
         script = """
             apptainer pull --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:pr-70
@@ -79,6 +79,8 @@
         """
         platform = oscar
         execution time limit = PT1H
+        submission retry delays = 5*PT30S
+        execution retry delays = 5*PT6S
         [[[directives]]]
             --mem = 12G
             --cpus-per-task = 8
@@ -96,6 +98,8 @@
         """
         platform = oscar
         execution time limit = PT1H
+        submission retry delays = 5*PT30S
+        execution retry delays = 5*PT6S
         [[[directives]]]
             --mem = 12G
             --cpus-per-task = 8
@@ -106,6 +110,8 @@
         """
         platform = oscar
         execution time limit = PT1H
+        submission retry delays = 2*PT30S
+        execution retry delays = 2*PT6S
         [[[directives]]]
             --mem = 16G
             --cpus-per-task = 8
@@ -118,6 +124,8 @@
         """
         platform = oscar
         execution time limit = PT1H
+        submission retry delays = 2*PT30S
+        execution retry delays = 2*PT6S
         [[[directives]]]
             --mem = 20G
             --cpus-per-task = 16
@@ -130,6 +138,8 @@
         """
         platform = oscar
         execution time limit = PT1H
+        submission retry delays = 2*PT30S
+        execution retry delays = 2*PT6S
         [[[directives]]]
             --mem = 60G
             --cpus-per-task = 40
@@ -142,6 +152,8 @@
         """
         platform = oscar
         execution time limit = PT1H
+        submission retry delays = 2*PT30S
+        execution retry delays = 2*PT6S
         [[[directives]]]
             --mem = 20G
             --cpus-per-task = 8
@@ -154,6 +166,8 @@
         """
         platform = oscar
         execution time limit = PT1H
+        submission retry delays = 2*PT30S
+        execution retry delays = 2*PT6S
         [[[directives]]]
             --mem = 20G
             --cpus-per-task = 8
@@ -166,6 +180,8 @@
         """
         platform = oscar
         execution time limit = PT1H
+        submission retry delays = 5*PT30S
+        execution retry delays = 5*PT6S
         [[[directives]]]
             --mem = 32G
             --cpus-per-task = 24
