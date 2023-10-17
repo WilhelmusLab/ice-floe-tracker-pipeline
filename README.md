@@ -38,6 +38,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
    - [ ] It is a good idea to reset the Singularity cache dir as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images)
 
    - [ ] first update the parameters at the top of the `flow.cylc` file:
+     - job_id # just enter `0` for one set of parameters or `0..n` for cycling
      - startdate
      - enddate
      - crs
@@ -48,6 +49,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
      - maxfloearea
      - project_dir
      **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
+     **Note:** if cycling through more than one set of parameters, enter values separated by a comma, e.g., `startdate = 2022-05-04,2022-05-08`
    - [ ] then, build the workflow, run it, and open the Terminal-based User Interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
 

@@ -6,6 +6,7 @@ resources/*
 results/*
 !results/README.md
 
+workflow/cylc-run/*
 workflow/report/*
 !workflow/report/README.md
 
