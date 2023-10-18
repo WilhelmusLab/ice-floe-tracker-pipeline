@@ -4,20 +4,19 @@
     # Update this variable to match the range of parameter sets
     param_set = 0..1
 [scheduling]
-    initial cycle point = PT1M
+    initial cycle point = PT1M #creates a datetime one minute from system time in UTC
     [[graph]]
-        R1 = """
-            global_setup => mkpaths<param_set> => pullfetchimage & pulljuliaimage => fetchdata<param_set> & soit<param_set> => landmask<param_set> => preprocess<param_set> => extractfeatures<param_set> => tracking<param_set> & exportH5<param_set>
-        """
+        R1 = global_setup  => mkpaths<param_set> => pullfetchimage & pulljuliaimage => fetchdata<param_set> & soit<param_set> => landmask<param_set> => preprocess<param_set> => extractfeatures<param_set> => tracking<param_set> & exportH5<param_set>
+        
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
             location = bering_strait,beaufort_sea
-            startdate = 2022-05-04,2022-05-08
-            enddate = 2022-05-09,2022-05-12
+            startdate = 2021-04-19,2021-05-16
+            enddate = 2021-04-21,2021-05-19
             crs = wgs84 #epsg3413 for polar stereographic
-            bounding_box=78.2@38.2@70.2@15.2,77.2@37.2@69.2@14.2
+            bounding_box=78.25@38.25@70.25@15.25,77.25@37.25@69.25@14.25
             centroid_x = 75,74
             centroid_y = 20,19
             minfloearea = 350
@@ -39,8 +38,9 @@
             mkdir -p ~/.cylc/flow
             cp $project_dir/config/cylc_hpc/global.cylc ~/.cylc/flow
         """
-    
+
     [[mkpaths<param_set>]]
+        # Convert param location list to indexable bash array and make directories for each location
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
@@ -54,6 +54,8 @@
         """
 
     [[pullfetchimage]]
+        # Pull the latest Docker image containing software for fetching images from NASA Worldview API and satellite times from space-track.org
+        # Singularity will check the image layers and only re-download if necessary
         script = """
             apptainer pull --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
         """
@@ -61,13 +63,14 @@
         execution time limit = PT1H
         [[[directives]]]
             --mem = 12G
-            --cpus-per-task = 8
+            --cpus-per-task = 2
 
     [[fetchdata<param_set>]]
+        # Convert param lists to indexable bash arrays and fetch reflectance, truecolor, and landmask for each location
         script = """
             i=${CYLC_TASK_PARAM_param_set}
-            location_array=( $(echo $location | sed -e 's/,/ /g') )
             bbox_array=( $(echo $bounding_box | sed -e 's/,/ /g') )
+            location_array=( $(echo $location | sed -e 's/,/ /g') )
             startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
             enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
 
@@ -79,9 +82,10 @@
         execution retry delays = 5*PT6S
         [[[directives]]]
             --mem = 12G
-            --cpus-per-task = 8
+            --cpus-per-task = 4
 
     [[soit<param_set>]]
+        # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
@@ -98,9 +102,11 @@
         execution retry delays = 5*PT6S
         [[[directives]]]
             --mem = 12G
-            --cpus-per-task = 8
+            --cpus-per-task = 4
     
     [[pulljuliaimage]]
+        # Pull the latest Docker image containing Julia IceFloeTracker software
+        # Singularity will check the image layers and only re-download if necessary 
         script = """
             apptainer pull --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:main
         """
@@ -110,9 +116,10 @@
         execution retry delays = 2*PT6S
         [[[directives]]]
             --mem = 32G
-            --cpus-per-task = 8
-    
+            --cpus-per-task = 2
+
     [[landmask<param_set>]]
+        # Generate land masks in Julia from raw landmask file
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
@@ -125,9 +132,10 @@
         execution retry delays = PT6S
         [[[directives]]]
             --mem = 20G
-            --cpus-per-task = 16
+            --cpus-per-task = 8
     
     [[preprocess<param_set>]]
+        # Preprocess the satellite imagery and convert to binary
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
@@ -139,10 +147,11 @@
         submission retry delays = 2*PT30S
         execution retry delays = PT6S
         [[[directives]]]
-            --mem = 60G
-            --cpus-per-task = 40
+            --mem = 70G
+            --cpus-per-task = 20
     
     [[extractfeatures<param_set>]]
+        # Identify floes and extract floe metrics from binary processed images
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
@@ -156,9 +165,10 @@
         execution retry delays = PT6S
         [[[directives]]]
             --mem = 20G
-            --cpus-per-task = 8
+            --cpus-per-task = 1
     
     [[tracking<param_set>]]
+        # Pair and track identified floes across days
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
@@ -172,9 +182,10 @@
         execution retry delays = PT6S
         [[[directives]]]
             --mem = 20G
-            --cpus-per-task = 8
+            --cpus-per-task = 1
     
     [[exportH5<param_set>]]
+        # Package intermediate and final outputs into HDF5 files
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
@@ -187,5 +198,5 @@
         execution retry delays = 2*PT6S
         [[[directives]]]
             --mem = 32G
-            --cpus-per-task = 24
+            --cpus-per-task = 1
         
