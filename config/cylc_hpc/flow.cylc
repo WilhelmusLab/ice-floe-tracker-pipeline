@@ -15,8 +15,8 @@
             location = bering_strait,beaufort_sea
             startdate = 2021-04-19,2021-05-16
             enddate = 2021-04-21,2021-05-19
-            crs = epsg3413 #epsg3413 for polar stereographic
-            bounding_box=2327477@-3002871@827477@-1502871,750000@-2383879@-750000@-883879
+            crs =  wgs84#epsg3413 for polar stereographic; wgs84 for lat/lon
+            bounding_box=-3002871.00126@2327477.2577@-1502871.00126@827477.2577,-2383879@750000@-883879@-750000
             centroid_x = 75,74
             centroid_y = 20,19
             minfloearea = 350
