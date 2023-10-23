@@ -19,7 +19,7 @@
             bounding_box = "78.186394,38.250605,70.749318,15.32373"
             centroid_x = "75"
             centroid_y = "20"
-            minfloearea = "300"
+            minfloearea = "350"
             maxfloearea = "90000"
             project_dir="/Users/tdivoll/Projects/Wilhelmus/ice-floe-tracker-pipeline" #the location where you cloned the pipeline repo
 

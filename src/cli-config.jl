@@ -35,7 +35,7 @@ function mkcliextract!(settings)
 
         "--minarea"
         help = "Minimum area (in pixels) of ice floes to extract"
-        default = "300"
+        default = "350"
 
         "--maxarea"
         help = "Maximum area (in pixels) of ice floes to extract"
