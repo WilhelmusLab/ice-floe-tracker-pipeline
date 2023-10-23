@@ -99,8 +99,11 @@
 
     @testset "feature extraction" begin
         # test new function default for minarea
-        c = code_lowered(extractfeatures)
-        @test c[2].code[1] == 350
+        c_ext = code_lowered(extractfeatures)
+        @test c_ext[2].code[1] == 350
+
+        c_mkext = code_lowered(mkcliextract!)
+        @test c_mkext[1].code[30] == :(:default => "350")
 
         minarea = "1"
         maxarea = "5"
