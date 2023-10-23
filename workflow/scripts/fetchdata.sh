@@ -121,7 +121,6 @@ download_landmask() {
   local bounding_box="${1}"
   local date="${2}"
   local output="${3}"
-
   local xml
   local layer='OSM_Land_Mask'
   local ext='png'
@@ -137,7 +136,6 @@ download_truecolor() {
   local date="${2}"
   local enddate="${3}"
   local output="${4}"
-
   local layer filename xml
   local ext="jpeg"
 
@@ -232,26 +230,33 @@ main() {
     die "undefined bounding box"
   fi
 
+  # split raw bounding box into top left and bottom right sets
   local topleft="$(get_topleft "${raw_bounding_box}")"
   local bottomright="$(get_bottomright "${raw_bounding_box}")"
   local x1 y1 x2 y2
 
+  # convert lat/lon to polar stereographic
   if [ "${crs}" == "wgs84" ]; then
     topleft="$(convert_to_epsg3413 "${topleft}")"
-    x1="$(echo "${topleft}" | awk '{ print $1 }')"
-    y1="$(echo "${topleft}" | awk '{ print $2 }')"
     bottomright="$(convert_to_epsg3413 "${bottomright}")"
-    x2="$(echo "${bottomright}" | awk '{ print $1 }')"
-    y2="$(echo "${bottomright}" | awk '{ print $2 }')"
   fi
 
+  # assign x and y from top left and bottom right coordinate sets
+  x1="$(echo "${topleft}" | awk '{ print $1 }')"
+  y1="$(echo "${topleft}" | awk '{ print $2 }')"
+  x2="$(echo "${bottomright}" | awk '{ print $1 }')"
+  y2="$(echo "${bottomright}" | awk '{ print $2 }')"
+
   local bounding_box
+  
   bounding_box="$(sort_xy $x1 $y1 $x2 $y2)"
-  # print to test
+
+  # make standard output dirs
   mkdir -p "${output}"
   mkdir -p "${output}/reflectance"
   mkdir -p "${output}/truecolor"
 
+  # download the images
   download_landmask "${bounding_box}" "${startdate}" "${output}"
   download_truecolor "${bounding_box}" "${startdate}" "${enddate}" "${output}/truecolor"
   download_reflectance "${bounding_box}" "${startdate}" "${enddate}" "${output}/reflectance"
