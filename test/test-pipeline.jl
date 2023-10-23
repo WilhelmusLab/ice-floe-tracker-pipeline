@@ -98,6 +98,10 @@
     include("_test-preprocess.jl")
 
     @testset "feature extraction" begin
+        # test new function default for minarea
+        c = code_lowered(extractfeatures)
+        @test c[2].code[1] == 350
+
         minarea = "1"
         maxarea = "5"
         features = "area bbox centroid"
@@ -125,7 +129,7 @@
         serialize(joinpath(input, "segmented_floes.jls"), container_to_serialize)
 
         # run feature extraction
-        @time extractfeatures(; args...)
+        @time extractfeatures(; args...) 
 
         # check that the output files exist
         @test isfile(joinpath(output, "floe_props.jls"))
