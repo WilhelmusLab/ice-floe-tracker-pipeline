@@ -50,7 +50,7 @@ julia> features = ["centroid", "area", "major_axis_length", "minor_axis_length",
 """
 function extractfeatures(
     bw::T;
-    minarea::Int64=300,
+    minarea::Int64=350,
     maxarea::Int64=90000,
     features::Union{Vector{Symbol},Vector{<:AbstractString}}
 )::DataFrame where {T<:AbstractArray{Bool}}
