@@ -125,7 +125,7 @@
         serialize(joinpath(input, "segmented_floes.jls"), container_to_serialize)
 
         # run feature extraction
-        @time extractfeatures(; args...) 
+        @time extractfeatures(; args...)
 
         # check that the output files exist
         @test isfile(joinpath(output, "floe_props.jls"))
