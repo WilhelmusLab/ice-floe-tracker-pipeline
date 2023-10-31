@@ -1,0 +1,14 @@
+# cycl template mytemplate.j2
+[runtime]
+    [[root]]
+        [[[environment]]]
+            # Update these variables with your run parameters
+            startdate = {{startdate}},{{startdate}}
+            enddate = {{enddate}}
+            crs = "wgs84" #epsg3413 for polar stereographic
+            bounding_box = {{bounding_box}}
+            centroid_x = {{centroid_x}}
+            centroid_y = {{centroid_y}}
+            minfloearea = {{minfloearea}}
+            maxfloearea = {{maxfloearea}}
+            project_dir = "~/ice-floe-tracker-pipeline"
