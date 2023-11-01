@@ -77,6 +77,10 @@ function mkclitrack!(settings)
         help = "Path to object with extracted features"
         required = true
 
+        "--passtimes"
+        help = "Path to object with satellite pass times"
+        required = true
+
         "--deltat"
         help = "Path to object with time deltas between consecutive images"
         required = true
