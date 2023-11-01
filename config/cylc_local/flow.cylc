@@ -1,51 +1,61 @@
 [scheduler]
     allow implicit tasks = True
 [task parameters]
-    # Update these variables with your run parameters
-    startdate = 2022-05-04, 2022-05-05
-    enddate = 2022-05-07, 2022-05-08
+    # Update this variable to match the range of parameter sets
+    param_set = 0..1
 [scheduling]
-    cycling mode = integer
-    initial cycle point = 1
+    initial cycle point = PT1M #creates a datetime one minute from system time in UTC
     [[graph]]
-        R1 = """
-            mkpaths<startdate> => fetchdata<startdate,enddate> & soit<startdate,enddate> # landmask => preprocess => extractfeatures => tracking & exportH5
-             """
+        R1 = global_setup  => mkpaths<param_set> => pullfetchimage & pulljuliaimage => fetchdata<param_set> & soit<param_set> => landmask<param_set> => preprocess<param_set> => extractfeatures<param_set> => tracking<param_set> & exportH5<param_set>
+
 [runtime]
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            crs = "wgs84" #epsg3413 for polar stereographic
-            bounding_box = "78.186394,38.250605,70.749318,15.32373"
-            centroid_x = "75"
-            centroid_y = "20"
-            minfloearea = "350"
-            maxfloearea = "90000"
+            location = bering_strait,beaufort_sea
+            startdate = 2021-04-19,2021-05-16
+            enddate = 2021-04-21,2021-05-19
+            crs =  epsg3413  # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
+                             # wgs84 for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon            
+            bounding_box = -3002871.00126@2327477.2577@-1502871.00126@827477.2577,-2383879@750000@-883879@-750000
+            centroid_x = 75,74
+            centroid_y = 20,19
+            minfloearea = 350
+            maxfloearea = 90000
             project_dir="/Users/tdivoll/Projects/Wilhelmus/ice-floe-tracker-pipeline" #the location where you cloned the pipeline repo
 
             # Recommend using these default paths for output
-            results_dir = $project_dir/"results"
-            fetchdata_dir = $project_dir/"resources"
+            t = ${CYLC_WORKFLOW_INITIAL_CYCLE_POINT}
+            julia_exec = "/usr/local/julia/bin/julia"
+            report_dir = $project_dir/"workflow/report"
+            results_dir = $project_dir/"results"/$t
+            fetchdata_dir = $project_dir/"resources"/$t
             truecolor_dir = $fetchdata_dir/"truecolor"
             reflectance_dir = $fetchdata_dir/"reflectance"
-            landmask_dir = $results_dir/"landmasks"
-            preprocess_dir = $results_dir/"preprocess"
-            soit_dir = $results_dir/"soit"
-            tracker_dir = $results_dir/"tracker"
-            h5_dir = $preprocess_dir/"hdf5-files"
 
-    [[mkpaths<startdate>]]
+    [[mkpaths<param_set>]]
+        # Convert param location list to indexable bash array and make directories for each location
         script = """
-            mkdir -p $fetchdata_dir/${CYLC_TASK_PARAM_startdate}
-            mkdir -p $soit_dir/${CYLC_TASK_PARAM_startdate}
-            mkdir -p $landmask_dir
-            mkdir -p $preprocess_dir
-            mkdir -p $tracker_dir
-            mkdir -p $h5_dir
+            i=${CYLC_TASK_PARAM_param_set}
+            location_array=( $(echo $location | sed -e 's/,/ /g') )
+            res=$results_dir/${location_array[$i]}
+            mkdir -p $fetchdata_dir/${location_array[$i]}
+            mkdir -p $res/soit
+            mkdir -p $res/landmasks
+            mkdir -p $res/preprocess
+            mkdir -p $res/tracker
+            mkdir -p $res/preprocess/hdf5-files
         """
         
-    [[fetchdata<startdate><enddate>]]
+    [[fetchdata<param_set>]]
+        # Convert param lists to indexable bash arrays and fetch reflectance, truecolor, and landmask for each location
         script = """
+            i=${CYLC_TASK_PARAM_param_set}
+            bbox_array=( $(echo $bounding_box | sed -e 's/,/ /g') )
+            location_array=( $(echo $location | sed -e 's/,/ /g') )
+            startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
+            enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
+            
             docker run --mount type=bind,source=$fetchdata_dir/${CYLC_TASK_PARAM_startdate},target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s ${CYLC_TASK_PARAM_startdate} -e ${CYLC_TASK_PARAM_enddate} -c $crs $bounding_box
         """
     [[soit<startdate><enddate>]]

@@ -139,7 +139,12 @@ If you need to change parameters and re-run a workflow, first do:
     cat ~/cylc-run/<workflow-name>/<run#>/log/job/1/<task-name>/01/job.err
     ```
 
-### Tips for running the Julia code locally for development
+### Tips for running the code locally for development
+
+When working locally, double check that the Docker client is running and clean the Docker cache to make sure you are using the latest images.
+
+- [ ] `docker rm $(docker ps -aq)`
+- [ ] `docker image prune`
 
 When running locally, make sure you have at least Julia 1.9.0 installed with the correct architecture for your local machine. (https://julialang.org/downloads/)
 
