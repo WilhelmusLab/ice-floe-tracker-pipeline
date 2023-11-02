@@ -6,7 +6,7 @@
 [scheduling]
     initial cycle point = PT1M #creates a datetime one minute from system time in UTC
     [[graph]]
-        R1 = global_setup  => mkpaths<param_set> => pullfetchimage & pulljuliaimage => fetchdata<param_set> & soit<param_set> => landmask<param_set> => preprocess<param_set> => extractfeatures<param_set> => tracking<param_set> & exportH5<param_set>
+        R1 = mkpaths<param_set> => fetchdata<param_set> & soit<param_set> => landmask<param_set> => preprocess<param_set> => extractfeatures<param_set> => tracking<param_set> & exportH5<param_set>
 
 [runtime]
     [[root]]
@@ -56,29 +56,77 @@
             startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
             enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
             
-            docker run --mount type=bind,source=$fetchdata_dir/${CYLC_TASK_PARAM_startdate},target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s ${CYLC_TASK_PARAM_startdate} -e ${CYLC_TASK_PARAM_enddate} -c $crs $bounding_box
+            docker run --mount type=bind,source=$fetchdata_dir/${location_array[$i]},target=/tmp \
+            --mount type=bind,source=$report_dir,target=/usr/local/bin/../report \
+            brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_array[$i]} -e ${enddate_array[$i]} -c $crs -b ${bbox_array[$i]}
         """
-    [[soit<startdate><enddate>]]
+    [[soit<param_set>]]
+        # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
         script = """
-            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$soit_dir/${CYLC_TASK_PARAM_startdate},target=/tmp brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate ${CYLC_TASK_PARAM_startdate} --enddate ${CYLC_TASK_PARAM_enddate} --csvoutpath /tmp --centroid_x $centroid_x --centroid_y $centroid_y --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+            i=${CYLC_TASK_PARAM_param_set}
+            location_array=( $(echo $location | sed -e 's/,/ /g') )
+            startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
+            enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
+            centroid_x_array=( $(echo $centroid_x| sed -e 's/,/ /g') )
+            centroid_y_array=( $(echo $centroid_y | sed -e 's/,/ /g') )
+
+            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$results_dir/${location_array[$i]}/soit,target=/tmp \
+            --mount type=bind,source=$report_dir,target=/usr/local/bin/../report \
+            brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid_x ${centroid_x_array[$i]} --centroid_y ${centroid_y_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
-    [[landmask]]
+
+    [[landmask<param_set>]]
+        # Generate land masks in Julia from raw landmask file
         script = """
-            julia --project=$project_dir -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl landmask $fetchdata_dir $landmask_dir
+            i=${CYLC_TASK_PARAM_param_set}
+            location_array=( $(echo $location | sed -e 's/,/ /g') )
+
+            docker run --mount type=bind,source=$results_dir/${location_array[$i]}/landmasks,target=/tmp \
+            --mount type=bind,source=$report_dir,target=/usr/local/bin/../report \
+            brownccv/icefloetracker-julia:main $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl landmask $fetchdata_dir/${location_array[$i]} /tmp
         """
-    [[preprocess]]
+
+    [[preprocess<param_set>]]
+        # Preprocess the satellite imagery and convert to binary
         script = """
-            julia --project=$project_dir -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl preprocess -t $fetchdata_dir/truecolor -r $fetchdata_dir/reflectance -l $landmask_dir -p $soit_dir -o $preprocess_dir
-         """
-    [[extractfeatures]]
-        script = """
-            julia --project=$project_dir -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o $preprocess_dir --minarea $minfloearea --maxarea $maxfloearea
+            i=${CYLC_TASK_PARAM_param_set}
+            location_array=( $(echo $location | sed -e 's/,/ /g') )
+
+            docker run --mount type=bind,source=$results_dir/${location_array[$i]}/preprocess,target=/tmp \
+            --mount type=bind,source=$report_dir,taget=/usr/local/bin/../report \
+            brownccv/icefloetracker-julia:main $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/${location_array[$i]}/truecolor -r $fetchdata_dir/${location_array[$i]}/reflectance -l $results_dir/${location_array[$i]}/landmasks -p $results_dir/${location_array[$i]}/soit -o /tmp
         """
-    [[tracking]]
+
+    [[extractfeatures<param_set>]]
+        # Identify floes and extract floe metrics from binary processed images
         script = """
-            julia --project=$project_dir -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output $tracker_dir
+            i=${CYLC_TASK_PARAM_param_set}
+            location_array=( $(echo $location | sed -e 's/,/ /g') )
+            preprocess_dir=$results_dir/${location_array[$i]}/preprocess
+
+            docker run --mount type=bind,source=$preprocess_dir,target=/tmp \
+            --mount type=bind,source=$report_dir,target=/usr/local/bin/../report \
+            brownccv/icefloetracker-julia:main $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o /tmp --minarea $minfloearea --maxarea $maxfloearea
         """
-    [[exportH5]]
+
+    [[tracking<param_set>]]
+        # Pair and track identified floes across days
         script = """
-            julia --project=$project_dir -t auto $project_dir/workflow/scripts/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/truecolor/$(ls $fetchdata_dir/truecolor | head -1) --resdir $preprocess_dir
+            i=${CYLC_TASK_PARAM_param_set}
+            location_array=( $(echo $location | sed -e 's/,/ /g') )
+            preprocess_dir=$results_dir/${location_array[$i]}/preprocess
+
+            docker run --mount type=bind,source=$results_dir/${location_array[$i]}/tracker,target=/tmp \
+            --mount type=bind,source=$report_dir,target=/usr/local/bin/../report \
+            brownccv/icefloetracker-julia:main $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output /tmp
+        """
+
+    [[exportH5<param_set>]]
+        # Package intermediate and final outputs into HDF5 files
+        script = """
+            i=${CYLC_TASK_PARAM_param_set}
+            location_array=( $(echo $location | sed -e 's/,/ /g') )
+
+            docker run --mount type=bind,source=$results_dir/${location_array[$i]}/preprocess,target=/tmp,$report_dir:/usr/local/bin/../report \
+            brownccv/icefloetracker-julia:main $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/${location_array[$i]}/truecolor/$(ls $fetchdata_dir/${location_array[$i]}/truecolor | head -1) --resdir /tmp
         """
