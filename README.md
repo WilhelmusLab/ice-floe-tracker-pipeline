@@ -19,8 +19,8 @@ To run SOIT manually :
 ```bash
 docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath /tmp --centroid_x <input_centroid_x> --centroid_y $<input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
 ```
-      * be sure to replace source, startdate, enddate, centroid_x, and centroid_y with your desired inputs
-      * csvoutpath must remain as `/tmp` to bind the Docker container output path with your desired local path
+   * be sure to replace source, startdate, enddate, centroid_x, and centroid_y with your desired inputs
+   * csvoutpath must remain as `/tmp` to bind the Docker container output path with your desired local path
 
 **Note:** The `pass_time_cylc.py` script in this project can be adapted to include additional satellites available in the [space-track.org](https://www.space-track.org/) repository.
 
@@ -78,13 +78,15 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
      - centroid_y #lon wgs84
      - minfloearea
      - maxfloearea
-     - project_dir
+     - project_dir 
+   <br>
      **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
      **Note:** if cycling through more than one set of parameters, enter values separated by a comma, e.g., `startdate = 2022-05-04,2022-05-08`
+
    - [ ] then, build the workflow, run it, and open the Terminal-based User Interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
 
-    ```
+    ```bash
     cylc install -n <workflow-name> ./config/cylc_hpc
     cylc validate <workflow-name>
     cylc play <workflow-name>
@@ -101,7 +103,8 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
     ```
    - [ ] Then, proceed to install, play, and open the TUI
 
- __Note__ Error logs are available for each task:
+   __Note__ Error logs are available for each task:
+
     ```
     cat ./cylc-run/<workflow-name>/<run#>/log/job/1/<task-name>/01/job.err
     ```
