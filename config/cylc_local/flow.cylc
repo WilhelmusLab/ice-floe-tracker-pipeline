@@ -35,6 +35,7 @@
 
     [[mkpaths<param_set>]]
         # Convert param location list to indexable bash array and make directories for each location
+        # sed is used to tokenize the list of comma-separated inputs
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
@@ -56,9 +57,7 @@
             startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
             enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
             
-            docker run --mount type=bind,source=$fetchdata_dir/${location_array[$i]},target=/tmp \
-            --mount type=bind,source=$report_dir,target=/usr/local/bin/../report \
-            brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_array[$i]} -e ${enddate_array[$i]} -c $crs -b ${bbox_array[$i]}
+            docker run --mount type=bind,source=$fetchdata_dir/${location_array[$i]},target=/tmp --mount type=bind,source=$report_dir,target=/usr/local/bin/../report brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_array[$i]} -e ${enddate_array[$i]} -c $crs -b ${bbox_array[$i]}
         """
     [[soit<param_set>]]
         # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
@@ -70,9 +69,7 @@
             centroid_x_array=( $(echo $centroid_x| sed -e 's/,/ /g') )
             centroid_y_array=( $(echo $centroid_y | sed -e 's/,/ /g') )
 
-            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$results_dir/${location_array[$i]}/soit,target=/tmp \
-            --mount type=bind,source=$report_dir,target=/usr/local/bin/../report \
-            brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid_x ${centroid_x_array[$i]} --centroid_y ${centroid_y_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$results_dir/${location_array[$i]}/soit,target=/tmp --mount type=bind,source=$report_dir,target=/usr/local/bin/../report brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid_x ${centroid_x_array[$i]} --centroid_y ${centroid_y_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
 
     [[landmask<param_set>]]

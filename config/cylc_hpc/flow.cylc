@@ -42,6 +42,7 @@
 
     [[mkpaths<param_set>]]
         # Convert param location list to indexable bash array and make directories for each location
+        # sed is used to tokenize the list of comma-separated inputs
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
