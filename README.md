@@ -15,7 +15,10 @@ To run SOIT manually :
         * when exporting the following environment variables, there __must__ be a space in front of each command
    - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
    - [ ] ` export SPACEPSWD=<password>`
-3. Update inputs and run the following: ```docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath /tmp --centroid_x <input_centroid_x> --centroid_y $<input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD```
+3. Update inputs and run the following: 
+```bash
+docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath /tmp --centroid_x <input_centroid_x> --centroid_y $<input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+```
       * be sure to replace source, startdate, enddate, centroid_x, and centroid_y with your desired inputs
       * csvoutpath must remain as `/tmp` to bind the Docker container output path with your desired local path
 
@@ -27,7 +30,10 @@ All the software dependencies to run `fetchdata.sh` are found in the Docker cont
 
 To fetch data independently of other tasks:
 1. Make sure Docker Desktop is running on your local machine.
-2. Update inputs and run the following: ```docker run --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s <YYYY-MM-DD> -e <YYYY-MM-DD> -c <wgs84|epsg3413> -b <top_left_lat@top_left_lon@lower_right_lat@lower_right_lon|left_x@top_y@right_x@lower_y```
+2. Update inputs and run the following: 
+```bash
+docker run --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s <YYYY-MM-DD> -e <YYYY-MM-DD> -c <wgs84|epsg3413> -b <top_left_lat@top_left_lon@lower_right_lat@lower_right_lon|left_x@top_y@right_x@lower_y
+```
    * be sure to replace `source`, `s`(startdate), `e`(enddate), `c`(crs), and `b`(bounding box) with your inputs
    * `o`(output) must remain as `/tmp` to bind the Docker container output path with your desired local path
    * `c`(crs) must be either wgs84 (lat/lon) or epsg3414 (polar stereographic)
@@ -89,7 +95,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
 
    - [ ] If you need to change parameters and re-run a workflow, first do:
     
-    ```
+    ```bash
     cylc stop --now <workflow-name>
     cylc clean <workflow-name>
     ```
@@ -157,18 +163,29 @@ If you need to change parameters and re-run a workflow, first do:
     cylc clean <workflow-name>
     ```
    - [ ] Then, proceed to install, play, and open the TUI
-   - [ ] To rerun in one line: ```cylc stop --now <workflow-name> && cylc clean <workflow-name> && cylc install -n <workflow-name> ./config/cylc_hpc && cylc validate <workflow-name> && cylc play <workflow-name> && cylc tui <workflow-name>```
+   - [ ] To rerun in one line: 
+   ```bash
+   cylc stop --now <workflow-name> && cylc clean <workflow-name> && cylc install -n <workflow-name> ./config/cylc_hpc && cylc validate <workflow-name> && cylc play <workflow-name> && cylc tui <workflow-name>
+   ```
 
     __Note__ Error logs are available for each task:
     
-    ```cat ~/cylc-run/<workflow-name>/<run#>/log/job/1/<task-name>/01/job.err```
+    ```bash
+    cat ~/cylc-run/<workflow-name>/<run#>/log/job/1/<task-name>/01/job.err
+    ```
 
 ### Tips for running the code locally for development
 
 When working locally, double check that the Docker client is running and clean the Docker cache to make sure you are using the latest images.
 - [ ] delete any existing images from the Docker Dashboard
-- [ ] from a terminal, run: ```docker rm $(docker ps -aq)```
-- [ ] from a terminal, run: ```docker image prune```
+- [ ] from a terminal, run: 
+```bash
+docker rm $(docker ps -aq)
+```
+- [ ] from a terminal, run: 
+```bash
+docker image prune
+```
 
 When running locally, make sure you have at least Julia 1.9.0 installed with the correct architecture for your local machine. (https://julialang.org/downloads/)
 
