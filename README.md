@@ -17,7 +17,9 @@ To run SOIT manually :
    - [ ] ` export SPACEPSWD=<password>`
 3. Update inputs and run the following: 
 ```bash
-docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath /tmp --centroid_x <input_centroid_x> --centroid_y $<input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/ \
+icefloetracker-fetchdata:main \
+python3 /usr/local/bin/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath /tmp --centroid_x <input_centroid_x> --centroid_y $<input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
 ```
    * be sure to replace `source`, `startdate`, `enddate`, `centroid_x`, and `centroid_y` with your desired inputs
    * csvoutpath must remain as `/tmp` to bind the Docker container output path with your desired local path
@@ -32,7 +34,9 @@ To fetch data independently of other tasks:
 1. Make sure Docker Desktop is running on your local machine.
 2. Update inputs and run the following: 
 ```bash
-docker run --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s <YYYY-MM-DD> -e <YYYY-MM-DD> -c <wgs84|epsg3413> -b <top_left_lat@top_left_lon@lower_right_lat@lower_right_lon|left_x@top_y@right_x@lower_y
+docker run --mount type=bind,source=<your_desired_output_dir>,target=/tmp \
+brownccv/icefloetracker-fetchdata:main \
+/usr/local/bin/fetchdata.sh -o /tmp -s <YYYY-MM-DD> -e <YYYY-MM-DD> -c <wgs84|epsg3413> -b <top_left_lat@top_left_lon@lower_right_lat@lower_right_lon|left_x@top_y@right_x@lower_y
 ```
    * be sure to replace `source`, `s`(startdate), `e`(enddate), `c`(crs), and `b`(bounding box) with your inputs
    * `o`(output) must remain as `/tmp` to bind the Docker container output path with your desired local path
@@ -78,8 +82,10 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
      - centroid_y #lon wgs84
      - minfloearea
      - maxfloearea
-     - project_dir 
+     - project_dir
+
 **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
+
 **Note:** if cycling through more than one set of parameters, enter values separated by a comma, e.g., `startdate = 2022-05-04,2022-05-08`
 
    - [ ] then, build the workflow, run it, and open the Terminal-based User Interface (TUI) to monitor the progress of each task. 
@@ -116,7 +122,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
 
 #### Prerequisites
 __Julia:__ When running locally, make sure you have at least Julia 1.9.0 installed with the correct architecture for your local machine. (https://julialang.org/downloads/)
-<br>
+
 __Docker Desktop:__ Also make sure Docker Desktop client is running in the background to use the Cylc pipeline locally. (https://www.docker.com/products/docker-desktop/)
 
 1. Build a virtual environment and install Cylc
@@ -148,7 +154,8 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
      - minfloearea
      - maxfloearea
      - project_dir
-     **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
+
+   **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
 
    - [ ] `cylc install -n <your-workflow-name> ./config/cylc_local`
    - [ ] `cylc graph <workflow-name> #install graphviz locally`
@@ -168,7 +175,12 @@ If you need to change parameters and re-run a workflow, first do:
    - [ ] Then, proceed to install, play, and open the TUI
    - [ ] To rerun in one line: 
    ```bash
-   cylc stop --now <workflow-name> && cylc clean <workflow-name> && cylc install -n <workflow-name> ./config/cylc_hpc && cylc validate <workflow-name> && cylc play <workflow-name> && cylc tui <workflow-name>
+   cylc stop --now <workflow-name> && \
+   cylc clean <workflow-name> && \
+   cylc install -n <workflow-name> ./config/cylc_hpc && \
+   cylc validate <workflow-name> && \
+   cylc play <workflow-name> && \
+   cylc tui <workflow-name>
    ```
 
 **Note:** Error logs are available for each task:
