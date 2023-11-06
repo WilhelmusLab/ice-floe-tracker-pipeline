@@ -47,7 +47,11 @@ def main():
 
     The following would create a flow file for however many rows of data the user input into the site_location.csv file for use on the Oscar HPC with polar stereographic coordinates, and intending to process floes between 350 and 75000 pixels in area.
 
-    python ./workflow/scripts/flow_generator.py "./config/site_locations.csv" "flow_template_hpc.j2" template_dir="./config/cylc_hpc" "eps3413" 350 75000"""
+    python ./workflow/scripts/flow_generator.py --csvfile "./config/site_locations.csv" --template "flow_template_hpc.j2" --template_dir "./config/cylc_hpc" --crs "epsg3413" --minfloearea 350 --maxfloearea 75000
+
+    In this second example, a flow file will be generated for use on a local OS using lat/lon inputs and considering floes from 500 - 90000 pixels in area.
+
+    python workflow/scripts/flow_generator.py --csvfile "./config/site_locations.csv" --template "flow_template_local.j2" --template_dir "./config/cylc_local" --crs "wgs84" --minfloearea 500 """
 
     parser = argparse.ArgumentParser(description="Generate a Cylc flow file from a CSV matrix of unique location-parameter sets", epilog=example, formatter_class=argparse.RawDescriptionHelpFormatter
     )

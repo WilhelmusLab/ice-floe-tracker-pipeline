@@ -2,7 +2,7 @@
     allow implicit tasks = True
 [task parameters]
     # Update this variable to match the range of parameter sets
-    param_set = 0..1
+    param_set = 0..9
 [scheduling]
     initial cycle point = PT1M #creates a datetime one minute from system time in UTC
     [[graph]]
@@ -12,15 +12,15 @@
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            location = bering_strait,beaufort_sea
-            startdate = 2021-04-19,2021-05-16
-            enddate = 2021-04-21,2021-05-19
-            crs =  epsg3413  # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
+            location = bering_strait,beaufort_sea,hudson_bay,baffin_bay,greenland_sea,barents-kara_seas,laptev_sea,sea_of_okhostk,chukchi-east_siberian_sea
+            startdate = 2020-09-04,2020-09-05,2020-09-06,2020-09-07,2020-09-08,2020-09-09,2020-09-10,2020-09-11,2020-09-12
+            enddate = 2020-09-07,2020-09-08,2020-09-09,2020-09-10,2020-09-11,2020-09-12,2020-09-13,2020-09-14,2020-09-15
+            crs = wgs84 # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
                              # wgs84 for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon            
-            bounding_box = -3002871.00126@2327477.2577@-1502871.00126@827477.2577,-2383879@750000@-883879@-750000
-            centroid_x = 75,74
-            centroid_y = 20,19
-            minfloearea = 350
+            bounding_box = 55.92827@-172.77869@74.25843@-163.83708,67.22298@-152.46426@79.32881@-94.68433,59.65687@-101.24295@57.54266@-66.04186,78.56615@-109.47909@66.90089@-44.91683,86.74814@-22.28082@67.34803@-8.27171,77.80705@94.33881@67.97169@33.18632,68.06271@146.18069@77.63863@84.72775,50.16669@155.19018@65.30942@136.05286,65.66088@171.50375@83.94127@143.00753
+            centroid_x = 65,75,60,75,77,75,75,58,75
+            centroid_y = -170,-135,-83,-65,-10,54,125,148,166
+            minfloearea = 500
             maxfloearea = 90000
             project_dir="/Users/tdivoll/Projects/Wilhelmus/ice-floe-tracker-pipeline" #the location where you cloned the pipeline repo
 
