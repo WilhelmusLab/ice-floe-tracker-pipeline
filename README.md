@@ -45,7 +45,34 @@ brownccv/icefloetracker-fetchdata:main \
 
 ## Cylc to run the pipeline
 
-Cylc is used to encode the entire pipeline from start to finish and relies on the command line scripts to automate the workflow. The `config/cylc_hpc/flow.cylc` file should be suitable for runs on HPC systems. The default pipeline is built to run on Brown's Oscar HPC and each task is submitted as its own batch job. To run Cylc locally, the `config/cylc_local_flow.cylc` file is used.
+Cylc is used to encode the entire pipeline from start to finish and relies on the command line scripts to automate the workflow. The `config/cylc_hpc/flow.cylc` file should be suitable for runs on HPC systems. The default pipeline is built to run on Brown's Oscar HPC and each task is submitted as its own batch job. To run Cylc locally, the `config/cylc_local/flow.cylc` file is used.
+
+### Generating the `flow.cylc` file to iterate through parameter sets
+
+We can use Jinja2 to populate a `flow.cylc` file using a CSV matrix. 
+1. Use the `site_locations_template.csv` to fill in your desired parameters, one row for each set. Save as `site_locations.csv` in the `config` directory.
+These fieds are required:  
+   - `location` (string name)
+   - `center_lat` (int wgs84)
+   - `center_lon` (int wgs84)
+   - `startdate` (YYYY-MM-DD)
+   - `enddate` (YYYY-MM-DD)
+
+   For wgs84(lat/lon), use: 
+   - `top_left_lat`
+   - `top_left_lon` 
+   - `lower_right_lat`
+   - `lower_right_lon`
+
+   For epsg3413(polar stereographic), use:
+   - `left_x`
+   - `right_x`
+   - `lower_y`
+   - `top_y`
+   
+**Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
+
+2. Jump to either running the Cylc pipeline on [Oscar](#running-the-cylc-pipeline-on-oscar) or [local](#running-the-cylc-pipeline-locally)
 
 ### Running the Cylc pipeline on Oscar
 
@@ -72,21 +99,19 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
     Cylc will use software dependencies inside a Singularity container to fetch images and satellite times from external APIs. 
    - [ ] It is a good idea to reset the Singularity cache dir as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images)
 
-   - [ ] first update the parameters at the top of the `flow.cylc` file:
-     - param_set # just enter `0` for one set of parameters or `0..n` for cycling
-     - startdate
-     - enddate
-     - crs
-     - bounding_box
-     - centroid_x #lat wgs84
-     - centroid_y #lon wgs84
-     - minfloearea
-     - maxfloearea
-     - project_dir
+   - [ ] first populate the `flow.cylc` file by running: 
+   ```python
+   python workflow/scripts/flow_generator.py \
+   --csvfile "./config/site_locations.csv" \
+   --template "flow_template_hpc.j2" \
+   --template_dir "./config/cylc_hpc" \
+   --crs "<crs>" \
+   --minfloearea <value> \
+   --maxfloearea <value>
+   ```
+Run `python workflow/scripts/flow_generator.py --help` for a list of options.
 
-**Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
-
-**Note:** if cycling through more than one set of parameters, enter values separated by a comma, e.g., `startdate = 2022-05-04,2022-05-08`
+**Note:** if cycling through more than one set of parameters, values need to be separated by a comma, e.g., `startdate = 2022-05-04,2022-05-08`
 
    - [ ] then, build the workflow, run it, and open the Terminal-based User Interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
@@ -144,16 +169,16 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
 
 4. Install your workflow, run it, and monitor with the Terminal User Interface (TUI)
 
-   - [ ] first update the parameters at the top of the `flow.cylc` file:
-     - startdate
-     - enddate
-     - crs
-     - bounding_box
-     - centroid_x #lat wgs84
-     - centroid_y #lon wgs84
-     - minfloearea
-     - maxfloearea
-     - project_dir
+   - [ ] first populate the `flow.cylc` file by running: 
+   ```python
+   python workflow/scripts/flow_generator.py \
+   --csvfile "./config/site_locations.csv" \
+   --template "flow_template_local.j2" \
+   --template_dir "./config/cylc_local" \
+   --crs "<crs>" \
+   --minfloearea <value> \
+   --maxfloearea <value>
+   ```
 
    **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
 
