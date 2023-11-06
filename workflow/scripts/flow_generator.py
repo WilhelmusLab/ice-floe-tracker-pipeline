@@ -47,7 +47,7 @@ def main():
 
     The following would create a flow file for however many rows of data the user input into the site_location.csv file for use on the Oscar HPC with polar stereographic coordinates, and intending to process floes between 350 and 75000 pixels in area.
 
-    python ./workflow/scripts/flow_generator.py "./config/site_locations.csv" "flow_template.j2" template_dir="./config/cylc_hpc" "eps3413" 350 75000"""
+    python ./workflow/scripts/flow_generator.py "./config/site_locations.csv" "flow_template_hpc.j2" template_dir="./config/cylc_hpc" "eps3413" 350 75000"""
 
     parser = argparse.ArgumentParser(description="Generate a Cylc flow file from a CSV matrix of unique location-parameter sets", epilog=example, formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -59,11 +59,13 @@ def main():
     parser.add_argument(
         "--template",
         type=str,
+        choices=['flow_template_hpc.j2','flow_template_local.j2'],
         help="`flow_template.j2` file that needs to be populated",
     )
     parser.add_argument(
         "--template_dir",
         type=str,
+        choices=['./config/cylc_hpc','./config/cylc_local'],
         help="Location path to the directory containing j2 template file",
     )
     parser.add_argument(
