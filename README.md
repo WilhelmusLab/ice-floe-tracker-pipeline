@@ -6,6 +6,8 @@ This repository contains the processing pipeline for IceFloeTracker.jl and ancil
 
 The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.ZBhat-zMJUe) is called to generate a list of satellite times for both Aqua and Terra in the area of interest. This program is written in Python and its dependencies are pulled from a Docker container at `docker://brownccv/icefloetracker-fetchdata:main`. 
 
+Register an account with [space-track.org](https://www.space-track.org/) to use SOIT. 
+
 To run SOIT manually :
 1. Make sure Docker Desktop is running on your local machine.
 2. Export SOIT username/password to environment variable.
@@ -84,7 +86,7 @@ These fieds are required:
    - [ ] `conda env create -f ./config/ift-env.yaml`
    - [ ] `conda activate ift-env`
 
-3. Make sure you have set SOIT credentials as an environment variable as outlined in in the [SOIT integration](#soit-integration) section.
+3. Make sure you have registered for an account with `space-track.org` and exported your SOIT credentials as an environment variable on Oscar as outlined in in the [SOIT integration](#soit-integration) section.
 
 4. Prepare the runtime environment 
 
@@ -149,11 +151,9 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
 
 **Note:** Depending on your existing Conda config, you may need to update your `.condarc` file to: `auto_activate_base: false` if you get errors running your first Cylc workflow.
 
-2. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
+2. Make sure you have registered for an account with `space-track.org` and exported your SOIT credentials as an environment variable on your local computer as outlined in the [SOIT integration](#soit-integration) section.
 
-3. Make sure you have set SOIT credentials as an environment variable as outlined in in the [SOIT integration](#soit-integration) section.
-
-4. Install your workflow, run it, and monitor with the Terminal User Interface (TUI)
+3. Install your workflow, run it, and monitor with the Terminal User Interface (TUI)
 
    - [ ] first populate the `flow.cylc` file by running: 
    ```python
@@ -166,7 +166,7 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
    --maxfloearea <value>
    ```
    Run `python workflow/scripts/flow_generator.py --help` for a list of options.
-   
+
    - [ ] `cylc install -n <your-workflow-name> ./config/cylc_local`
    - [ ] `cylc graph <workflow-name> #install graphviz locally`
    - [ ] `cylc validate <workflow-name>`
