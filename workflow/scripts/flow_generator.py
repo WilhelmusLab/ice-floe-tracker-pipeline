@@ -1,6 +1,6 @@
 
 from jinja2 import Environment, FileSystemLoader # templating engine
-import pandas as pd, os
+import pandas as pd, os, argparse
 
 def get_parameters(data, name, crs=None):
     if name != "bounding_box":
@@ -20,41 +20,75 @@ def get_bounding_box_list(data, crs="wgs84"):
     return ",".join(data.apply(f, axis=1).values)
 
 def generate_cylc_file(csvfile="site_locations.csv", template="flow_template.j2", template_dir="./config", crs="wgs84", minfloearea=350, maxfloearea=90_000):
-    """
-    Generate cylc files from template.
-
-    Parameters
-    ----------
-    csvfile : str
-        Name of CSV file with parameters for cylc flow file. Each row is a unique set of parameters.
-    template : str
-        Name of template file to fill.
-    template_dir : str
-        Path to directory with template and csv files.
-    crs : str
-        Either "wgs84" (default) or "epsg3413"
-    minfloearea : int
-        Default = 350
-    maxfloearea : int
-        Default = 90,000
-    """
+    
     df = pd.read_csv(csvfile)
-    df['startdate'] = pd.to_datetime(df['startdate']).dt.strftime('%Y-%m-%d')
-    df['enddate'] = pd.to_datetime(df['enddate']).dt.strftime('%Y-%m-%d')
+    date_columns = ['startdate', 'enddate']
+    df[date_columns] = df[date_columns].apply(lambda x: pd.to_datetime(x).dt.strftime('%Y-%m-%d'))
     df['bounding_box'] = None
     data = {c: get_parameters(df, c, crs) for c in df.columns}
+    data['rows'] = len(df.index)
     data['crs'] = crs
     data['minfloearea'] = minfloearea
     data['maxfloearea'] = maxfloearea
-    data['centroid_x'] = data['center_x']
-    data['centroid_y'] = data['center_y']
-    template_dir = "./config"
-    template = "flow_template.j2"
+    data['centroid_x'] = data['center_lat']
+    data['centroid_y'] = data['center_lon']
+    template_dir = template_dir
+    template = template
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template(template)
-    fname = os.path.join(template_dir, "testflow.cylc")
+    fname = os.path.join(template_dir, "flow.cylc")
     content = template.render(data)
     with open(fname, "w") as fh:
         fh.write(content)
 
-generate_cylc_file('./config/site_locations.csv', 'flow_template.j2', template_dir='./config', crs="wgs84")
+
+def main():
+    example = """Example:
+
+    The following would create a flow file for however many rows of data the user input into the site_location.csv file for use on the Oscar HPC with polar stereographic coordinates, and intending to process floes between 350 and 75000 pixels in area.
+
+    python ./workflow/scripts/flow_generator.py "./config/site_locations.csv" "flow_template.j2" template_dir="./config/cylc_hpc" "eps3413" 350 75000"""
+
+    parser = argparse.ArgumentParser(description="Generate a Cylc flow file from a CSV matrix of unique location-parameter sets", epilog=example, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--csvfile",
+        type=str,
+        help="path to `site_locations.csv` file with each param set as unique row",
+    )
+    parser.add_argument(
+        "--template",
+        type=str,
+        help="`flow_template.j2` file that needs to be populated",
+    )
+    parser.add_argument(
+        "--template_dir",
+        type=str,
+        help="Location path to the directory containing j2 template file",
+    )
+    parser.add_argument(
+        "--crs",
+        type=str,
+        choices=['wgs84','epsg3413'],
+        help="Either 'wgs84' or 'epsg3413'",
+    )
+    parser.add_argument(
+        "--minfloearea",
+        type=int,
+        default=350,
+        help="minimum pixel size of ice floes to process",
+    )
+    parser.add_argument(
+        "--maxfloearea",
+        type=int,
+        default=90000,
+        help="maximum pixel size of ice floes to process"
+    )
+
+    args = parser.parse_args()
+    
+    generate_cylc_file(**vars(args))
+
+if __name__ == "__main__":
+
+    main()
