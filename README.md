@@ -58,13 +58,13 @@ These fieds are required:
    - `startdate` (YYYY-MM-DD)
    - `enddate` (YYYY-MM-DD)
 
-   For wgs84(lat/lon), use: 
+   For wgs84 (lat/lon), use: 
    - `top_left_lat`
    - `top_left_lon` 
    - `lower_right_lat`
    - `lower_right_lon`
 
-   For epsg3413(polar stereographic), use:
+   For epsg3413 (polar stereographic), use:
    - `left_x`
    - `right_x`
    - `lower_y`
@@ -84,17 +84,9 @@ These fieds are required:
    - [ ] `conda env create -f ./config/ift-env.yaml`
    - [ ] `conda activate ift-env`
 
-3. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
+3. Make sure you have set SOIT credentials as an environment variable as outlined in in the [SOIT integration](#soit-integration) section.
 
-4. Export SOIT username/password to environment variable
-   - [ ] From your home directory `nano .bash_profile`
-   - [ ] add `export HISTCONTROL=ignoreboth` to the bottom of your .bash_profile
-        * this will ensure that your username/password are not stored in history
-        * when exporting the following environment variables, there __must__ be a space in front of each command
-   - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
-   - [ ] ` export SPACEPSWD=<password>`
-
-5. Prepare the runtime environment 
+4. Prepare the runtime environment 
 
     Cylc will use software dependencies inside a Singularity container to fetch images and satellite times from external APIs. 
    - [ ] It is a good idea to reset the Singularity cache dir as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images)
@@ -159,13 +151,7 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
 
 2. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
 
-3. Export SOIT username/password to environment variable
-   - [ ] From your home directory`nano .bash_profile`
-   - [ ] add `export HISTCONTROL=ignoreboth` to the bottom of your .bash_profile
-        * this will ensure that your username/password are not stored in history
-        * when exporting the following environment variables, there __must__ be a space in front of each command
-   - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
-   - [ ] ` export SPACEPSWD=<password>`
+3. Make sure you have set SOIT credentials as an environment variable as outlined in in the [SOIT integration](#soit-integration) section.
 
 4. Install your workflow, run it, and monitor with the Terminal User Interface (TUI)
 
@@ -179,9 +165,8 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
    --minfloearea <value> \
    --maxfloearea <value>
    ```
-
-   **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
-
+   Run `python workflow/scripts/flow_generator.py --help` for a list of options.
+   
    - [ ] `cylc install -n <your-workflow-name> ./config/cylc_local`
    - [ ] `cylc graph <workflow-name> #install graphviz locally`
    - [ ] `cylc validate <workflow-name>`
