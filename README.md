@@ -50,7 +50,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
 ### Generating the `flow.cylc` file to iterate through parameter sets
 
 We can use Jinja2 to populate a `flow.cylc` file using a CSV matrix. 
-1. Use the `site_locations_template.csv` to fill in your desired parameters, one row for each set. Save as `site_locations.csv` in the `config` directory.
+1. Use the `sample_site_locations.csv` to fill in your desired parameters, one row for each set. Save as `site_locations.csv` in the `config` directory.
 These fieds are required:  
    - `location` (string name)
    - `center_lat` (int wgs84)
@@ -69,7 +69,7 @@ These fieds are required:
    - `right_x`
    - `lower_y`
    - `top_y`
-   
+
 **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
 
 2. Jump to either running the Cylc pipeline on [Oscar](#running-the-cylc-pipeline-on-oscar) or [local](#running-the-cylc-pipeline-locally)
