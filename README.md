@@ -6,6 +6,8 @@ This repository contains the processing pipeline for IceFloeTracker.jl and ancil
 
 The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.ZBhat-zMJUe) is called to generate a list of satellite times for both Aqua and Terra in the area of interest. This program is written in Python and its dependencies are pulled from a Docker container at `docker://brownccv/icefloetracker-fetchdata:main`. 
 
+Register an account with [space-track.org](https://www.space-track.org/) to use SOIT. 
+
 To run SOIT manually :
 1. Make sure Docker Desktop is running on your local machine.
 2. Export SOIT username/password to environment variable.
@@ -45,7 +47,34 @@ brownccv/icefloetracker-fetchdata:main \
 
 ## Cylc to run the pipeline
 
-Cylc is used to encode the entire pipeline from start to finish and relies on the command line scripts to automate the workflow. The `config/cylc_hpc/flow.cylc` file should be suitable for runs on HPC systems. The default pipeline is built to run on Brown's Oscar HPC and each task is submitted as its own batch job. To run Cylc locally, the `config/cylc_local_flow.cylc` file is used.
+Cylc is used to encode the entire pipeline from start to finish and relies on the command line scripts to automate the workflow. The `config/cylc_hpc/flow.cylc` file should be suitable for runs on HPC systems. The default pipeline is built to run on Brown's Oscar HPC and each task is submitted as its own batch job. To run Cylc locally, the `config/cylc_local/flow.cylc` file is used.
+
+### Generating the `flow.cylc` file to iterate through parameter sets
+
+We can use Jinja2 to populate a `flow.cylc` file using a CSV file with input parameters. 
+1. Use the `sample_site_locations.csv` to fill in your desired parameters, one row for each set. Save as `site_locations.csv` in the `config` directory.
+These fieds are required:  
+   - `location` (string name)
+   - `center_lat` (int wgs84)
+   - `center_lon` (int wgs84)
+   - `startdate` (YYYY-MM-DD)
+   - `enddate` (YYYY-MM-DD)
+
+   For wgs84 (lat/lon), use: 
+   - `top_left_lat`
+   - `top_left_lon` 
+   - `lower_right_lat`
+   - `lower_right_lon`
+
+   For epsg3413 (polar stereographic), use:
+   - `left_x`
+   - `right_x`
+   - `lower_y`
+   - `top_y`
+
+**Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
+
+2. Jump to either running the Cylc pipeline on [Oscar](#running-the-cylc-pipeline-on-oscar) or [local](#running-the-cylc-pipeline-locally)
 
 ### Running the Cylc pipeline on Oscar
 
@@ -57,36 +86,24 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
    - [ ] `conda env create -f ./config/ift-env.yaml`
    - [ ] `conda activate ift-env`
 
-3. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
+3. Make sure you have registered for an account with `space-track.org` and exported your SOIT credentials as an environment variable on Oscar as outlined in the [SOIT integration](#soit-integration) section.
 
-4. Export SOIT username/password to environment variable
-   - [ ] From your home directory `nano .bash_profile`
-   - [ ] add `export HISTCONTROL=ignoreboth` to the bottom of your .bash_profile
-        * this will ensure that your username/password are not stored in history
-        * when exporting the following environment variables, there __must__ be a space in front of each command
-   - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
-   - [ ] ` export SPACEPSWD=<password>`
-
-5. Prepare the runtime environment 
+4. Prepare the runtime environment 
 
     Cylc will use software dependencies inside a Singularity container to fetch images and satellite times from external APIs. 
-   - [ ] It is a good idea to reset the Singularity cache dir as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images)
+   - [ ] It is a good idea to reset the Singularity cache dir to `scratch` as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images). Images take up a lot of space and `scratch` gets cleaned regularly.
 
-   - [ ] first update the parameters at the top of the `flow.cylc` file:
-     - param_set # just enter `0` for one set of parameters or `0..n` for cycling
-     - startdate
-     - enddate
-     - crs
-     - bounding_box
-     - centroid_x #lat wgs84
-     - centroid_y #lon wgs84
-     - minfloearea
-     - maxfloearea
-     - project_dir
-
-**Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
-
-**Note:** if cycling through more than one set of parameters, enter values separated by a comma, e.g., `startdate = 2022-05-04,2022-05-08`
+   - [ ] first populate the `flow.cylc` file by running: 
+   ```python
+   python workflow/scripts/flow_generator.py \
+   --csvfile "./config/site_locations.csv" \
+   --template "flow_template_hpc.j2" \
+   --template_dir "./config/cylc_hpc" \
+   --crs "<crs>" \
+   --minfloearea <value> \
+   --maxfloearea <value>
+   ```
+Run `python workflow/scripts/flow_generator.py --help` for a list of options.
 
    - [ ] then, build the workflow, run it, and open the Terminal-based User Interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)
@@ -132,30 +149,21 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
 
 **Note:** Depending on your existing Conda config, you may need to update your `.condarc` file to: `auto_activate_base: false` if you get errors running your first Cylc workflow.
 
-2. Register an account with [space-track.org](https://www.space-track.org/) for SOIT
+2. Make sure you have registered for an account with `space-track.org` and exported your SOIT credentials as an environment variable on your local computer as outlined in the [SOIT integration](#soit-integration) section.
 
-3. Export SOIT username/password to environment variable
-   - [ ] From your home directory`nano .bash_profile`
-   - [ ] add `export HISTCONTROL=ignoreboth` to the bottom of your .bash_profile
-        * this will ensure that your username/password are not stored in history
-        * when exporting the following environment variables, there __must__ be a space in front of each command
-   - [ ] ` export SPACEUSER=<firstname>_<lastname>@brown.edu`
-   - [ ] ` export SPACEPSWD=<password>`
+3. Install your workflow, run it, and monitor with the Terminal User Interface (TUI)
 
-4. Install your workflow, run it, and monitor with the Terminal User Interface (TUI)
-
-   - [ ] first update the parameters at the top of the `flow.cylc` file:
-     - startdate
-     - enddate
-     - crs
-     - bounding_box
-     - centroid_x #lat wgs84
-     - centroid_y #lon wgs84
-     - minfloearea
-     - maxfloearea
-     - project_dir
-
-   **Note:** bounding box format = top_left_x top_left_y bottom_right_x bottom_right_y (x = lat(wgs84) or easting(epsg3413),  y = lon(wgs84) or northing(epsg3413))
+   - [ ] first populate the `flow.cylc` file by running: 
+   ```python
+   python workflow/scripts/flow_generator.py \
+   --csvfile "./config/site_locations.csv" \
+   --template "flow_template_local.j2" \
+   --template_dir "./config/cylc_local" \
+   --crs "<crs>" \
+   --minfloearea <value> \
+   --maxfloearea <value>
+   ```
+   Run `python workflow/scripts/flow_generator.py --help` for a list of options.
 
    - [ ] `cylc install -n <your-workflow-name> ./config/cylc_local`
    - [ ] `cylc graph <workflow-name> #install graphviz locally`

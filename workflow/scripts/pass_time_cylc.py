@@ -435,7 +435,7 @@ def daysInMonth(month, year):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Overpass time tool")
+    parser = argparse.ArgumentParser(description="Aqua and Terra Satellite Overpass time tool")
     parser.add_argument(
         "--SPACEUSER",
         "-u",

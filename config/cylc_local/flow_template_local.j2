@@ -2,7 +2,7 @@
     allow implicit tasks = True
 [task parameters]
     # Update this variable to match the range of parameter sets
-    param_set = 0..1
+    param_set = 0..{{ rows }}
 [scheduling]
     initial cycle point = PT1M #creates a datetime one minute from system time in UTC
     [[graph]]
@@ -12,16 +12,16 @@
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            location = bering_strait,beaufort_sea
-            startdate = 2021-04-19,2021-05-16
-            enddate = 2021-04-21,2021-05-19
-            crs =  epsg3413  # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
+            location = {{ location }}
+            startdate = {{ startdate }}
+            enddate = {{ enddate }}
+            crs = {{ crs }} # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
                              # wgs84 for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon            
-            bounding_box = -3002871.00126@2327477.2577@-1502871.00126@827477.2577,-2383879@750000@-883879@-750000
-            centroid_x = 75,74
-            centroid_y = 20,19
-            minfloearea = 350
-            maxfloearea = 90000
+            bounding_box = {{ bounding_box }}
+            centroid_x = {{ centroid_x }}
+            centroid_y = {{ centroid_y }}
+            minfloearea = {{ minfloearea }}
+            maxfloearea = {{ maxfloearea }}
             project_dir="/Users/tdivoll/Projects/Wilhelmus/ice-floe-tracker-pipeline" #the location where you cloned the pipeline repo
 
             # Recommend using these default paths for output
