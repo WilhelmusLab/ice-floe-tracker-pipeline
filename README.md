@@ -51,7 +51,7 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
 
 ### Generating the `flow.cylc` file to iterate through parameter sets
 
-We can use Jinja2 to populate a `flow.cylc` file using a CSV matrix. 
+We can use Jinja2 to populate a `flow.cylc` file using a CSV file with input parameters. 
 1. Use the `sample_site_locations.csv` to fill in your desired parameters, one row for each set. Save as `site_locations.csv` in the `config` directory.
 These fieds are required:  
    - `location` (string name)
@@ -86,12 +86,12 @@ These fieds are required:
    - [ ] `conda env create -f ./config/ift-env.yaml`
    - [ ] `conda activate ift-env`
 
-3. Make sure you have registered for an account with `space-track.org` and exported your SOIT credentials as an environment variable on Oscar as outlined in in the [SOIT integration](#soit-integration) section.
+3. Make sure you have registered for an account with `space-track.org` and exported your SOIT credentials as an environment variable on Oscar as outlined in the [SOIT integration](#soit-integration) section.
 
 4. Prepare the runtime environment 
 
     Cylc will use software dependencies inside a Singularity container to fetch images and satellite times from external APIs. 
-   - [ ] It is a good idea to reset the Singularity cache dir as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images)
+   - [ ] It is a good idea to reset the Singularity cache dir to `scratch` as specified [here](https://docs.ccv.brown.edu/oscar/singularity-containers/building-images). Images take up a lot of space and `scratch` gets cleaned regularly.
 
    - [ ] first populate the `flow.cylc` file by running: 
    ```python
@@ -104,8 +104,6 @@ These fieds are required:
    --maxfloearea <value>
    ```
 Run `python workflow/scripts/flow_generator.py --help` for a list of options.
-
-**Note:** if cycling through more than one set of parameters, values need to be separated by a comma, e.g., `startdate = 2022-05-04,2022-05-08`
 
    - [ ] then, build the workflow, run it, and open the Terminal-based User Interface (TUI) to monitor the progress of each task. 
     ![TUI example](./tui-example.png)

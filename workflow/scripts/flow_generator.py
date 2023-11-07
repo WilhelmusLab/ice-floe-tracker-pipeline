@@ -26,14 +26,12 @@ def generate_cylc_file(csvfile="site_locations.csv", template="flow_template.j2"
     df[date_columns] = df[date_columns].apply(lambda x: pd.to_datetime(x).dt.strftime('%Y-%m-%d'))
     df['bounding_box'] = None
     data = {c: get_parameters(df, c, crs) for c in df.columns}
-    data['rows'] = len(df.index)
+    data['rows'] = len(df.index) - 1
     data['crs'] = crs
     data['minfloearea'] = minfloearea
     data['maxfloearea'] = maxfloearea
     data['centroid_x'] = data['center_lat']
     data['centroid_y'] = data['center_lon']
-    template_dir = template_dir
-    template = template
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template(template)
     fname = os.path.join(template_dir, "flow.cylc")
@@ -45,7 +43,7 @@ def generate_cylc_file(csvfile="site_locations.csv", template="flow_template.j2"
 def main():
     example = """Example:
 
-    The following would create a flow file for however many rows of data the user input into the site_location.csv file for use on the Oscar HPC with polar stereographic coordinates, and intending to process floes between 350 and 75000 pixels in area.
+    The following would create a flow file for however many rows of data the user input into the site_location.csv file for use on a high-performance cluster (like Brown's Oscar) with polar stereographic coordinates, and intending to process floes between 350 and 75000 pixels in area.
 
     python ./workflow/scripts/flow_generator.py --csvfile "./config/site_locations.csv" --template "flow_template_hpc.j2" --template_dir "./config/cylc_hpc" --crs "epsg3413" --minfloearea 350 --maxfloearea 75000
 
