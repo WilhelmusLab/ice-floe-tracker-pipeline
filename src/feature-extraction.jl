@@ -29,23 +29,22 @@ julia> features = ["centroid", "area", "major_axis_length", "minor_axis_length",
  "convex_area"
  "bbox"
 
- julia> minarea, maxarea = 1, 5
+julia> minarea, maxarea = 1, 5
  (1, 5)
 
- julia> IceFloeTracker.Pipeline.extractfeatures(bw_img; minarea=minarea, maxarea=maxarea, features=features)
- 8×10 DataFrame
-  Row │ area   bbox-0  bbox-1  bbox-2  bbox-3  centroid-0  centroid-1  convex_area  major_axis_length  minor_axis_length 
-      │ Int32  Int32   Int32   Int32   Int32   Float64     Float64     Int32        Float64            Float64
- ─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-    1 │     1       1       3       2       4        0.0         2.0             1            0.0                0.0
-    2 │     1       5       9       6      10        4.0         8.0             1            0.0                0.0
-    3 │     2       1      18       2      20        0.0        17.5             2            2.0                0.0
-    4 │     2       5      28       6      30        4.0        27.5             2            2.0                0.0
-    5 │     1       4      31       5      32        3.0        30.0             1            0.0                0.0
-    6 │     1       5      33       6      34        4.0        32.0             1            0.0                0.0
-    7 │     4       4      35       6      39        3.25       35.5             5            4.68021            1.04674
-    8 │     4       4      47       6      50        3.75       47.25            5            3.4641             1.41421
- 
+julia> IFTPipeline.extractfeatures(bw_img; minarea=minarea, maxarea=maxarea, features=features)
+8×10 DataFrame
+ Row │ area   min_row  min_col  max_row  max_col  row_centroid  col_centroid  convex_area  major_axis_length  minor_axis_length 
+     │ Int32  Int32    Int32    Int32    Int32    Int64         Int64         Int32        Float64            Float64
+─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │     1        1        3        1        3             1             3            1            0.0                0.0
+   2 │     1        5        9        5        9             5             9            1            0.0                0.0
+   3 │     2        1       18        1       19             1            19            2            2.0                0.0
+   4 │     2        5       28        5       29             5            29            2            2.0                0.0
+   5 │     1        4       31        4       31             4            31            1            0.0                0.0
+   6 │     1        5       33        5       33             5            33            1            0.0                0.0
+   7 │     4        4       35        5       38             4            37            5            4.68021            1.04674
+   8 │     4        4       47        5       49             5            48            5            3.4641             1.41421
 ```
 """
 function extractfeatures(
