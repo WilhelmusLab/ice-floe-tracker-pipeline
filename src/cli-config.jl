@@ -81,8 +81,8 @@ function mkclitrack!(settings)
         help = "Path to object with satellite pass times"
         required = true
 
-        "--deltat"
-        help = "Path to object with time deltas between consecutive images"
+        "--latlon"
+        help = "Path to geotiff image with latitude/longitude data"
         required = true
 
         "--output", "-o"

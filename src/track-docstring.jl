@@ -2,7 +2,7 @@
 Pair floes in the floe library using an equivalent implementation as in the MATLAB script `final_2020.m` from https://github.com/WilhelmusLab/ice-floe-tracker/blob/main/existing_code/final_2020.m.
 
 # Arguments
-- `indir`: path to directory containing the floe library (cropped floe masks for registration and correlation), extracted features from segmented images, and overpass elapsed times `delta_t`.
+- `indir`: path to directory containing the floe library (cropped floe masks for registration and correlation), extracted features from segmented images, and satellite overpass times.
 - `condition_thresholds`: 3-tuple of thresholds (each a named tuple) for deciding whether to match floe `i` from day `k` to floe j from day `k+1`.
 - `mc_thresholds`: thresholds for area mismatch and psi-s shape correlation and goodness of a match. 
 
