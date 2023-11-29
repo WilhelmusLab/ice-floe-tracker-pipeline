@@ -9,54 +9,6 @@ function makeh5filename(imgfname, ts)
 end
 
 """
-    convertcentroid!(propdf, latlondata, colstodrop)
-
-Convert the centroid coordinates from row and column to latitude and longitude. Also drop the columns specified in `colstodrop`.
-"""
-function convertcentroid!(propdf, latlondata, colstodrop)
-    latitude, longitude = [
-        [latlondata[c][x, y] for
-         (x, y) in zip(propdf.row_centroid, propdf.col_centroid)] for
-        c in ["latitude", "longitude"]
-    ]
-
-    x, y = [
-        [latlondata[c][z] for z in V] for
-        (c, V) in zip(["Y", "X"], [propdf.row_centroid, propdf.col_centroid])
-    ]
-
-    propdf.latitude = latitude
-    propdf.longitude = longitude
-    propdf.x = x
-    propdf.y = y
-    dropcols!(propdf, colstodrop)
-    return nothing
-end
-
-function dropcols!(df, colstodrop)
-    select!(df, Not(colstodrop))
-    return nothing
-end
-
-function converttounits!(propdf, latlondata, colstodrop)
-    if nrow(propdf) == 0
-        dropcols!(propdf, colstodrop)
-        return nothing
-    end
-    convertcentroid!(propdf, latlondata, colstodrop)
-    x = latlondata["X"]
-    dx = abs(x[2] - x[1])
-    convertarea(area) = area * dx^2 / 1e6
-    convertlength(length) = length * dx / 1e3
-    propdf.area .= convertarea(propdf.area)
-    propdf.convex_area .= convertarea(propdf.convex_area)
-    propdf.minor_axis_length .= convertlength(propdf.minor_axis_length)
-    propdf.major_axis_length .= convertlength(propdf.major_axis_length)
-    propdf.perimeter .= convertlength(propdf.perimeter)
-    return nothing
-end
-
-"""
     makeh5files(pathtosampleimg, resdir)
 
 Package the results of the IceFloeTracker pipeline in `resdir` into individual HDF5 files in `resdir/hdf5-files`. 

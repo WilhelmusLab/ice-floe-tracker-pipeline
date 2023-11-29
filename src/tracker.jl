@@ -2,7 +2,7 @@
     track(
     imgsdir::String,
     propsdir::String,
-    timedeltasdir::String,
+    passtimesdir::String,
     paramsdir::String,
     outdir::String,
 )
@@ -11,13 +11,13 @@ $(include("track-docstring.jl"))
 """
 function track(; args...)
     condition_thresholds, mc_thresholds = get_thresholds(; args...)
-    vals = values(args)
+    vals = NamedTuple{Tuple(keys(args))}(values(args)) # convert to NamedTuple
     imgs = deserialize(joinpath(vals.imgs, "segmented_floes.jls"))
     props = deserialize(joinpath(vals.props, "floe_props.jls"))
     passtimes = deserialize(joinpath(vals.passtimes, "passtimes.jls"))
-    deltat = deserialize(joinpath(vals.deltat, "timedeltas.jls"))
-    labeledfloes, tracked = pairfloes(imgs, props, passtimes, deltat, condition_thresholds, mc_thresholds)
-    [serialize(joinpath(vals.output, name), obj) for (name, obj) in zip(["labeled_floes.jls", "track_data.jls"], [labeledfloes, tracked])]
+    latlon = vals.latlon
+    labeledfloes = IceFloeTracker.pairfloes(imgs, props, passtimes, latlon, condition_thresholds, mc_thresholds)
+    serialize(joinpath(vals.output, "labeled_floes.jls"), labeledfloes)
     return nothing
 end
 
