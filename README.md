@@ -1,5 +1,7 @@
 # Ice Floe Tracker Pipeline
 
+[![Build Status](https://github.com/WilhelmusLab/ice-floe-tracker-pipeline/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/WilhelmusLab/ice-floe-tracker-pipeline/actions/workflows/CI.yml?query=branch%3Amain)
+
 This repository contains the processing pipeline for IceFloeTracker.jl and ancillary scripts.
 
 ## SOIT Integration
