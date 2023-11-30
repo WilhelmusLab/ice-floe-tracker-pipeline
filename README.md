@@ -1,6 +1,6 @@
 # Ice Floe Tracker Pipeline
 
-[![Build Status](https://github.com/WilhelmusLab/ice-floe-tracker-pipeline/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/WilhelmusLab/ice-floe-tracker-pipeline/actions/workflows/CI.yml?query=branch%3Amain)
+[![Build Status](https://github.com/WilhelmusLab/ice-floe-tracker-pipeline/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/WilhelmusLab/ice-floe-tracker-pipeline/actions/workflows/test.yml?query=branch%3Amain) [![Coverage](https://codecov.io/gh/WilhelmusLab/ice-floe-tracker-pipeline/branch/main/graph/badge.svg)](https://codecov.io/gh/WilhelmusLab/ice-floe-tracker-pipeline)
 
 This repository contains the processing pipeline for IceFloeTracker.jl and ancillary scripts.
 
