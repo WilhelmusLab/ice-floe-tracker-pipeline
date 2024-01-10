@@ -52,7 +52,7 @@ def get_passtimes(
     lon = float(centroid_lon)
     print(f"Outpath {csvoutpath}")
     print(f"Timeframe starts on {start_date}, and ends on {end_date}")
-    print(f"Cooridinates (x, y): ({centroid_lat}, {centroid_lon})")
+    print(f"Coordinates (x, y): ({centroid_lat}, {centroid_lon})")
 
     end_date = getNextDay(end_date)
 
