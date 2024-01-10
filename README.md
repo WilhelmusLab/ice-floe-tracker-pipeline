@@ -21,7 +21,7 @@ To run SOIT manually :
 3. Update inputs and run the following: 
 ```bash
 docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-fetchdata:main \
-python3 /usr/local/bin/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath /tmp --centroid_x <input_centroid_x> --centroid_y $<input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+python3 /usr/local/bin/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath /tmp --centroid_lat <input_centroid_lat> --centroid_lon <input_centroid_lon> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
 ```
    * be sure to replace `source`, `startdate`, `enddate`, `centroid_lat`, and `centroid_lon` with your desired inputs
    * csvoutpath must remain as `/tmp` to bind the Docker container output path with your desired local path
