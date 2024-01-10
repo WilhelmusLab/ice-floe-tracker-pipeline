@@ -466,6 +466,7 @@ def main():
     parser.add_argument(
         "--centroid_lon",
         "-lon",
+        metavar="centroid_lon",
         type=str,
         help="longitude of bounding box centroid",
     )
