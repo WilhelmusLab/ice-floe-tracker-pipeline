@@ -41,20 +41,18 @@ class MyError(Exception):
 
 
 def get_passtimes(
-    startdate, enddate, csvoutpath, centroid_x, centroid_y, SPACEUSER, SPACEPSWD
+    startdate, enddate, csvoutpath, centroid_lat, centroid_lon, SPACEUSER, SPACEPSWD
 ):
-    centroidx = centroid_x
-    centroidy = centroid_y
     configUsr = SPACEUSER
     configPwd = SPACEPSWD
     siteCred = {"identity": configUsr, "password": configPwd}
     end_date = datetime.datetime.strptime(enddate, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
     start_date = datetime.datetime.strptime(startdate, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
-    lat = int(centroidx)
-    long = int(centroidy)
+    lat = float(centroid_lat)
+    lon = float(centroid_lon)
     print(f"Outpath {csvoutpath}")
     print(f"Timeframe starts on {start_date}, and ends on {end_date}")
-    print(f"Centroid (x, y): ({centroidx}, {centroidy})")
+    print(f"Cooridinates (x, y): ({centroid_lat}, {centroid_lon})")
 
     end_date = getNextDay(end_date)
 
@@ -100,7 +98,7 @@ def get_passtimes(
     ts = load.timescale()
 
     # Specify area of interest.
-    aoi = wgs84.latlon(lat, long)
+    aoi = wgs84.latlon(lat, lon)
 
     # Define today and tomorrow.
     today = start_date
@@ -375,7 +373,7 @@ def get_passtimes(
             today = getNextDay(today)
             tomorrow = getNextDay(today)
 
-    csvwrite(start_date, end_date, lat, long, rows, csvoutpath)
+    csvwrite(start_date, end_date, lat, lon, rows, csvoutpath)
 
 
 # Write CSV of all pass information.
@@ -459,17 +457,17 @@ def main():
         help="End date in format YYYY-MM-DD",
     )
     parser.add_argument(
-        "--centroid_x",
-        "-x",
-        metavar="centroid_x",
+        "--centroid_lat",
+        "-lat",
+        metavar="centroid_lat",
         type=str,
-        help="x-coordinate of bounding box centroid",
+        help="latitude of bounding box centroid",
     )
     parser.add_argument(
-        "--centroid_y",
-        "-y",
+        "--centroid_lon",
+        "-lon",
         type=str,
-        help="y-coordinate of bounding box centroid",
+        help="longitude of bounding box centroid",
     )
     parser.add_argument(
         "--csvoutpath",
