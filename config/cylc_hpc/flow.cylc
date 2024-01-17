@@ -3,7 +3,7 @@
     allow implicit tasks = True
 [task parameters]
     # Update this variable to match the range of parameter sets
-    param_set = 0..{{ rows }}
+    param_set = 0..0
 [scheduling]
     initial cycle point = PT1M #creates a datetime one minute from system time in UTC
     [[graph]]
@@ -13,16 +13,16 @@
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            location = {{ location }}
-            startdate = {{ startdate }}
-            enddate = {{ enddate }}
-            crs = {{ crs }} # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
+            location = bering_strait,beaufort_sea,hudson_bay
+            startdate = 2020-09-04,2020-09-05,2020-09-06
+            enddate = 2020-09-07,2020-09-08,2020-09-09
+            crs = epsg3413 # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
                              # wgs84 for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon            
-            bounding_box = {{ bounding_box }}
-            centroid_x = {{ centroid_x }}
-            centroid_y = {{ centroid_y }}
-            minfloearea = {{ minfloearea }}
-            maxfloearea = {{ maxfloearea }}
+            bounding_box = -3002871.001@2327477.258@-1502871.001@827477.2577,-2383879.497@750000.0@-883879.4975@-750000.0,-2795941.755@-1868686.029@-1295941.755@-3368686.029
+            centroid_x = 65,75,60
+            centroid_y = -170,-135,-83
+            minfloearea = 350
+            maxfloearea = 90000
             project_dir = "~/ice-floe-tracker-pipeline"
 
             # Recommend using these default paths for output
@@ -110,7 +110,7 @@
         # Pull the latest Docker image containing Julia IceFloeTracker software
         # Singularity will check the image layers and only re-download if necessary 
         script = """
-            apptainer pull --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:pr-97
+            apptainer pull --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:main
         """
         platform = oscar
         execution time limit = PT1H

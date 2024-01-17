@@ -2,7 +2,7 @@ FROM julia:1.9-bookworm
 
 ENV TERM=xterm
 ENV JULIA_PROJECT=/opt/ice-floe-tracker-pipeline
-ENV JULIA_DEPOT_PATH=/opt/julia
+ENV JULIA_DEPOT_PATH=/opt/.julia
 ENV JULIA_PKGDIR=/opt/julia
 
 RUN apt-get -y update && \
@@ -18,6 +18,7 @@ RUN /usr/local/julia/bin/julia --project="/opt/ice-floe-tracker-pipeline" -e 'EN
 COPY workflow/scripts/ice-floe-tracker.jl /usr/local/bin/ice-floe-tracker.jl
 
 RUN chmod a+x /usr/local/bin/ice-floe-tracker.jl
+RUN chmod -R a+rX $JULIA_DEPOT_PATH
 
 ENV JULIA_DEPOT_PATH="$HOME/.julia:$JULIA_DEPOT_PATH"
 
