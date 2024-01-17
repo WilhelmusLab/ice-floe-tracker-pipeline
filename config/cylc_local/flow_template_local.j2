@@ -90,7 +90,8 @@
             location_array=( $(echo $location | sed -e 's/,/ /g') )
 
             docker run --mount type=bind,source=$results_dir/${location_array[$i]}/preprocess,target=/tmp \
-            --mount type=bind,source=$report_dir,taget=/usr/local/bin/../report \
+            --mount 
+type=bind,source=$report_dir,target=/usr/local/bin/../report \
             brownccv/icefloetracker-julia:main $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/${location_array[$i]}/truecolor -r $fetchdata_dir/${location_array[$i]}/reflectance -l $results_dir/${location_array[$i]}/landmasks -p $results_dir/${location_array[$i]}/soit -o /tmp
         """
 
