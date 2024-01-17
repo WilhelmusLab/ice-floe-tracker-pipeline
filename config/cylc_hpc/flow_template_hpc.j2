@@ -110,7 +110,7 @@
         # Pull the latest Docker image containing Julia IceFloeTracker software
         # Singularity will check the image layers and only re-download if necessary 
         script = """
-            apptainer pull --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:pr-97
+            apptainer pull --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:main
         """
         platform = oscar
         execution time limit = PT1H
