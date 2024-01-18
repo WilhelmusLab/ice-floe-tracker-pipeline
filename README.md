@@ -97,7 +97,7 @@ These fieds are required:
    - [ ] first populate the `flow.cylc` file by running: 
    ```python
    python workflow/scripts/flow_generator.py \
-   --csvfile "./config/site_locations.csv" \
+   --csvfile "./config/sample_site_locations.csv" \
    --template "flow_template_hpc.j2" \
    --template_dir "./config/cylc_hpc" \
    --crs "<crs>" \
