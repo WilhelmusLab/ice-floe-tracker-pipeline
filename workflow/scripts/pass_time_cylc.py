@@ -348,18 +348,14 @@ def get_passtimes(
             # pass, which means a daytime pass for Terra. These are the only passes of interest. If, furthermore, it's
             # less than the current minimum distance between the overpass and the aoi, this is the new closest pass.
             if not np.isnan(pass_dict["rise_lat"]):
-                if (pass_dict["rise_lat"] > pass_dict["over_lat"]) and (
-                    pass_dict["distance"] < least_distance
-                ):
+                if (pass_dict["rise_lat"] > pass_dict["over_lat"]) and (pass_dict["distance"] < least_distance):
                     least_distance = pass_dict["distance"]
                     closest_time = pass_dict["time"]
 
             # For some edge case passes, rise latitude values are undefined. In this case, compare overpass latitude and
             # set latitude values. If the overpass latitude is greater than the set latitude, it's a descending pass.
             else:
-                if (pass_dict["set_lat"] < pass_dict["over_lat"]) and (
-                    pass_dict["distance"] < least_distance
-                ):
+                if (pass_dict["set_lat"] < pass_dict["over_lat"]) and (pass_dict["distance"] < least_distance):
                     least_distance = pass_dict["distance"]
                     closest_time = pass_dict["time"]
 

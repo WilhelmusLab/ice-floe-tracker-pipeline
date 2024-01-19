@@ -1,4 +1,4 @@
-FROM julia:1.9-bookworm
+FROM julia:1.9.2-bookworm
 
 ENV TERM=xterm
 ENV JULIA_PROJECT=/opt/ice-floe-tracker-pipeline
