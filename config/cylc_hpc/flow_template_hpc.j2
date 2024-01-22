@@ -57,7 +57,7 @@
 
     [[pullfetchimage]]
         # Pull the latest Docker image containing software for fetching images from NASA Worldview API and satellite times from space-track.org
-        # Singularity will check the image layers and only re-download if necessary
+        # Apptainer will check the image layers and only re-download if necessary
         script = """
             apptainer pull --force $project_dir/fetchdata.simg docker://brownccv/icefloetracker-fetchdata:main
         """
@@ -76,7 +76,7 @@
             startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
             enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
 
-            singularity exec --bind $fetchdata_dir/${location_array[$i]}:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_array[$i]} -e ${enddate_array[$i]} -c $crs -b ${bbox_array[$i]}
+            apptainer exec --bind $fetchdata_dir/${location_array[$i]}:/tmp $project_dir/fetchdata.simg /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_array[$i]} -e ${enddate_array[$i]} -c $crs -b ${bbox_array[$i]}
         """
         platform = oscar
         execution time limit = PT1H
@@ -96,7 +96,7 @@
             centroid_x_array=( $(echo $centroid_x| sed -e 's/,/ /g') )
             centroid_y_array=( $(echo $centroid_y | sed -e 's/,/ /g') )
 
-            singularity exec --bind $results_dir/${location_array[$i]}/soit:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid_x ${centroid_x_array[$i]} --centroid_y ${centroid_y_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+            apptainer exec --bind $results_dir/${location_array[$i]}/soit:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid_x ${centroid_x_array[$i]} --centroid_y ${centroid_y_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
         platform = oscar
         execution time limit = PT1H
@@ -108,7 +108,7 @@
     
     [[pulljuliaimage]]
         # Pull the latest Docker image containing Julia IceFloeTracker software
-        # Singularity will check the image layers and only re-download if necessary 
+        # apptainer will check the image layers and only re-download if necessary 
         script = """
             apptainer pull --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:main
         """
@@ -126,14 +126,14 @@
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
 
-            singularity exec --bind $results_dir/${location_array[$i]}/landmasks:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl landmask $fetchdata_dir/${location_array[$i]} /tmp
+            apptainer exec --env JULIA_DEPOT_PATH=$HOME/.julia:/opt/julia --bind $results_dir/${location_array[$i]}/landmasks:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl landmask $fetchdata_dir/${location_array[$i]} /tmp
         """
         platform = oscar
         execution time limit = PT1H
         submission retry delays = 2*PT30S
         execution retry delays = PT6S
         [[[directives]]]
-            --mem = 20G
+            --mem-per-cpu = 4G
             --cpus-per-task = 8
     
     [[preprocess<param_set>]]
@@ -142,14 +142,14 @@
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
 
-            singularity exec --bind $results_dir/${location_array[$i]}/preprocess:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/${location_array[$i]}/truecolor -r $fetchdata_dir/${location_array[$i]}/reflectance -l $results_dir/${location_array[$i]}/landmasks -p $results_dir/${location_array[$i]}/soit -o /tmp
+            apptainer exec --env JULIA_DEPOT_PATH=$HOME/.julia:/opt/julia --bind $results_dir/${location_array[$i]}/preprocess:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/${location_array[$i]}/truecolor -r $fetchdata_dir/${location_array[$i]}/reflectance -l $results_dir/${location_array[$i]}/landmasks -p $results_dir/${location_array[$i]}/soit -o /tmp
         """
         platform = oscar
         execution time limit = PT1H
         submission retry delays = 2*PT30S
         execution retry delays = PT6S
         [[[directives]]]
-            --mem = 70G
+            --mem-per-cpu = 12G
             --cpus-per-task = 20
     
     [[extractfeatures<param_set>]]
@@ -159,7 +159,7 @@
             location_array=( $(echo $location | sed -e 's/,/ /g') )
             preprocess_dir=$results_dir/${location_array[$i]}/preprocess
 
-            singularity exec --bind $preprocess_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o /tmp --minarea $minfloearea --maxarea $maxfloearea
+            apptainer exec --env JULIA_DEPOT_PATH=$HOME/.julia:/opt/julia --bind $preprocess_dir:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl extractfeatures -i $preprocess_dir -o /tmp --minarea $minfloearea --maxarea $maxfloearea
         """
         platform = oscar
         execution time limit = PT1H
@@ -176,7 +176,7 @@
             location_array=( $(echo $location | sed -e 's/,/ /g') )
             preprocess_dir=$results_dir/${location_array[$i]}/preprocess
 
-            singularity exec --bind $results_dir/${location_array[$i]}/"tracker":/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output /tmp
+            apptainer exec --env JULIA_DEPOT_PATH=$HOME/.julia:/opt/julia --bind $results_dir/${location_array[$i]}/"tracker":/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl track --imgs $preprocess_dir --props $preprocess_dir --deltat $preprocess_dir --output /tmp
         """
         platform = oscar
         execution time limit = PT1H
@@ -192,7 +192,7 @@
             i=${CYLC_TASK_PARAM_param_set}
             location_array=( $(echo $location | sed -e 's/,/ /g') )
 
-            singularity exec --bind $results_dir/${location_array[$i]}/preprocess:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/${location_array[$i]}/truecolor/$(ls $fetchdata_dir/${location_array[$i]}/truecolor | head -1) --resdir /tmp
+            apptainer exec --env JULIA_DEPOT_PATH=$HOME/.julia:/opt/julia --bind $results_dir/${location_array[$i]}/preprocess:/tmp,$report_dir:/usr/local/bin/../report $project_dir/icefloetracker-julia.simg $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl makeh5files --pathtosampleimg $fetchdata_dir/${location_array[$i]}/truecolor/$(ls $fetchdata_dir/${location_array[$i]}/truecolor | head -1) --resdir /tmp
         """
         platform = oscar
         execution time limit = PT1H
