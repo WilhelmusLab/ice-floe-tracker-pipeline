@@ -5,3 +5,4 @@ channels:
 
 dependencies:
   - cylc-flow=8.2.1
+  - pandas

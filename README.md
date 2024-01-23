@@ -157,7 +157,7 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
    - [ ] first populate the `flow.cylc` file by running: 
    ```python
    python workflow/scripts/flow_generator.py \
-   --csvfile "./config/site_locations.csv" \
+   --csvfile "./config/sample_site_locations.csv" \
    --template "flow_template_local.j2" \
    --template_dir "./config/cylc_local" \
    --crs "<crs>" \
@@ -166,7 +166,7 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
    ```
    Run `python workflow/scripts/flow_generator.py --help` for a list of options.
 
-   - [ ] `cylc install -n <your-workflow-name> ./config/cylc_local`
+   - [ ] `cylc install -n <your-workflow-name> --symlink-dirs="run=<full-path-to-ice-floe-tracker>/workflow" ./config/cylc_local`
    - [ ] `cylc graph <workflow-name> #install graphviz locally`
    - [ ] `cylc validate <workflow-name>`
    - [ ] `cylc play <workflow-name>`
@@ -186,7 +186,7 @@ If you need to change parameters and re-run a workflow, first do:
    ```bash
    cylc stop --now <workflow-name> && \
    cylc clean <workflow-name> && \
-   cylc install -n <workflow-name> ./config/cylc_hpc && \
+   cylc install -n <workflow-name> --symlink-dirs="run=<full-path-to-ice-floe-tracker>/workflow" ./config/cylc_hpc && \
    cylc validate <workflow-name> && \
    cylc play <workflow-name> && \
    cylc tui <workflow-name>
