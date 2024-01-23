@@ -138,6 +138,8 @@ Run `python workflow/scripts/flow_generator.py --help` for a list of options.
    
 ### Running the Cylc pipeline locally
 
+**Note:** Running the Cylc pipeline locally on a Mac will be siginificantly slower than running on Oscar due to Docker Desktop emulation. 
+
 #### Prerequisites
 __Julia:__ When running locally, make sure you have at least Julia 1.9.0 installed with the correct architecture for your local machine. (https://julialang.org/downloads/)
 
