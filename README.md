@@ -52,15 +52,13 @@ Cylc is used to encode the entire pipeline from start to finish and relies on th
 
 ### Generating the `flow.cylc` file to iterate through parameter sets
 
-We can use Jinja2 to populate a `flow.cylc` file using a CSV file with input parameters. 
-1. Use the `sample_site_locations.csv` to fill in your desired parameters, one row for each set. Save as `site_locations.csv` in the `config` directory.
-These fieds are required:  
-   - `location` (string name)
-   - `center_lat` (int wgs84)
-   - `center_lon` (int wgs84)
-   - `startdate` (YYYY-MM-DD)
-   - `enddate` (YYYY-MM-DD)
-
+1. We can use Jinja2 to populate a `flow.cylc` file using a CSV file with input parameters. You will be passing the name of this file to `flow_generator.py`. An example specification file is provided in the config folder, `./config/sample_site_locations.csv`. Each row in the CSV file defines a parameter set. Parameter sets consist of a name, a date range, and a geographic bounding box. These columns are required:
+   - `location` (string): name for parameter set. Must be unique.
+   - `center_lat` (numeric): latitude of the centroid of each scene in decimal degrees, used for finding the satellite overpass time
+   - `center_lon` (numeric): longitude of the centroid of each scene in decimal degrees, used for finding the satellite overpass time
+   - `startdate` (YYYY-MM-DD): first date to download
+   - `enddate` (YYYY-MM-DD): end date for the date range (exclusive, i.e., the last date downloaded is the day before `enddate`)
+The bounding box can be specified either using latitude and longitude (crs=wgs84) or north polar stereographic (crs=epsg3413). 
    For wgs84 (lat/lon), use: 
    - `top_left_lat`
    - `top_left_lon` 
@@ -97,13 +95,14 @@ These fieds are required:
    - [ ] first populate the `flow.cylc` file by running: 
    ```python
    python workflow/scripts/flow_generator.py \
-   --csvfile "./config/sample_site_locations.csv" \
+   --csvfile "./config/<site_locations_file.csv>" \
    --template "flow_template_hpc.j2" \
    --template_dir "./config/cylc_hpc" \
    --crs "<crs>" \
    --minfloearea <value> \
    --maxfloearea <value>
    ```
+   (replacing `<site_locations_file.csv>` with the name of your CSV file.)
 Run `python workflow/scripts/flow_generator.py --help` for a list of options.
 
    - [ ] then, build the workflow, run it, and open the Terminal-based User Interface (TUI) to monitor the progress of each task. 
@@ -157,13 +156,15 @@ __Docker Desktop:__ Also make sure Docker Desktop client is running in the backg
    - [ ] first populate the `flow.cylc` file by running: 
    ```python
    python workflow/scripts/flow_generator.py \
-   --csvfile "./config/site_locations.csv" \
+   --csvfile "./config/<site_locations_file.csv>" \
    --template "flow_template_local.j2" \
    --template_dir "./config/cylc_local" \
    --crs "<crs>" \
    --minfloearea <value> \
    --maxfloearea <value>
    ```
+   (replacing `<site_locations_file.csv>` with the name of your CSV file.)
+   
    Run `python workflow/scripts/flow_generator.py --help` for a list of options.
 
    - [ ] `cylc install -n <your-workflow-name> ./config/cylc_local`
