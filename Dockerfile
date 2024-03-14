@@ -21,4 +21,4 @@ RUN chmod a+x /usr/local/bin/ice-floe-tracker.jl
 
 ENV JULIA_DEPOT_PATH="$HOME/.julia:$JULIA_DEPOT_PATH"
 
-CMD [ "/bin/bash", "-c" ]
+CMD [ "/bin/bash" ]
