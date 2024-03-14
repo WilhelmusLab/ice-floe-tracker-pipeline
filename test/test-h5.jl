@@ -1,5 +1,5 @@
 testlisteq = (a, b) -> @test Set(a) == Set(b)
-pathtosampleimg = joinpath(@__DIR__, "test_inputs/input_pipeline/20220914.aqua.reflectance.250m.tiff")
+pathtosampleimg = joinpath(@__DIR__, "test_inputs/input_pipeline/20220914.aqua.falsecolor.250m.tiff")
 resdir = joinpath(dirname(pathtosampleimg), "h5")
 
 originalbbox = (latitude=[81, 79], longitude=[-22, -12])
