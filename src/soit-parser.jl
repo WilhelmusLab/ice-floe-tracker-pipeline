@@ -58,7 +58,7 @@ Create image filenames based on the SOIT output file.
 
 # Arguments
 - `df::DataFrame`: The cleaned SOIT output file with columns :sat and :pass_time
-- `colorspace::String`: The colorspace, either "reflectance" or "truecolor"
+- `colorspace::String`: The colorspace, either "falsecolor" or "truecolor"
 - `grid::String`: The grid size, either "250m" or "1km"
 - `ext::String`: The file extension, either "tiff" or "jpg"
 

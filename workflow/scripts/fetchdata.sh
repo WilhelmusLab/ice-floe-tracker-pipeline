@@ -253,7 +253,7 @@ main() {
 
   # make standard output dirs
   mkdir -p "${output}"
-  mkdir -p "${output}/reflectance"
+  mkdir -p "${output}/falsecolor"
   mkdir -p "${output}/truecolor"
 
   # download the images
