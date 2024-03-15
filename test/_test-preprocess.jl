@@ -10,10 +10,10 @@
         landmask_imgs = (dilated=lm, non_dilated=lm)
 
         truecolor_img = loadimg(; dir=".", fname=truecolor_test_image_file)[ice_floe_test_region...]
-        reflectance_img = loadimg(; dir=".", fname=reflectance_test_image_file)[ice_floe_test_region...]
+        falsecolor_img = loadimg(; dir=".", fname=falsecolor_test_image_file)[ice_floe_test_region...]
 
         segmented_floes = IFTPipeline.preprocess(
-            truecolor_img, reflectance_img, landmask_imgs
+            truecolor_img, falsecolor_img, landmask_imgs
         )
 
         segmented_floes_expected = load("$(test_data_dir)/matlab_BW7.png") .> 0.499
@@ -30,7 +30,7 @@
         imgsdir = joinpath(test_data_dir, "input_pipeline")
 
         preprocess(;
-            truedir=imgsdir, refdir=imgsdir, lmdir=imgsdir, passtimesdir=imgsdir, output=imgsdir
+            truedir=imgsdir, fcdir=imgsdir, lmdir=imgsdir, passtimesdir=imgsdir, output=imgsdir
         )
 
         segfloes_outfile = joinpath(imgsdir, "segmented_floes.jls")

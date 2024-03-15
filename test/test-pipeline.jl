@@ -12,7 +12,7 @@
 
     args_to_pass = Dict{Symbol,AbstractString}(zip([:input, :output], [input, output]))
 
-    reflectance_images = load_imgs(; input=input, image_type=:reflectance)
+    falsecolor_images = load_imgs(; input=input, image_type=:falsecolor)
 
     truecolor_images = load_imgs(; input=input, image_type=:truecolor)
 
@@ -49,7 +49,7 @@
             println("-------------------------------------------------")
             println("------------ cloudmasking tests -----------------")
             # Generate cloudmasks by hand
-            cldmasks_paths = [f for f in readdir(input) if contains(f, "reflectance")]
+            cldmasks_paths = [f for f in readdir(input) if contains(f, "falsecolor")]
             cldmasks_expected =
                 IceFloeTracker.create_cloudmask.([
                     float64.(load(joinpath(input, f))) for f in cldmasks_paths
@@ -60,18 +60,18 @@
         end
 
         @testset "load images" begin
-            @test length(reflectance_images) == 2
+            @test length(falsecolor_images) == 2
 
             @test length(truecolor_images) == 2
 
-            @test all(size.(reflectance_images) .== size.(truecolor_images))
+            @test all(size.(falsecolor_images) .== size.(truecolor_images))
 
-            @test load_reflectance_imgs(; input=input) == reflectance_images
+            @test load_falsecolor_imgs(; input=input) == falsecolor_images
             @test load_truecolor_imgs(; input=input) == truecolor_images
         end
 
         @testset "ice water discrimination" begin
-            cloudmasks = map(create_cloudmask, reflectance_images)
+            cloudmasks = map(create_cloudmask, falsecolor_images)
             normalized_images = [
                 IceFloeTracker.normalize_image(
                     sharpened_img, sharpened_gray_img, lm_expected
@@ -79,13 +79,13 @@
                 zip(sharpened_imgs, sharpenedgray_imgs)
             ]
             ice_water_discrim_imgs = disc_ice_water(
-                reflectance_images, normalized_images, cloudmasks, lm_expected
+                falsecolor_images, normalized_images, cloudmasks, lm_expected
             )
             @test length(ice_water_discrim_imgs) == 2
         end
 
         @testset "ice labels" begin
-            ice_labels = get_ice_labels(reflectance_images, lm_expected)
+            ice_labels = get_ice_labels(falsecolor_images, lm_expected)
             @test length(ice_labels) == 2
         end
 

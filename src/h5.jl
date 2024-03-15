@@ -28,7 +28,7 @@ Each HDF5 file has the following structure:
     🗂️ HDF5.File: (read-only) YYYYmmddTHHMM.sat.labeled_image.250m.h5
     ├─ 🏷️ contact
     ├─ 🏷️ crs
-    ├─ 🏷️ fname_reflectance
+    ├─ 🏷️ fname_falsecolor
     ├─ 🏷️ fname_truecolor
     ├─ 🏷️ iftversion
     ├─ 🏷️ reference
@@ -58,7 +58,7 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
     ptsunix = Int64.(Dates.datetime2unix.(passtimes))
 
     fnpath = joinpath(resdir, "filenames.jls")
-    truecolor_refs, reflectance_refs = deserialize(fnpath)
+    truecolor_refs, falsecolor_refs = deserialize(fnpath)
 
     floespath = joinpath(resdir, "segmented_floes.jls") # for labeled_image
     floes = deserialize(floespath)
@@ -77,7 +77,7 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
         fnamepath = joinpath(h5dir, fname)
         h5open(fnamepath, "w") do file
             # Add top-level attributes
-            attrs(file)["fname_reflectance"] = reflectance_refs[i]
+            attrs(file)["fname_falsecolor"] = falsecolor_refs[i]
             attrs(file)["fname_truecolor"] = truecolor_refs[i]
             attrs(file)["iftversion"] = string(iftversion)
             attrs(file)["crs"] = latlondata["crs"]

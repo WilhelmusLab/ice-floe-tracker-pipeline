@@ -4,8 +4,8 @@ function mkclipreprocess!(settings)
         help = "Truecolor image directory"
         required = true
 
-        "--refdir", "-r"
-        help = "Reflectance image directory"
+        "--fcdir", "-r"
+        help = "Falsecolor image directory"
         required = true
 
         "--lmdir", "-l"

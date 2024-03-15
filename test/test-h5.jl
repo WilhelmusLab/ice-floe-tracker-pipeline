@@ -1,5 +1,5 @@
 testlisteq = (a, b) -> @test Set(a) == Set(b)
-pathtosampleimg = joinpath(@__DIR__, "test_inputs/input_pipeline/20220914.aqua.reflectance.250m.tiff")
+pathtosampleimg = joinpath(@__DIR__, "test_inputs/input_pipeline/20220914.aqua.falsecolor.250m.tiff")
 resdir = joinpath(dirname(pathtosampleimg), "h5")
 
 originalbbox = (latitude=[81, 79], longitude=[-22, -12])
@@ -15,7 +15,7 @@ passtimes = deserialize(ptpath)
 ptsunix = Int64.(Dates.datetime2unix.(passtimes))
 
 fnpath = joinpath(resdir, "filenames.jls")
-truecolor_refs, reflectance_refs = deserialize(fnpath)
+truecolor_refs, falsecolor_refs = deserialize(fnpath)
 
 floespath = joinpath(resdir, "segmented_floes.jls") # for labeled_image
 floes = deserialize(floespath)
@@ -43,7 +43,7 @@ h5path = joinpath(resdir, "hdf5-files", "20220914T1244.aqua.labeled_image.250m.h
 
     # top level attributes
     @test attrs(fid)["iftversion"] == string(IceFloeTracker.IFTVERSION)
-    @test attrs(fid)["fname_reflectance"] == reflectance_refs[1]
+    @test attrs(fid)["fname_falsecolor"] == falsecolor_refs[1]
     @test attrs(fid)["fname_truecolor"] == truecolor_refs[1]
     @test attrs(fid)["crs"] == latlondata["crs"]
 

@@ -31,7 +31,7 @@
             results_dir = $project_dir/"results"/$t
             fetchdata_dir = $project_dir/"resources"/$t
             truecolor_dir = $fetchdata_dir/"truecolor"
-            reflectance_dir = $fetchdata_dir/"reflectance"
+            falsecolor_dir = $fetchdata_dir/"falsecolor"
 
     [[mkpaths<param_set>]]
         # Convert param location list to indexable bash array and make directories for each location
@@ -49,7 +49,7 @@
         """
         
     [[fetchdata<param_set>]]
-        # Convert param lists to indexable bash arrays and fetch reflectance, truecolor, and landmask for each location
+        # Convert param lists to indexable bash arrays and fetch falsecolor, truecolor, and landmask for each location
         script = """
             i=${CYLC_TASK_PARAM_param_set}
             bbox_array=( $(echo $bounding_box | sed -e 's/,/ /g') )
@@ -92,7 +92,7 @@
             docker run --mount type=bind,source=$results_dir/${location_array[$i]}/preprocess,target=/tmp \
             --mount 
 type=bind,source=$report_dir,target=/usr/local/bin/../report \
-            brownccv/icefloetracker-julia:main $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/${location_array[$i]}/truecolor -r $fetchdata_dir/${location_array[$i]}/reflectance -l $results_dir/${location_array[$i]}/landmasks -p $results_dir/${location_array[$i]}/soit -o /tmp
+            brownccv/icefloetracker-julia:main $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/${location_array[$i]}/truecolor -r $fetchdata_dir/${location_array[$i]}/falsecolor -l $results_dir/${location_array[$i]}/landmasks -p $results_dir/${location_array[$i]}/soit -o /tmp
         """
 
     [[extractfeatures<param_set>]]

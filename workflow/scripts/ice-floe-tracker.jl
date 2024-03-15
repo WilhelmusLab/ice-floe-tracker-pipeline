@@ -45,7 +45,7 @@ function main(args)
         action = :command
 
         "preprocess"
-        help = "Preprocess truecolor/reflectance images"
+        help = "Preprocess truecolor/falsecolor images"
         action = :command
 
         "extractfeatures"

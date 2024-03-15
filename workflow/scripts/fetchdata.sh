@@ -157,7 +157,7 @@ download_truecolor() {
   printf '\n'
 }
 
-download_reflectance() {
+download_falsecolor() {
   local bounding_box="${1}"
   local date="${2}"
   local enddate="${3}"
@@ -167,12 +167,12 @@ download_reflectance() {
   local ext="jpeg"
 
 
-  echo "downloading reflectance color images"
+  echo "downloading falsecolor color images"
   while [ "${date}" != "${enddate}" ]; do
     
     for sat in Aqua Terra; do
       layer="MODIS_${sat}_CorrectedReflectance_Bands721"
-      filename="$(echo "${date}" | sed -e 's/-//g').$(echo "${sat}" | tr '[:upper:]' '[:lower:]').reflectance.250m.tiff"
+      filename="$(echo "${date}" | sed -e 's/-//g').$(echo "${sat}" | tr '[:upper:]' '[:lower:]').falsecolor.250m.tiff"
 
       xml="$(echo "${GDAL_WMS_TEMPLATE}" | sed -e "s/%%LAYER%%/${layer}/" -e "s/%%EXT%%/${ext}/" -e "s/%%DATE%%/${date}/" )" 
       gdalwarp -overwrite -t_srs "${GDAL_SRS}" -te ${bounding_box} "${xml}" "${output}/${filename}" &> /dev/null
@@ -253,13 +253,13 @@ main() {
 
   # make standard output dirs
   mkdir -p "${output}"
-  mkdir -p "${output}/reflectance"
+  mkdir -p "${output}/falsecolor"
   mkdir -p "${output}/truecolor"
 
   # download the images
   download_landmask "${bounding_box}" "${startdate}" "${output}"
   download_truecolor "${bounding_box}" "${startdate}" "${enddate}" "${output}/truecolor"
-  download_reflectance "${bounding_box}" "${startdate}" "${enddate}" "${output}/reflectance"
+  download_falsecolor "${bounding_box}" "${startdate}" "${enddate}" "${output}/falsecolor"
 }
 
 main "$@"
