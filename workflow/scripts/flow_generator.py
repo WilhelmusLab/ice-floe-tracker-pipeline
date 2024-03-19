@@ -31,8 +31,8 @@ def generate_cylc_file(csvfile="site_locations.csv", template="flow_template.j2"
     data['crs'] = crs
     data['minfloearea'] = minfloearea
     data['maxfloearea'] = maxfloearea
-    data['centroid_x'] = data['centroid_lat']
-    data['centroid_y'] = data['centroid_lon']
+    data['centroid_x'] = data['center_lat']
+    data['centroid_y'] = data['center_lon']
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template(template)
     fname = os.path.join(template_dir, "flow.cylc")
