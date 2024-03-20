@@ -19,7 +19,8 @@ def get_bounding_box_list(data, crs="wgs84"):
     f = lambda x: generate_bounding_box(x, crs) 
     return ",".join(data.apply(f, axis=1).values)
 
-def generate_cylc_file(csvfile="site_locations.csv", template="flow_template.j2", template_dir="./config", crs="wgs84", minfloearea=350, maxfloearea=90_000):
+def generate_cylc_file(csvfile="site_locations.csv", template="flow_template.j2",
+                       template_dir="./config", crs="wgs84", minfloearea=350, maxfloearea=90_000):
     
     df = pd.read_csv(csvfile)
     date_columns = ['startdate', 'enddate']
@@ -43,15 +44,20 @@ def generate_cylc_file(csvfile="site_locations.csv", template="flow_template.j2"
 def main():
     example = """Example:
 
-    The following would create a flow file for however many rows of data the user input into the site_location.csv file for use on a high-performance cluster (like Brown's Oscar) with polar stereographic coordinates, and intending to process floes between 350 and 75000 pixels in area.
+    The following would create a flow file for however many rows of data the user input into the 
+    site_location.csv file for use on a high-performance cluster (like Brown's Oscar) with polar
+    stereographic coordinates, and intending to process floes between 350 and 75000 pixels in area.
 
     python ./workflow/scripts/flow_generator.py --csvfile "./config/site_locations.csv" --template "flow_template_hpc.j2" --template_dir "./config/cylc_hpc" --crs "epsg3413" --minfloearea 350 --maxfloearea 75000
 
-    In this second example, a flow file will be generated for use on a local OS using lat/lon inputs and considering floes from 500 - 90000 pixels in area.
+    In this second example, a flow file will be generated for use on a local OS using lat/lon inputs
+    and considering floes from 500 - 90000 pixels in area.
 
     python workflow/scripts/flow_generator.py --csvfile "./config/site_locations.csv" --template "flow_template_local.j2" --template_dir "./config/cylc_local" --crs "wgs84" --minfloearea 500 """
 
-    parser = argparse.ArgumentParser(description="Generate a Cylc flow file from a CSV matrix of unique location-parameter sets", epilog=example, formatter_class=argparse.RawDescriptionHelpFormatter
+    parser = argparse.ArgumentParser(
+        description="Generate a Cylc flow file from a CSV matrix of unique location-parameter sets",
+        epilog=example, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
         "--csvfile",
