@@ -201,7 +201,8 @@ If you need to change parameters and re-run a workflow, first do:
 
 ### Tips for running the code locally for development
 
-When working locally, double check that the Docker client is running and clean the Docker cache to make sure you are using the latest images.
+#### Cylc local development
+When working locally and using the Cylc local pipeline, double check that the Docker client is running and clean the Docker cache to make sure you are using the latest images.
 - [ ] delete any existing images from the Docker Dashboard
 - [ ] from a terminal, run: 
 ```bash
@@ -211,8 +212,8 @@ docker rm $(docker ps -aq)
 ```bash
 docker image prune
 ```
-
-When running locally, make sure you have at least Julia 1.9.0 installed with the correct architecture for your local machine. (https://julialang.org/downloads/)
+#### CLI local development
+When running the CLI locally, make sure you have at least Julia 1.9.0 installed with the correct architecture for your local machine. (https://julialang.org/downloads/)
 
 - [ ] `cd <your-project-path>/ice-floe-tracker-pipeline`
 
