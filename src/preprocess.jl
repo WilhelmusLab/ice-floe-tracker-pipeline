@@ -244,7 +244,7 @@ function preprocess(; truedir::T, fcdir::T, lmdir::T, passtimesdir::T, output::T
             if isa(e, ArgumentError)
                 @warn "ArgumentError: $(e.msg).\nIs there excessive cloud coverage? Skipping image $i."
             end
-            segmented_floes[i] .= BitMatrix(zeros(size(falsecolor_container)))
+            segmented_floes[i] .= BitMatrix(zeros(size(falsecolor_container[i])))
         end
     end
 
