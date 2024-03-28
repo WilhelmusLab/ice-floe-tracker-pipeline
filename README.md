@@ -201,6 +201,8 @@ If you need to change parameters and re-run a workflow, first do:
 
 ### Tips for running the code locally for development
 
+When working locally, we have found VSCode to be a good interface for development. 
+
 #### Cylc local development
 When working locally and using the Cylc local pipeline, double check that the Docker client is running and clean the Docker cache to make sure you are using the latest images.
 - [ ] delete any existing images from the Docker Dashboard
@@ -212,7 +214,7 @@ docker rm $(docker ps -aq)
 ```bash
 docker image prune
 ```
-#### CLI local development
+#### Command-line interface (CLI) - local development
 When running the CLI locally, make sure you have at least Julia 1.9.0 installed with the correct architecture for your local machine. (https://julialang.org/downloads/)
 
 - [ ] `cd <your-project-path>/ice-floe-tracker-pipeline`
@@ -231,6 +233,18 @@ __Note__ Use the help for wrapper scripts to learn about available options in ea
 For example, from a bash prompt: 
 `julia --project=. ./workflow/scripts/ice-floe-tracker.jl extractfeatures --help`
 
+Here is the list of wrapper functions used in the CLI: 
+```bash
+commands:
+  landmask         Generate land mask images
+  preprocess       Preprocess truecolor/falsecolor images
+  extractfeatures  Extract ice floe features from segmented floe image
+  makeh5files      Make HDF5 files from extracted floe features
+  track            Pair ice floes in day k with ice floes in day k+1
+
+optional arguments:
+  -h, --help       show this help message and exit
+```
 ## Sample workflows to read in data stored in hdf5 files with Python
 
 Due to differences in multidimensional array representation between Julia and Python, special handling might be necessary.
