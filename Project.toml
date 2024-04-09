@@ -16,10 +16,10 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]
 ArgParse = "1.1"
-Folds = "0.2"  
-HDF5 = "0.16"
+Folds = "0.2"
+HDF5 = "0.16, 0.17"
 IceFloeTracker = "0"
 LoggingExtras = "1.0"
-PyCall = "1.96"
 Pkg = "1.9"
+PyCall = "1.96"
 TOML = "1.0"
