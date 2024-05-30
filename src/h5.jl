@@ -24,8 +24,8 @@ Choose the appropriate unsigned integer type based on a maximum value.
       * `UInt32` if `mx` is less than or equal to 4294967295.
 """
 function choose_dtype(mx)
-    bounds = [2^(2^i) - 1 for i in 3:5]
     types = [UInt8, UInt16, UInt32]
+    bounds = [2^(2^(2+i)) - 1 for (i, _) in enumerate(types)]
     for (b, t) in zip(bounds, types)
         if mx <= b
             return t
