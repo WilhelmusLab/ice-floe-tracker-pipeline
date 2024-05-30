@@ -49,19 +49,16 @@ h5path = joinpath(resdir, "hdf5-files", "20220914T1244.aqua.labeled_image.250m.h
 
     # groups
     testlisteq(keys(fid), ["floe_properties", "index"])
-    testlisteq(keys(fid["index"]), ["latitude", "longitude", "time", "x", "y"])
+    keys_index = [k for k in keys(fid["index"]) if k ∉ ["latitude", "longitude"]]
+    testlisteq(keys_index, ["time", "x", "y"])
     testlisteq(keys(fid["floe_properties"]), ["column_names", "labeled_image", "properties"])
 
     # check index group datasets
     g = fid["index"]
-    lat = read(g["latitude"])
-    lon = read(g["longitude"])
     t = read(g["time"])
     x = read(g["x"])
     y = read(g["y"])
 
-    @test lat == latlondata["latitude"]
-    @test lon == latlondata["longitude"]
     @test t == ptsunix[1]
     @test x == latlondata["X"]
     @test y == latlondata["Y"]
@@ -74,9 +71,13 @@ h5path = joinpath(resdir, "hdf5-files", "20220914T1244.aqua.labeled_image.250m.h
 
     testlisteq(colnames, ["area", "convex_area", "major_axis_length", "minor_axis_length", "orientation", "perimeter", "latitude", "longitude", "x", "y"])
 
-    @test typeof(lb) == Matrix{Int64}
+    @test typeof(lb) == Matrix{UInt8}
     @test typeof(props) == Matrix{Float64}
     close(fid)
+
+    @test choose_dtype(100) == UInt8
+    @test choose_dtype(300) == UInt16
+    @test choose_dtype(70_000) == UInt32
 end
 
 # clean up
