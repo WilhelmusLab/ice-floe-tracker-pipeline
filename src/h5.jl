@@ -9,6 +9,32 @@ function makeh5filename(imgfname, ts)
 end
 
 """
+    choose_dtype(mx)
+
+Choose the appropriate unsigned integer type based on a maximum value.
+
+# Arguments
+
+  * `mx`: Maximum value to be stored in the unsigned integer type.
+
+# Returns
+    
+      * `UInt8` if `mx` is less than or equal to 255.
+      * `UInt16` if `mx` is less than or equal to 65535.
+      * `UInt32` if `mx` is less than or equal to 4294967295.
+"""
+function choose_dtype(mx)
+    bounds = [2^(2^i) - 1 for i in 3:5]
+    types = [UInt8, UInt16, UInt32]
+    for (b, t) in zip(bounds, types)
+        if mx <= b
+            return t
+        end
+    end
+end
+
+
+"""
     makeh5files(pathtosampleimg, resdir)
 
 Package the results of the IceFloeTracker pipeline in `resdir` into individual HDF5 files in `resdir/hdf5-files`. 
@@ -88,8 +114,6 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
             g["time"] = ptsunix[i]
             g["x"] = latlondata["X"]
             g["y"] = latlondata["Y"]
-            g["latitude"] = latlondata["latitude"]
-            g["longitude"] = latlondata["longitude"]
 
             g = create_group(file, "floe_properties")
             g["properties"] = Matrix(props[i])
@@ -99,7 +123,11 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
             """
 
             g["column_names"] = names(props[i])
-            g["labeled_image"] = label_components(floes[i], trues(3, 3))
+            comps = label_components(floes[i], trues(3, 3))
+            mx = maximum(comps)
+            T = choose_dtype(mx)
+            g["labeled_image"] = T.(comps)
+
             attrs(g)["Description of labeled_image"] = "Connected components of the segmented floe image using a 3x3 structuring element. The property matrix consists of the properties of each connected component."
         end
     end
