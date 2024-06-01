@@ -1,6 +1,6 @@
 using IFTPipeline
 using IFTPipeline: load_imgs, sharpen, sharpen_gray, loadimg
-using IFTPipeline: HDF5, h5open, attrs
+using IFTPipeline: HDF5, h5open, attrs, choose_dtype
 using .IceFloeTracker: DataFrames, save, Gray, create_cloudmask, deserialize, serialize, float64, load, imrotate, loadimg, RGB, DataFrame, nrow, rename!, Dates, Not, select!, getlatlon
 using ArgParse: @add_arg_table!, ArgParseSettings, add_arg_group!, parse_args
 using DelimitedFiles
