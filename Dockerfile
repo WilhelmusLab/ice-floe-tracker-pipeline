@@ -32,8 +32,14 @@ RUN apt-get update -y && \
 
 # Python packages
 #===========================================
-RUN pip install --upgrade pip --break-system-packages && \
-    pip install git+${EBSEG_REPO} --break-system-packages
+RUN pip install --upgrade pip --break-system-packages
+
+RUN pip install git+${EBSEG_REPO} \
+    jinja2==3.1 \
+    pyproj==3.6 \
+    requests==2.31 \
+    skyfield==1.45 \
+    --break-system-packages
 
 WORKDIR /opt
 
