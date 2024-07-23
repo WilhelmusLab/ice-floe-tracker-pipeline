@@ -45,7 +45,7 @@ WORKDIR /opt
 
 RUN git clone --single-branch --branch main --depth 1 ${IFTPIPELINE_REPO}
 
-RUN /usr/local/julia/bin/julia --project=${JULIA_PROJECT} -e ${JULIA_BUILD_PYCALL}
+RUN julia --project=${JULIA_PROJECT} -e ${JULIA_BUILD_PYCALL}
 
 COPY workflow/scripts/ice-floe-tracker.jl ${LOCAL_PATH_TO_IFT_CLI}
 
