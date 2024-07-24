@@ -43,14 +43,15 @@ RUN pip install git+${EBSEG_REPO} \
 
 WORKDIR /opt
 
+# Julia package build
+#===========================================
 RUN git clone --single-branch --branch main --depth 1 ${IFTPIPELINE_REPO}
-
 RUN julia --project=${JULIA_PROJECT} -e ${JULIA_BUILD_PYCALL}
+RUN julia -e 'using Pkg; Pkg.instantiate()'
 
+# Final setup
+#===========================================
 COPY workflow/scripts/ice-floe-tracker.jl ${LOCAL_PATH_TO_IFT_CLI}
-
 RUN chmod a+x ${LOCAL_PATH_TO_IFT_CLI}
-
 ENV JULIA_DEPOT_PATH="$HOME/.julia:$JULIA_DEPOT_PATH"
-
-CMD [ "/bin/bash", "-c" ]
+CMD ["/bin/bash"]
