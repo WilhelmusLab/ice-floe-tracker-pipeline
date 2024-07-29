@@ -50,7 +50,7 @@ RUN julia --project=${JULIA_PROJECT} -e ${JULIA_BUILD_PYCALL}
 
 # Final setup
 #===========================================
-COPY ../workflow/scripts/ice-floe-tracker.jl ${LOCAL_PATH_TO_IFT_CLI}
+COPY workflow/scripts/ice-floe-tracker.jl ${LOCAL_PATH_TO_IFT_CLI}
 RUN chmod a+x ${LOCAL_PATH_TO_IFT_CLI}
 ENV JULIA_DEPOT_PATH="/usr/local/bin/julia:$JULIA_DEPOT_PATH"
 CMD ["/bin/bash"]
