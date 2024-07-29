@@ -53,5 +53,5 @@ RUN julia -e 'using Pkg; Pkg.instantiate()'
 #===========================================
 COPY workflow/scripts/ice-floe-tracker.jl ${LOCAL_PATH_TO_IFT_CLI}
 RUN chmod a+x ${LOCAL_PATH_TO_IFT_CLI}
-ENV JULIA_DEPOT_PATH="/.julia:$JULIA_DEPOT_PATH"
+ENV JULIA_DEPOT_PATH="/home/.julia:$JULIA_DEPOT_PATH"
 CMD ["/bin/bash"]
