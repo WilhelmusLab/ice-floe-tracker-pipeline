@@ -1,6 +1,6 @@
 # from https://docs.github.com/en/actions/guides/publishing-docker-images
 
-name: Build and PushContainer - Fetchdata
+name: Build and PushContainer - EBSeg
 on:
   push:
     branches:
@@ -10,10 +10,11 @@ on:
   pull_request:  
     branches:
       - 'main'
+  workflow_dispatch:
 
 env:
   REGISTRY: hub.docker.com
-  IMAGE_NAME: brownccv/icefloetracker-fetchdata
+  IMAGE_NAME: brownccv/icefloetracker-ebseg
 
 jobs:
   build_and_push:
@@ -42,7 +43,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./workflow/scripts
+          context: ./workflow/ebseg
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

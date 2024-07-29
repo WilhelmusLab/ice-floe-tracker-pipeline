@@ -1,6 +1,6 @@
 # from https://docs.github.com/en/actions/guides/publishing-docker-images
 
-name: Build and PushContainer
+name: Build and PushContainer - Julia
 on:
   push:
     branches:
@@ -44,7 +44,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
