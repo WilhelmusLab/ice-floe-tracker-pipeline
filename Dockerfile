@@ -17,9 +17,9 @@ RUN git clone --single-branch --branch main --depth 1 ${IFTPIPELINE_REPO}
 
 RUN /usr/local/julia/bin/julia --project=${JULIA_PROJECT} -e ${JULIA_BUILD}
 
-COPY workflow/scripts/ice-floe-tracker.jl /usr/local/bin/ice-floe-tracker.jl
+COPY workflow/scripts/ice-floe-tracker.jl ${LOCAL_PATH_TO_IFT_CLI}
 
-RUN chmod a+x /usr/local/bin/ice-floe-tracker.jl
+RUN chmod a+x ${LOCAL_PATH_TO_IFT_CLI}
 
 ENV JULIA_DEPOT_PATH="/usr/local/bin/julia:$JULIA_DEPOT_PATH"
 
