@@ -21,6 +21,6 @@ COPY workflow/scripts/ice-floe-tracker.jl /usr/local/bin/ice-floe-tracker.jl
 
 RUN chmod a+x /usr/local/bin/ice-floe-tracker.jl
 
-ENV JULIA_DEPOT_PATH="$HOME/.julia:$JULIA_DEPOT_PATH"
+ENV JULIA_DEPOT_PATH="/usr/local/bin/julia:$JULIA_DEPOT_PATH"
 
 CMD [ "/bin/bash", "-c" ]
