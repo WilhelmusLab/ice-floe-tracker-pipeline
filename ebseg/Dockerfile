@@ -13,6 +13,9 @@ ENV LOCAL_PATH_TO_IFT_CLI='/usr/local/bin/ice-floe-tracker.jl'
 #===========================================
 RUN apt-get update -y && \
     apt-get -qq install -y \
+    gdal-bin \
+    libgdal-dev \
+    python3-gdal \
     build-essential \
     cmake \
     git \
