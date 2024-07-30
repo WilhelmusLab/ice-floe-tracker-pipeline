@@ -7,11 +7,16 @@ ENV JULIA_BUILD='ENV["PYTHON"]=""; using Pkg; Pkg.build(); Pkg.instantiate()'
 ENV IFTPIPELINE_REPO='https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git'
 ENV LOCAL_PATH_TO_IFT_CLI='/usr/local/bin/ice-floe-tracker.jl'
 
+WORKDIR /opt
+
+# DEPENDENCIES
+#===========================================
 RUN apt-get -y update && \
     apt-get install -y git python3.10 && \
     rm -rf /var/lib/apt/list/* 
 
-WORKDIR /opt
+# Julia package build
+#===========================================
 
 RUN git clone --single-branch --branch main --depth 1 ${IFTPIPELINE_REPO}
 
