@@ -3,7 +3,7 @@ ENV TERM=xterm
 ENV JULIA_PROJECT=/opt/ice-floe-tracker-pipeline
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
-ENV JULIA_BUILD='ENV["PYTHON"]=""; using Pkg; Pkg.build(); Pkg.instantiate()'
+ENV JULIA_BUILD='ENV["PYTHON"]=""; using Pkg; Pkg.build()'
 ENV IFTPIPELINE_REPO='https://github.com/WilhelmusLab/ice-floe-tracker-pipeline.git'
 ENV LOCAL_PATH_TO_IFT_CLI='/usr/local/bin/ice-floe-tracker.jl'
 
