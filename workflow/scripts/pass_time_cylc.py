@@ -50,8 +50,8 @@ def get_passtimes(
     configUsr = SPACEUSER
     configPwd = SPACEPSWD
     siteCred = {"identity": configUsr, "password": configPwd}
-    end_date = datetime.datetime.strptime(enddate, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
-    start_date = datetime.datetime.strptime(startdate, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
+    end_date = _parsedate(enddate)
+    start_date = _parsedate(startdate)
     lat = float(centroid_lat)
     lon = float(centroid_lon)
     print(f"Outpath {csvoutpath}")
