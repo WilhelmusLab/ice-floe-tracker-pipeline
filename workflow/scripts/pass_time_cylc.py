@@ -60,7 +60,6 @@ def get_passtimes(
 
     end_date = getNextDay(end_date)
 
-
     aquaData, terraData = get_Data(siteCred, start_date, end_date)
 
     # Load in orbital mechanics tool timescale.
@@ -106,7 +105,7 @@ def get_passtimes(
 def csvwrite(startdate, enddate, lat, lon, rows, outpath):
     fields = ["Date", "Aqua pass time", "Terra pass time"]
     filename = f"{outpath}/passtimes_lat{lat}_lon{lon}_{''.join(startdate)}_{''.join(enddate)}.csv"
-    with open(filename, "w", newline='') as csvfile:
+    with open(filename, "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
         csvwriter.writerows(rows)
@@ -344,7 +343,9 @@ def getclosest(aqua, terra, aoi, t0, t1, altitude_degrees=30):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Aqua and Terra Satellite Overpass time tool")
+    parser = argparse.ArgumentParser(
+        description="Aqua and Terra Satellite Overpass time tool"
+    )
     parser.add_argument(
         "--SPACEUSER",
         "-u",
@@ -393,5 +394,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()
