@@ -106,8 +106,7 @@ def get_passtimes(
 def csvwrite(startdate, enddate, lat, lon, rows, outpath):
     fields = ["Date", "Aqua pass time", "Terra pass time"]
     filename = f"{outpath}/passtimes_lat{lat}_lon{lon}_{''.join(startdate)}_{''.join(enddate)}.csv"
-
-    with open(filename, "w") as csvfile:
+    with open(filename, "w", newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
         csvwriter.writerows(rows)
