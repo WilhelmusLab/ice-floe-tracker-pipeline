@@ -60,43 +60,8 @@ def get_passtimes(
 
     end_date = getNextDay(end_date)
 
-    # Get TLEs from space track.
-    with requests.Session() as session:
-        # Log in with username and password.
-        resp = session.post(uriBase + requestLogin, data=siteCred)
-        if resp.status_code != 200:
-            raise MyError(
-                resp, "POST fail on login. Your username/password may be incorrect."
-            )
 
-        # Retrieve Aqua TLEs from space track.
-        resp = session.get(
-            f"https://www.space-track.org/basicspacedata/query/class/gp_history/NORAD_CAT_ID/27424/orderby/TLE_LINE1%20ASC/EPOCH/{start_date[2]}-{start_date[0]}-{start_date[1]}--{end_date[2]}-{end_date[0]}-{end_date[1]}/format/json"
-        )
-        if resp.status_code != 200:
-            print(resp)
-            raise MyError(resp, "GET fail on request")
-
-        # Turn JSON into Python dict.
-        aquaData = json.loads(resp.text)
-
-        # Retrieve Terra TLEs from space track.
-        resp = session.get(
-            f"https://www.space-track.org/basicspacedata/query/class/gp_history/NORAD_CAT_ID/25994/orderby/TLE_LINE1%20ASC/EPOCH/{start_date[2]}-{start_date[0]}-{start_date[1]}--{end_date[2]}-{end_date[0]}-{end_date[1]}/format/json"
-        )
-        if resp.status_code != 200:
-            print(resp)
-            raise MyError(resp, "GET fail on request")
-
-        # Turn JSON into Python dict.
-        terraData = json.loads(resp.text)
-
-        # No more requests.
-        session.close()
-
-    # Define index variables for each satellite.
-    aqua_i = 0
-    terra_i = 0
+    aquaData, terraData = get_Data(siteCred, start_date, end_date)
 
     # Load in orbital mechanics tool timescale.
     ts = load.timescale()
@@ -430,6 +395,192 @@ def daysInMonth(month, year):
             return 29
         return 28
     return 30
+
+
+def get_epochs(dataset):
+    return [timestamp_to_utc(item["EPOCH"]) for item in dataset]
+
+
+def getclosestepoch(t0, dataset):
+    epochs = get_epochs(dataset)
+
+    # sequentially compute the absolute difference between the epoch and t0
+    # keeping track of the index and value of the minimum difference
+    min_diff = float("inf")
+    min_diff_index = 0
+    for i, epoch in enumerate(epochs):
+        diff = abs(t0 - epoch)
+        if diff < min_diff:
+            min_diff = diff
+            min_diff_index = i
+
+    return min_diff_index, epochs[min_diff_index]
+
+
+def get_tli_lines(tle):
+    line1, line2 = tle["TLE_LINE1"], tle["TLE_LINE2"]
+    return line1, line2
+
+
+def timestamp_to_utc(timestamp):
+    ts = load.timescale()
+    # Split the timestamp into date and time components
+    date_part, time_part = timestamp.split("T")
+
+    # Split the date part into year, month, and day
+    year, month, day = map(int, date_part.split("-"))
+
+    # Split the time part into hour, minute, and second
+    hour, minute, second = map(float, time_part.split(":"))
+
+    # Pass the parsed components to ts.utc
+    return ts.utc(year, month, day, hour, minute, second)
+
+
+def to_utc(t):
+    ts = load.timescale()
+    return ts.utc(int(t[2]), int(t[0]), int(t[1]))
+
+
+def get_Data(credentials: dict, start_date, end_date):
+    # URLs for space track login.
+    uriBase = "https://www.space-track.org"
+    requestLogin = "/ajaxauth/login"
+
+    # Get TLEs from space track.
+    with requests.Session() as session:
+        # Log in with username and password.
+        resp = session.post(uriBase + requestLogin, data=credentials)
+        if resp.status_code != 200:
+            raise MyError(
+                resp, "POST fail on login. Your username/password may be incorrect."
+            )
+
+        # Retrieve Aqua TLEs from space track.
+        resp = session.get(
+            f"https://www.space-track.org/basicspacedata/query/class/gp_history/NORAD_CAT_ID/27424/orderby/TLE_LINE1%20ASC/EPOCH/{start_date[2]}-{start_date[0]}-{start_date[1]}--{end_date[2]}-{end_date[0]}-{end_date[1]}/format/json"
+        )
+        if resp.status_code != 200:
+            print(resp)
+            raise MyError(resp, "GET fail on request")
+
+        # Turn JSON into Python dict.
+        aquaData = json.loads(resp.text)
+
+        # Retrieve Terra TLEs from space track.
+        resp = session.get(
+            f"https://www.space-track.org/basicspacedata/query/class/gp_history/NORAD_CAT_ID/25994/orderby/TLE_LINE1%20ASC/EPOCH/{start_date[2]}-{start_date[0]}-{start_date[1]}--{end_date[2]}-{end_date[0]}-{end_date[1]}/format/json"
+        )
+        if resp.status_code != 200:
+            print(resp)
+            raise MyError(resp, "GET fail on request")
+
+        # Turn JSON into Python dict.
+        terraData = json.loads(resp.text)
+
+        # No more requests.
+        session.close()
+    return aquaData, terraData
+
+
+def getlatlon(config):
+    # Read in area of interest latitude and longitude values from configuration file.
+    try:
+        lat = float(config.get("configuration", "latitude of interest"))
+        long = float(config.get("configuration", "longitude of interest"))
+    except ValueError:
+        print(
+            "Looks like there may be an issue with your lat/long values.",
+            "Check the configuration file and try again.",
+        )
+        quit()
+    return lat, long
+
+
+def getclosest(aqua, terra, aoi, t0, t1, altitude_degrees=30):
+    def process_passes(satellite, events, times):
+        passes = []
+        pass_dict = {}
+
+        for i, (event, ti) in enumerate(zip(events, times)):
+            geocentric = satellite.at(ti)
+            difference = satellite - aoi
+            topocentric = difference.at(ti)
+
+            if event == 0:  # Rise
+                pass_dict = {}
+                riselat, riselon = wgs84.latlon_of(geocentric)
+                pass_dict["rise_lat"] = riselat.degrees
+                pass_dict["rise_lon"] = riselon.degrees
+
+            elif event == 1:  # Overpass
+                alt, az, distance = topocentric.altaz()
+                pass_dict["distance"] = distance.km
+                pass_dict["time"] = ti.utc_strftime("%Y %b %d %H:%M:%S")
+                overlat, overlon = wgs84.latlon_of(geocentric)
+                pass_dict["over_lat"] = overlat.degrees
+                pass_dict["over_lon"] = overlon.degrees
+
+                # Handle edge case for first overpass without prior rise
+                if i == 0:
+                    pass_dict["rise_lat"] = float("nan")
+                    pass_dict["rise_lon"] = float("nan")
+                # Handle edge case for last overpass without subsequent set
+                if i == len(events) - 1:
+                    pass_dict["set_lat"] = float("nan")
+                    pass_dict["set_lon"] = float("nan")
+                    passes.append(pass_dict)
+
+            else:  # Set
+                setlat, setlon = wgs84.latlon_of(geocentric)
+                pass_dict["set_lat"] = setlat.degrees
+                pass_dict["set_lon"] = setlon.degrees
+                passes.append(pass_dict)
+
+        return passes
+
+    def find_closest_pass(passes, ascending=True):
+        least_distance = math.inf
+        closest_time = ""
+
+        for pass_dict in passes:
+            if not np.isnan(pass_dict["rise_lat"]):
+                is_ascending = (
+                    (pass_dict["rise_lat"] < pass_dict["over_lat"])
+                    if ascending
+                    else (pass_dict["rise_lat"] > pass_dict["over_lat"])
+                )
+                if is_ascending and pass_dict["distance"] < least_distance:
+                    least_distance = pass_dict["distance"]
+                    closest_time = pass_dict["time"]
+            else:
+                is_ascending = (
+                    (pass_dict["set_lat"] > pass_dict["over_lat"])
+                    if ascending
+                    else (pass_dict["set_lat"] < pass_dict["over_lat"])
+                )
+                if is_ascending and pass_dict["distance"] < least_distance:
+                    least_distance = pass_dict["distance"]
+                    closest_time = pass_dict["time"]
+
+        return closest_time.split(" ")[3] if closest_time else ""
+
+    aqua_t, aqua_events = aqua.find_events(
+        aoi, t0, t1, altitude_degrees=altitude_degrees
+    )
+    terra_t, terra_events = terra.find_events(
+        aoi, t0, t1, altitude_degrees=altitude_degrees
+    )
+
+    aqua_passes = process_passes(aqua, aqua_events, aqua_t)
+    terra_passes = process_passes(terra, terra_events, terra_t)
+
+    aqua_closest, terra_closest = [
+        find_closest_pass(passes, ascending=ascending)
+        for passes, ascending in zip([aqua_passes, terra_passes], [True, False])
+    ]
+
+    return aqua_closest, terra_closest
 
 
 def main():
