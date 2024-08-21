@@ -40,6 +40,10 @@ class MyError(Exception):
         self.args = args
 
 
+def _parsedate(date):
+    return datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
+
+
 def get_passtimes(
     startdate, enddate, csvoutpath, centroid_lat, centroid_lon, SPACEUSER, SPACEPSWD
 ):
