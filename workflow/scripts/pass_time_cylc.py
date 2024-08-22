@@ -44,9 +44,7 @@ def _parsedate(date):
     return datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
 
 
-def get_passtimes(
-    start_date, end_date, csvoutpath, lat, lon, SPACEUSER, SPACEPSWD
-):
+def get_passtimes(start_date, end_date, csvoutpath, lat, lon, SPACEUSER, SPACEPSWD):
     siteCred = {"identity": SPACEUSER, "password": SPACEPSWD}
     print(f"Outpath {csvoutpath}")
     print(f"Timeframe starts on {start_date}, and ends on {end_date}")
@@ -234,20 +232,6 @@ def get_Data(credentials: dict, start_date, end_date):
         # No more requests.
         session.close()
     return aquaData, terraData
-
-
-def getlatlon(config):
-    # Read in area of interest latitude and longitude values from configuration file.
-    try:
-        lat = float(config.get("configuration", "latitude of interest"))
-        long = float(config.get("configuration", "longitude of interest"))
-    except ValueError:
-        print(
-            "Looks like there may be an issue with your lat/long values.",
-            "Check the configuration file and try again.",
-        )
-        quit()
-    return lat, long
 
 
 def getclosest(aqua, terra, aoi, t0, t1, altitude_degrees=30):
