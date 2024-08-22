@@ -45,18 +45,12 @@ def _parsedate(date):
 
 
 def get_passtimes(
-    startdate, enddate, csvoutpath, centroid_lat, centroid_lon, SPACEUSER, SPACEPSWD
+    start_date, end_date, csvoutpath, lat, lon, SPACEUSER, SPACEPSWD
 ):
-    configUsr = SPACEUSER
-    configPwd = SPACEPSWD
-    siteCred = {"identity": configUsr, "password": configPwd}
-    end_date = _parsedate(enddate)
-    start_date = _parsedate(startdate)
-    lat = float(centroid_lat)
-    lon = float(centroid_lon)
+    siteCred = {"identity": SPACEUSER, "password": SPACEPSWD}
     print(f"Outpath {csvoutpath}")
     print(f"Timeframe starts on {start_date}, and ends on {end_date}")
-    print(f"Coordinates (x, y): ({centroid_lat}, {centroid_lon})")
+    print(f"Coordinates (x, y): ({lat}, {lon})")
 
     end_date = getNextDay(end_date)
 
