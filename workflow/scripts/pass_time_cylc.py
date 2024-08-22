@@ -365,17 +365,19 @@ def main():
         help="End date in format YYYY-MM-DD",
     )
     parser.add_argument(
-        "--centroid_lat",
-        "-lat",
-        metavar="centroid_lat",
-        type=str,
+        "--centroid-lat",
+        "--lat",
+        metavar="lat",
+        dest="lat",
+        type=float,
         help="latitude of bounding box centroid",
     )
     parser.add_argument(
-        "--centroid_lon",
-        "-lon",
-        metavar="centroid_lon",
-        type=str,
+        "--centroid-lon",
+        "--lon",
+        metavar="lon",
+        dest="lon",
+        type=float,
         help="longitude of bounding box centroid",
     )
     parser.add_argument(
