@@ -354,12 +354,14 @@ def main():
     )
     parser.add_argument(
         "--startdate",
-        type=str,
+        type=_parsedate,
+        dest="start_date",
         help="Start date in format YYYY-MM-DD",
     )
     parser.add_argument(
         "--enddate",
-        type=str,
+        type=_parsedate,
+        dest="end_date",
         help="End date in format YYYY-MM-DD",
     )
     parser.add_argument(
