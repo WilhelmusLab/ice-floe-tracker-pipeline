@@ -96,7 +96,7 @@
             centroid_lat_array=( $(echo $centroid_lat| sed -e 's/,/ /g') )
             centroid_lon_array=( $(echo $centroid_lon | sed -e 's/,/ /g') )
 
-            apptainer exec --bind $results_dir/${location_array[$i]}/soit:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid_lat ${centroid_lat_array[$i]} --centroid_lon ${centroid_lon_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+            apptainer exec --bind $results_dir/${location_array[$i]}/soit:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid-lat ${centroid_lat_array[$i]} --centroid-lon ${centroid_lon_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
         platform = oscar
         execution time limit = PT1H
