@@ -269,7 +269,7 @@ df.head()
 
 ```
 
-### Simple visualization of a segmented image
+### Simple visualization of a segmented image 
 ```python
 import numpy as np
 import matplotlib.pyplot as plt

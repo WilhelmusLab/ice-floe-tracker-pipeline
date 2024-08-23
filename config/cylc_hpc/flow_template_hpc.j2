@@ -8,7 +8,7 @@
     initial cycle point = PT1M #creates a datetime one minute from system time in UTC
     [[graph]]
         R1 = global_setup  => mkpaths<param_set> => pullfetchimage & pulljuliaimage => fetchdata<param_set> & soit<param_set> => landmask<param_set> => preprocess<param_set> => extractfeatures<param_set> => tracking<param_set> & exportH5<param_set>
-        
+
 [runtime]
     [[root]]
         [[[environment]]]
@@ -17,7 +17,7 @@
             startdate = {{ startdate }}
             enddate = {{ enddate }}
             crs = {{ crs }} # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
-                             # wgs84 for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon            
+                             # wgs84 for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon
             bounding_box = {{ bounding_box }}
             centroid_lat = {{ center_lat }}
             centroid_lon = {{ center_lon }}
@@ -33,8 +33,8 @@
             fetchdata_dir = $project_dir/"resources"/$t
             truecolor_dir = $fetchdata_dir/"truecolor"
             falsecolor_dir = $fetchdata_dir/"falsecolor"
-            
-    [[global_setup]]  
+
+    [[global_setup]]
         script = """
             mkdir -p ~/.cylc
             mkdir -p ~/.cylc/flow
@@ -96,7 +96,7 @@
             centroid_lat_array=( $(echo $centroid_lat| sed -e 's/,/ /g') )
             centroid_lon_array=( $(echo $centroid_lon | sed -e 's/,/ /g') )
 
-            apptainer exec --bind $results_dir/${location_array[$i]}/soit:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid_lat ${centroid_lat_array[$i]} --centroid_lon ${centroid_lon_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+            apptainer exec --bind $results_dir/${location_array[$i]}/soit:/tmp $project_dir/fetchdata.simg python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid-lat ${centroid_lat_array[$i]} --centroid-lon ${centroid_lon_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
         platform = oscar
         execution time limit = PT1H
@@ -105,10 +105,10 @@
         [[[directives]]]
             --mem = 12G
             --cpus-per-task = 4
-    
+
     [[pulljuliaimage]]
         # Pull the latest Docker image containing Julia IceFloeTracker software
-        # apptainer will check the image layers and only re-download if necessary 
+        # apptainer will check the image layers and only re-download if necessary
         script = """
             apptainer pull --force $project_dir/icefloetracker-julia.simg docker://brownccv/icefloetracker-julia:main
         """
@@ -135,7 +135,7 @@
         [[[directives]]]
             --mem-per-cpu = 4G
             --cpus-per-task = 8
-    
+
     [[preprocess<param_set>]]
         # Preprocess the satellite imagery and convert to binary
         script = """
@@ -151,7 +151,7 @@
         [[[directives]]]
             --mem-per-cpu = 12G
             --cpus-per-task = 20
-    
+
     [[extractfeatures<param_set>]]
         # Identify floes and extract floe metrics from binary processed images
         script = """
@@ -168,7 +168,7 @@
         [[[directives]]]
             --mem = 18G
             --cpus-per-task = 2
-    
+
     [[tracking<param_set>]]
         # Pair and track identified floes across days
         script = """
@@ -186,7 +186,7 @@
         [[[directives]]]
             --mem = 20G
             --cpus-per-task = 1
-    
+
     [[exportH5<param_set>]]
         # Package intermediate and final outputs into HDF5 files
         script = """
