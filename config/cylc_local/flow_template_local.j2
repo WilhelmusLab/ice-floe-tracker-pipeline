@@ -16,7 +16,7 @@
             startdate = {{ startdate }}
             enddate = {{ enddate }}
             crs = {{ crs }} # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
-                             # wgs84 for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon            
+                             # wgs84 for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon
             bounding_box = {{ bounding_box }}
             centroid_x = {{ centroid_x }}
             centroid_y = {{ centroid_y }}
@@ -47,7 +47,7 @@
             mkdir -p $res/tracker
             mkdir -p $res/preprocess/hdf5-files
         """
-        
+
     [[fetchdata<param_set>]]
         # Convert param lists to indexable bash arrays and fetch falsecolor, truecolor, and landmask for each location
         script = """
@@ -56,7 +56,7 @@
             location_array=( $(echo $location | sed -e 's/,/ /g') )
             startdate_array=( $(echo $startdate | sed -e 's/,/ /g') )
             enddate_array=( $(echo $enddate | sed -e 's/,/ /g') )
-            
+
             docker run --mount type=bind,source=$fetchdata_dir/${location_array[$i]},target=/tmp --mount type=bind,source=$report_dir,target=/usr/local/bin/../report brownccv/icefloetracker-fetchdata:main /usr/local/bin/fetchdata.sh -o /tmp -s ${startdate_array[$i]} -e ${enddate_array[$i]} -c $crs -b ${bbox_array[$i]}
         """
     [[soit<param_set>]]
@@ -69,7 +69,7 @@
             centroid_x_array=( $(echo $centroid_x| sed -e 's/,/ /g') )
             centroid_y_array=( $(echo $centroid_y | sed -e 's/,/ /g') )
 
-            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$results_dir/${location_array[$i]}/soit,target=/tmp --mount type=bind,source=$report_dir,target=/usr/local/bin/../report brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid_x ${centroid_x_array[$i]} --centroid_y ${centroid_y_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+            docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=$results_dir/${location_array[$i]}/soit,target=/tmp --mount type=bind,source=$report_dir,target=/usr/local/bin/../report brownccv/icefloetracker-fetchdata:main python3 /usr/local/bin/pass_time_cylc.py --startdate ${startdate_array[$i]} --enddate ${enddate_array[$i]} --csvoutpath /tmp --centroid-lon ${centroid_x_array[$i]} --centroid-lat ${centroid_y_array[$i]} --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
         """
 
     [[landmask<param_set>]]
@@ -90,7 +90,7 @@
             location_array=( $(echo $location | sed -e 's/,/ /g') )
 
             docker run --mount type=bind,source=$results_dir/${location_array[$i]}/preprocess,target=/tmp \
-            --mount 
+            --mount
 type=bind,source=$report_dir,target=/usr/local/bin/../report \
             brownccv/icefloetracker-julia:main $julia_exec -t auto /usr/local/bin/ice-floe-tracker.jl preprocess -t $fetchdata_dir/${location_array[$i]}/truecolor -r $fetchdata_dir/${location_array[$i]}/falsecolor -l $results_dir/${location_array[$i]}/landmasks -p $results_dir/${location_array[$i]}/soit -o /tmp
         """
