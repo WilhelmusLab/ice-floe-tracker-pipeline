@@ -1,3 +1,23 @@
+# Simplified Ice Floe Tracker Pipeline
+
+## History
+
+- Started with the cylc_local template from ice-floe-tracker-pipeline
+- Removed all the location-specific variables, (just wanted to get a simple pipeline which does one location).
+- Refactored the calls to Julia IceFloeTracker.jl and the wrapper to make these single commands like `${IFT} preprocess ...` – if we want to put them into docker later, we totally can, but I need to be able to make changes without having to build a full docker image, which takes way too long.
+
+## ToDos
+
+- Replace `fetchdata` with the new API-based method from Ebseg
+- Make it so we can configure where the reports directory is on the command line, rather than it going into ${this_directory}/../reports
+- Copy ice-floe-tracker.jl and its component parts into `./bin/` or `./lib/` and install from there; do the same with the other CLI scripts
+- merge into original repo as a separate branch for now
+
+- Refactor `preprocess` so that it can be run on single groups of files.
+- Refactor cylc workflow so that it uses the cycle point method to parallelize loading and preprocessing data, and then gathers all the data in a single step at the end – will reduce memory and speed up development.
+
+# Installation
+
 ## Prerequisites
 
 ### Instantiate IceFloeTracker.jl
