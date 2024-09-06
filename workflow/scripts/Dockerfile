@@ -1,4 +1,4 @@
-FROM python:3.9-bullseye
+FROM python:3.10-bullseye
 
 ENV TERM=xterm
 
@@ -9,9 +9,9 @@ RUN apt-get clean && apt-get update && \
     rm -rf /var/lib/apt/list/*
 RUN apt-get install gdal-bin -y
 
-RUN pip3 install skyfield \
-        requests\ 
-        opencv-python
+RUN pip3 install skyfield==1.45 \
+        requests==2.31.0 \ 
+        opencv-python==4.10.0.84
 
 # Build software
 #===========================================
