@@ -4,7 +4,7 @@
     allow implicit tasks = True
 [scheduling]
     [[graph]]
-        R1 = fetchdata & soit => landmask => preprocess => extractfeatures => tracking & exportH5
+        R1 = FETCHDATA:succeed-all & soit => landmask => preprocess => extractfeatures => tracking & exportH5
 
 [runtime]
     [[root]]
@@ -53,15 +53,41 @@
             WORKSPACE="/workspaces/ice-floe-tracker-workspace"
             IFT="julia --project=${WORKSPACE}/ice-floe-tracker-pipeline/ ${WORKSPACE}/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl"
 
-    [[fetchdata]]
-        # Convert param lists to indexable bash arrays and fetch falsecolor, truecolor, and landmask for each location
+            FSDPROC="pipx run --editable --spec ${WORKSPACE}/ebseg fsdproc --debug"
+
+    [[FETCHDATA]]
         pre-script = """
             mkdir -p ${report_dir}
             mkdir -p ${truecolor_dir}
             mkdir -p ${falsecolor_dir}
         """
         script = """
-            ${FETCHDATA} -o ${docker_fetchdata_dir} -s ${startdate} -e ${enddate} -c ${crs} -b ${bounding_box}
+            d="{{ START }}"
+            until [[ $d > {{ END }} ]]; do 
+                ${FSDPROC} load ${truecolor_dir}/${d//-/}.${satellite}.truecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox ${bounding_box} --crs "EPSG:3413" --no-validate
+                
+                ${FSDPROC} load ${falsecolor_dir}/${d//-/}.${satellite}.falsecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs "EPSG:3413"
+                
+                d=$(date -I -d "$d + 1 day")
+            done
+        """
+        [[[environment]]]
+            scale="250"
+
+    [[FETCHDATA_aqua]]
+        inherit=FETCHDATA
+        [[[environment]]]
+            satellite="aqua"
+    
+    [[FETCHDATA_terra]]
+        inherit=FETCHDATA
+        [[[environment]]]
+            satellite="terra"
+    
+    [[FETCHDATA_landmask]]
+        inherit=FETCHDATA
+        script="""
+            ${FSDPROC} load ${fetchdata_dir}/landmask.tiff --datetime ${startdate} --scale ${scale} --kind landmask --bbox ${bounding_box} --crs "EPSG:3413"
         """
 
     [[soit]]
