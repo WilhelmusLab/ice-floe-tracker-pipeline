@@ -64,9 +64,10 @@
         script = """
             d="{{ START }}"
             until [[ $d > {{ END }} ]]; do 
-                ${FSDPROC} load ${truecolor_dir}/${d//-/}.${satellite}.truecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox ${bounding_box} --crs "EPSG:3413" --no-validate
+                date_without_dashes=${d//-/}
+                ${FSDPROC} load ${truecolor_dir}/${date_without_dashes}.${satellite}.truecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox ${bounding_box} --crs "EPSG:3413" --no-validate
                 
-                ${FSDPROC} load ${falsecolor_dir}/${d//-/}.${satellite}.falsecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs "EPSG:3413"
+                ${FSDPROC} load ${falsecolor_dir}/${date_without_dashes}.${satellite}.falsecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs "EPSG:3413"
                 
                 d=$(date -I -d "$d + 1 day")
             done
