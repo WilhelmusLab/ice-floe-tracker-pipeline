@@ -38,12 +38,15 @@
 
             RUN="docker run"
 
-            FETCHDATA_CONTAINER={{ FETCHDATA_CONTAINER }}
-            REPORT_MOUNT="--mount type=bind,source=${report_dir},target=${docker_report_dir}"
-
             JULIA_CONTAINER={{ JULIA_CONTAINER }}
             julia_exec="/usr/local/julia/bin/julia -t auto"
             IFT_PATH="/usr/local/bin/ice-floe-tracker.jl"
+            
+            FETCHDATA_MOUNT="--mount type=bind,source=${fetchdata_dir},target=${docker_fetchdata_dir}"
+            FETCHDATA_CONTAINER={{ FETCHDATA_CONTAINER }}
+            REPORT_MOUNT="--mount type=bind,source=${report_dir},target=${docker_report_dir}"
+            FETCHDATA="${RUN} ${FETCHDATA_MOUNT} ${REPORT_MOUNT} ${FETCHDATA_CONTAINER} /usr/local/bin/fetchdata.sh"
+            
             WORKSPACE="/workspaces/ice-floe-tracker-workspace"
             IFT="julia --project=${WORKSPACE}/ice-floe-tracker-pipeline/ ${WORKSPACE}/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl"
 
@@ -55,9 +58,6 @@
             mkdir -p ${falsecolor_dir}
         """
         script = """
-            mkdir -p ${fetchdata_dir}
-            FETCHDATA_MOUNT="--mount type=bind,source=${fetchdata_dir},target=${docker_fetchdata_dir}"
-            FETCHDATA="${RUN} ${FETCHDATA_MOUNT} ${REPORT_MOUNT} ${FETCHDATA_CONTAINER} /usr/local/bin/fetchdata.sh"
             ${FETCHDATA} -o ${docker_fetchdata_dir} -s ${startdate} -e ${enddate} -c ${crs} -b ${bounding_box}
         """
 
