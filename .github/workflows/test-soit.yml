@@ -1,0 +1,27 @@
+name: Test SOIT
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Set up Python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - name: Install dependencies
+              run: pip install -r requirements.txt
+
+            - name: Run SOIT
+              run: |
+                python ./workflow/scripts/pass_time_cylc.py -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} --startdate 2013-03-31 --enddate 2013-05-01 --lat 76.0015 --lon -18.4315 --csvoutpath .
