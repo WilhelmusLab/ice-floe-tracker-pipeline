@@ -9,9 +9,7 @@ RUN apt-get clean && apt-get update && \
     rm -rf /var/lib/apt/list/*
 RUN apt-get install gdal-bin -y
 
-RUN pip3 install skyfield==1.45 \ 
-        requests==2.31 \
-	opencv-python==4.10
+RUN pip3 install skyfield==1.45 requests==2.31 opencv-python==4.10
 
 # Build software
 #===========================================
