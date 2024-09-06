@@ -12,7 +12,7 @@ RUN apt-get install gdal-bin -y
 RUN pip3 install skyfield==1.45 \ 
         requests==2.31 \
 	opencv-python==4.10
-
+>>>>>>> Stashed changes
 
 # Build software
 #===========================================
