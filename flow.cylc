@@ -46,6 +46,9 @@
             FETCHDATA_CONTAINER={{ FETCHDATA_CONTAINER }}
             REPORT_MOUNT="--mount type=bind,source=${report_dir},target=${docker_report_dir}"
             FETCHDATA="${RUN} ${FETCHDATA_MOUNT} ${REPORT_MOUNT} ${FETCHDATA_CONTAINER} /usr/local/bin/fetchdata.sh"
+
+            SOIT_MOUNT="--mount type=bind,source=${soit_dir},target=/tmp"
+            PASS_TIME="${RUN} ${SOIT_MOUNT} ${REPORT_MOUNT} ${FETCHDATA_CONTAINER} python3 /usr/local/bin/pass_time_cylc.py"
             
             WORKSPACE="/workspaces/ice-floe-tracker-workspace"
             IFT="julia --project=${WORKSPACE}/ice-floe-tracker-pipeline/ ${WORKSPACE}/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl"
@@ -68,8 +71,6 @@
             mkdir -p ${soit_dir}
         """
         script = """
-            SOIT_MOUNT="--mount type=bind,source=${soit_dir},target=/tmp"
-            PASS_TIME="${RUN} ${SOIT_MOUNT} ${REPORT_MOUNT} ${FETCHDATA_CONTAINER} python3 /usr/local/bin/pass_time_cylc.py"
             ${PASS_TIME} --csvoutpath /tmp \
             --startdate ${startdate} --enddate ${enddate} \
             --centroid_lat ${centroid_lat} --centroid_lon ${centroid_lon} \
