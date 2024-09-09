@@ -15,6 +15,7 @@
             enddate = {{ END }}
             crs = {{ CRS }} # epsg3413 for polar stereographic: left_x@top_y@right_x@lower_y
                             # wgs84 for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon            
+
             bounding_box = {{ BBOX }}
             centroid_lat = {{ CENTROID_LAT }}
             centroid_lon = {{ CENTROID_LON }}
@@ -45,14 +46,17 @@
             mkdir -p ${report_dir}
             mkdir -p ${truecolor_dir}
             mkdir -p ${falsecolor_dir}
+            declare -A epsg_crs=( ["epsg3413"]="EPSG:3413" ["wgs84"]="EPSG:4326" )
+            epsg="${epsg_crs[${crs}]}"
         """
         script = """
-            d="{{ START }}"
-            until [[ $d > {{ END }} ]]; do 
+        echo ${epsg}
+            d="${startdate}"
+            until [[ $d > ${enddate} ]]; do 
                 date_without_dashes=${d//-/}
-                ${FSDPROC} load ${truecolor_dir}/${date_without_dashes}.${satellite}.truecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox ${bounding_box} --crs "EPSG:3413" --no-validate
+                ${FSDPROC} load ${truecolor_dir}/${date_without_dashes}.${satellite}.truecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox ${bounding_box} --crs ${epsg} --no-validate
                 
-                ${FSDPROC} load ${falsecolor_dir}/${date_without_dashes}.${satellite}.falsecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs "EPSG:3413"
+                ${FSDPROC} load ${falsecolor_dir}/${date_without_dashes}.${satellite}.falsecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs ${epsg}
                 
                 d=$(date -I -d "$d + 1 day")
             done
@@ -73,7 +77,8 @@
     [[FETCHDATA_landmask]]
         inherit=FETCHDATA
         script="""
-            ${FSDPROC} load ${fetchdata_dir}/landmask.tiff --datetime ${startdate} --scale ${scale} --kind landmask --bbox ${bounding_box} --crs "EPSG:3413"
+            echo ${epsg}
+            ${FSDPROC} load ${fetchdata_dir}/landmask.tiff --datetime ${startdate} --scale ${scale} --kind landmask --bbox ${bounding_box} --crs ${epsg}
         """
 
     [[soit]]
