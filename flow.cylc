@@ -47,7 +47,7 @@
             REPORT_MOUNT="--mount type=bind,source=${report_dir},target=${docker_report_dir}"
             FETCHDATA="${RUN} ${FETCHDATA_MOUNT} ${REPORT_MOUNT} ${FETCHDATA_CONTAINER} /usr/local/bin/fetchdata.sh"
 
-            PASS_TIME="pipx run lib/pass_time.py"
+            PASS_TIME="pipx run --path ${CYLC_WORKFLOW_RUN_DIR}/lib/pass_time.py"
             
             WORKSPACE="/workspaces/ice-floe-tracker-workspace"
             IFT="julia --project=${WORKSPACE}/ice-floe-tracker-pipeline/ ${WORKSPACE}/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl"
