@@ -20,6 +20,8 @@
 
 ## Prerequisites
 
+Note that before running we need to have instantiated the PyCall conda environment on the local machine
+
 ### Instantiate IceFloeTracker.jl
 
 ```
