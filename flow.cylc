@@ -38,7 +38,7 @@
             WORKSPACE="/workspaces/ice-floe-tracker-workspace"
             IFT="julia --project=${WORKSPACE}/ice-floe-tracker-pipeline/ ${WORKSPACE}/ice-floe-tracker-pipeline/workflow/scripts/ice-floe-tracker.jl"
 
-            FSDPROC="pipx run --editable --spec ${WORKSPACE}/ebseg fsdproc --debug"
+            FSDPROC="pipx run --editable --spec git+https://github.com/WilhelmusLab/ebseg.git@add-band721-support fsdproc --debug"
 
     [[FETCHDATA]]
         pre-script = """
