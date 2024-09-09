@@ -33,20 +33,6 @@
 
             report_dir = "${CYLC_WORKFLOW_SHARE_DIR}/report"
 
-            docker_report_dir=/usr/local/bin/../report
-            docker_fetchdata_dir=/tmp
-
-            RUN="docker run"
-
-            JULIA_CONTAINER={{ JULIA_CONTAINER }}
-            julia_exec="/usr/local/julia/bin/julia -t auto"
-            IFT_PATH="/usr/local/bin/ice-floe-tracker.jl"
-            
-            FETCHDATA_MOUNT="--mount type=bind,source=${fetchdata_dir},target=${docker_fetchdata_dir}"
-            FETCHDATA_CONTAINER={{ FETCHDATA_CONTAINER }}
-            REPORT_MOUNT="--mount type=bind,source=${report_dir},target=${docker_report_dir}"
-            FETCHDATA="${RUN} ${FETCHDATA_MOUNT} ${REPORT_MOUNT} ${FETCHDATA_CONTAINER} /usr/local/bin/fetchdata.sh"
-
             PASS_TIME="pipx run --path ${CYLC_WORKFLOW_RUN_DIR}/lib/pass_time.py"
             
             WORKSPACE="/workspaces/ice-floe-tracker-workspace"
