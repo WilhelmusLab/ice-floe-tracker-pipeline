@@ -2,9 +2,22 @@
 
 [scheduler]
     allow implicit tasks = True
+
+[task parameters]
+    satellite = {{ SATELLITES | join(", ")}}
+
 [scheduling]
+    initial cycle point = {{ START }}
+    final cycle point = {{ END }}
     [[graph]]
-        R1 = FETCHDATA:succeed-all & soit => landmask => preprocess => extractfeatures => tracking & exportH5
+        R1 = soit & FETCHDATA_landmask
+        P1D = """
+            FETCHDATA_landmask[^] & soit[^] => preprocess
+            FETCHDATA<satellite> => preprocess => extractfeatures => cycle_end
+            cycle_end[-P1D] => cycle_end
+        """
+        R1/P0Y = cycle_end => tracking & exportH5
+
 
 [runtime]
     [[root]]
@@ -13,6 +26,8 @@
             location = {{ LOCATION }}
             startdate = {{ START }}
             enddate = {{ END }}
+            date=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format CCYY-MM-DD)
+            date_without_dashes=${date//-/}
             crs = {{ CRS }} # "EPSG:3413" for polar stereographic: left_x@top_y@right_x@lower_y
                             # "EPSG:4326" (same as WGS84) for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon            
 
@@ -22,15 +37,18 @@
             minfloearea = {{ MINFLOEAREA }}
             maxfloearea = {{ MAXFLOEAREA }}
 
-            fetchdata_dir = "${CYLC_WORKFLOW_SHARE_DIR}/resources"
-            truecolor_dir = "${fetchdata_dir}/truecolor"
-            falsecolor_dir = "${fetchdata_dir}/falsecolor"
+            fetchdata_dir = "${CYLC_WORKFLOW_SHARE_DIR}"
+            truecolor_dir = "${fetchdata_dir}"
+            falsecolor_dir = "${fetchdata_dir}"
 
-            results_dir = "${CYLC_WORKFLOW_SHARE_DIR}/results"
-            soit_dir = "${results_dir}/soit"
-            landmask_dir = "${results_dir}/landmasks"
-            preprocess_dir = "${results_dir}/preprocess"
-            tracker_dir = "${results_dir}/tracker"
+            scale = 250  # pixel scale in units of the CRS
+            landmask_file = ${fetchdata_dir}/landmask.tiff
+
+            results_dir = "${CYLC_WORKFLOW_SHARE_DIR}"
+            soit_dir = "${results_dir}"
+            landmask_dir = "${results_dir}"
+            preprocess_dir = "${results_dir}"
+            tracker_dir = "${results_dir}"
 
             report_dir = "${CYLC_WORKFLOW_SHARE_DIR}/report"
 
@@ -40,41 +58,30 @@
 
             FSDPROC="pipx run --editable --spec git+https://github.com/WilhelmusLab/ebseg.git@add-band721-support fsdproc --debug"
 
+    [[<satellite>]]
+        [[[environment]]]
+            satellite=${CYLC_TASK_PARAM_satellite}
+            truecolor_file = ${truecolor_dir}/${date_without_dashes}.${satellite}.truecolor.${scale}m.tiff
+            falsecolor_file = ${falsecolor_dir}/${date_without_dashes}.${satellite}.falsecolor.${scale}m.tiff
+
     [[FETCHDATA]]
         pre-script = """
-            mkdir -p ${report_dir}
             mkdir -p ${truecolor_dir}
-            mkdir -p ${falsecolor_dir}
-            
+            mkdir -p ${falsecolor_dir} 
         """
-        script = """
-            d="${startdate}"
-            until [[ $d > ${enddate} ]]; do 
-                date_without_dashes=${d//-/}
-                ${FSDPROC} load ${truecolor_dir}/${date_without_dashes}.${satellite}.truecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox ${bounding_box} --crs ${crs} --no-validate
-                
-                ${FSDPROC} load ${falsecolor_dir}/${date_without_dashes}.${satellite}.falsecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs ${crs}
-                
-                d=$(date -I -d "$d + 1 day")
-            done
-        """
-        [[[environment]]]
-            scale="250"
 
-    [[FETCHDATA_aqua]]
-        inherit=FETCHDATA
-        [[[environment]]]
-            satellite="aqua"
-    
-    [[FETCHDATA_terra]]
-        inherit=FETCHDATA
-        [[[environment]]]
-            satellite="terra"
+    [[FETCHDATA<satellite>]]
+        inherit = FETCHDATA, <satellite>
+        script = """
+            ${FSDPROC} load ${truecolor_file} --datetime ${date} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox ${bounding_box} --crs ${crs}
+            ${FSDPROC} load ${falsecolor_file} --datetime ${date} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs ${crs}
+        """
     
     [[FETCHDATA_landmask]]
         inherit=FETCHDATA
         script="""
-            ${FSDPROC} load ${fetchdata_dir}/landmask.tiff --datetime ${startdate} --scale ${scale} --kind landmask --bbox ${bounding_box} --crs ${crs}
+            ${FSDPROC} load ${landmask_file} --datetime ${startdate} --scale ${scale} --kind landmask --bbox ${bounding_box} --crs ${crs}
+            ${IFT} landmask ${landmask_file} ${landmask_dir}/generated_landmask.jls
         """
 
     [[soit]]
@@ -87,15 +94,6 @@
             --startdate ${startdate} --enddate ${enddate} \
             --centroid-lat ${centroid_lat} --centroid-lon ${centroid_lon} \
             --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
-        """
-
-    [[landmask]]
-        # Generate land masks in Julia from raw landmask file
-        pre-script = """
-            mkdir -p ${landmask_dir}
-        """
-        script = """
-            ${IFT} landmask ${fetchdata_dir} ${landmask_dir}
         """
 
     [[preprocess]]

@@ -196,9 +196,9 @@ end
 function mkclilandmask!(settings)
     args = [
         "input",
-        Dict(:help => "Input image directory", :required => true),
+        Dict(:help => "Input image", :required => true),
         "output",
-        Dict(:help => "Output image directory", :required => true),
+        Dict(:help => "Output file", :required => true),
     ]
     add_arg_table!(settings["landmask"], args...)
 end
