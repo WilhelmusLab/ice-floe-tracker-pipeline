@@ -106,7 +106,7 @@ The bounding box can be specified either using latitude and longitude (crs=wgs84
 Run `python workflow/scripts/flow_generator.py --help` for a list of options.
 
    - [ ] then, build the workflow, run it, and open the Terminal-based User Interface (TUI) to monitor the progress of each task. 
-    ![TUI example](./tui-example.png)
+    ![TUI example](./img/tui-example.png)
 
    ```bash
    cylc install -n <workflow-name> ./config/cylc_hpc
@@ -115,7 +115,7 @@ Run `python workflow/scripts/flow_generator.py --help` for a list of options.
    cylc tui <workflow-name>
    ```
    You can also get an image of the task dependency graph with `cylc graph <workflow-name>`; you have to click the generated link to open it in VS Code.
-   ![Graph example](./graph-example.PNG)
+   ![Graph example](./img/graph-example.PNG)
 
    - [ ] If you need to change parameters and re-run a workflow, first do:
     
