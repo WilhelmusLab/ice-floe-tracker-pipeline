@@ -96,7 +96,7 @@
             mkdir -p ${landmask_dir}
         """
         script = """
-            ${IFT} landmask --log 1 ${fetchdata_dir} ${landmask_dir}
+            ${IFT} landmask ${fetchdata_dir} ${landmask_dir}
         """
 
     [[preprocess]]
@@ -105,13 +105,13 @@
             mkdir -p ${preprocess_dir}
         """
         script = """
-            ${IFT} preprocess --log 1 -t ${truecolor_dir} -r ${falsecolor_dir} -l ${landmask_dir} -p ${soit_dir} -o ${preprocess_dir}
+            ${IFT} preprocess -t ${truecolor_dir} -r ${falsecolor_dir} -l ${landmask_dir} -p ${soit_dir} -o ${preprocess_dir}
         """
 
     [[extractfeatures]]
         # Identify floes and extract floe metrics from binary processed images
         script = """
-            ${IFT} extractfeatures --log 1 -i ${preprocess_dir} -o ${preprocess_dir} --minarea ${minfloearea} --maxarea ${maxfloearea}
+            ${IFT} extractfeatures -i ${preprocess_dir} -o ${preprocess_dir} --minarea ${minfloearea} --maxarea ${maxfloearea}
         """
 
     [[tracking]]
@@ -121,7 +121,7 @@
         """
         script = """
             sample_img=$(ls -d1 ${truecolor_dir}/* | head -1)
-            ${IFT} track --log 1 --imgs ${preprocess_dir} --props ${preprocess_dir} --passtimes ${preprocess_dir} --latlon ${sample_img} --output ${tracker_dir}
+            ${IFT} track --imgs ${preprocess_dir} --props ${preprocess_dir} --passtimes ${preprocess_dir} --latlon ${sample_img} --output ${tracker_dir}
         """
 
     [[exportH5]]
@@ -131,5 +131,5 @@
         """
         script = """
         sample_img=$(ls -d1 ${truecolor_dir}/* | head -1)
-        ${IFT} makeh5files --log 1 --pathtosampleimg ${sample_img} --resdir ${preprocess_dir}
+        ${IFT} makeh5files --pathtosampleimg ${sample_img} --resdir ${preprocess_dir}
         """
