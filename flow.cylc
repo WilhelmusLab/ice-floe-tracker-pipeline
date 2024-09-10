@@ -36,7 +36,7 @@
 
             PASS_TIME="pipx run --path ${CYLC_WORKFLOW_RUN_DIR}/lib/pass_time.py"
             
-            IFT="julia --project=IFTPipeline/ IFTPipeline/workflow/scripts/ice-floe-tracker.jl"
+            IFT="julia --project=${CYLC_WORKFLOW_RUN_DIR}/IFTPipeline.jl/ ${CYLC_WORKFLOW_RUN_DIR}/IFTPipeline.jl/src/cli.jl"
 
             FSDPROC="pipx run --editable --spec git+https://github.com/WilhelmusLab/ebseg.git@add-band721-support fsdproc --debug"
 
