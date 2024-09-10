@@ -1,0 +1,135 @@
+#!jinja2
+
+[scheduler]
+    allow implicit tasks = True
+[scheduling]
+    [[graph]]
+        R1 = FETCHDATA:succeed-all & soit => landmask => preprocess => extractfeatures => tracking & exportH5
+
+[runtime]
+    [[root]]
+        [[[environment]]]
+            # Update these variables with your run parameters
+            location = {{ LOCATION }}
+            startdate = {{ START }}
+            enddate = {{ END }}
+            crs = {{ CRS }} # "EPSG:3413" for polar stereographic: left_x@top_y@right_x@lower_y
+                            # "EPSG:4326" (same as WGS84) for lat/lon: top_left_lat@top_left_lon@lower_right_lat@lower_right_lon            
+
+            bounding_box = {{ BBOX }}
+            centroid_lat = {{ CENTROID_LAT }}
+            centroid_lon = {{ CENTROID_LON }}
+            minfloearea = {{ MINFLOEAREA }}
+            maxfloearea = {{ MAXFLOEAREA }}
+
+            fetchdata_dir = "${CYLC_WORKFLOW_SHARE_DIR}/resources"
+            truecolor_dir = "${fetchdata_dir}/truecolor"
+            falsecolor_dir = "${fetchdata_dir}/falsecolor"
+
+            results_dir = "${CYLC_WORKFLOW_SHARE_DIR}/results"
+            soit_dir = "${results_dir}/soit"
+            landmask_dir = "${results_dir}/landmasks"
+            preprocess_dir = "${results_dir}/preprocess"
+            tracker_dir = "${results_dir}/tracker"
+
+            report_dir = "${CYLC_WORKFLOW_SHARE_DIR}/report"
+
+            PASS_TIME="pipx run --path ${CYLC_WORKFLOW_RUN_DIR}/lib/pass_time.py"
+            
+            WORKSPACE="/workspaces/ice-floe-tracker-workspace"
+            IFT="julia --project=${WORKSPACE}/ice-floe-tracker-cli/IFTPipeline/ ${WORKSPACE}/ice-floe-tracker-cli/IFTPipeline/src/cli.jl"
+
+            FSDPROC="pipx run --editable --spec git+https://github.com/WilhelmusLab/ebseg.git@add-band721-support fsdproc --debug"
+
+    [[FETCHDATA]]
+        pre-script = """
+            mkdir -p ${report_dir}
+            mkdir -p ${truecolor_dir}
+            mkdir -p ${falsecolor_dir}
+            
+        """
+        script = """
+            d="${startdate}"
+            until [[ $d > ${enddate} ]]; do 
+                date_without_dashes=${d//-/}
+                ${FSDPROC} load ${truecolor_dir}/${date_without_dashes}.${satellite}.truecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox ${bounding_box} --crs ${crs} --no-validate
+                
+                ${FSDPROC} load ${falsecolor_dir}/${date_without_dashes}.${satellite}.falsecolor.${scale}m.tiff --datetime ${d} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs ${crs}
+                
+                d=$(date -I -d "$d + 1 day")
+            done
+        """
+        [[[environment]]]
+            scale="250"
+
+    [[FETCHDATA_aqua]]
+        inherit=FETCHDATA
+        [[[environment]]]
+            satellite="aqua"
+    
+    [[FETCHDATA_terra]]
+        inherit=FETCHDATA
+        [[[environment]]]
+            satellite="terra"
+    
+    [[FETCHDATA_landmask]]
+        inherit=FETCHDATA
+        script="""
+            ${FSDPROC} load ${fetchdata_dir}/landmask.tiff --datetime ${startdate} --scale ${scale} --kind landmask --bbox ${bounding_box} --crs ${crs}
+        """
+
+    [[soit]]
+        # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
+        pre-script = """
+            mkdir -p ${soit_dir}
+        """
+        script = """
+            ${PASS_TIME} --csvoutpath ${soit_dir} \
+            --startdate ${startdate} --enddate ${enddate} \
+            --centroid-lat ${centroid_lat} --centroid-lon ${centroid_lon} \
+            --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
+        """
+
+    [[landmask]]
+        # Generate land masks in Julia from raw landmask file
+        pre-script = """
+            mkdir -p ${landmask_dir}
+        """
+        script = """
+            ${IFT} landmask ${fetchdata_dir} ${landmask_dir}
+        """
+
+    [[preprocess]]
+        # Preprocess the satellite imagery and convert to binary
+        pre-script = """
+            mkdir -p ${preprocess_dir}
+        """
+        script = """
+            ${IFT} preprocess -t ${truecolor_dir} -r ${falsecolor_dir} -l ${landmask_dir} -p ${soit_dir} -o ${preprocess_dir}
+        """
+
+    [[extractfeatures]]
+        # Identify floes and extract floe metrics from binary processed images
+        script = """
+            ${IFT} extractfeatures -i ${preprocess_dir} -o ${preprocess_dir} --minarea ${minfloearea} --maxarea ${maxfloearea}
+        """
+
+    [[tracking]]
+        # Pair and track identified floes across days
+        pre-script = """
+            mkdir -p ${tracker_dir}
+        """
+        script = """
+            sample_img=$(ls -d1 ${truecolor_dir}/* | head -1)
+            ${IFT} track --imgs ${preprocess_dir} --props ${preprocess_dir} --passtimes ${preprocess_dir} --latlon ${sample_img} --output ${tracker_dir}
+        """
+
+    [[exportH5]]
+        # Package intermediate and final outputs into HDF5 files
+        pre-script = """
+            mkdir -p ${preprocess_dir}/hdf5-files
+        """
+        script = """
+        sample_img=$(ls -d1 ${truecolor_dir}/* | head -1)
+        ${IFT} makeh5files --pathtosampleimg ${sample_img} --resdir ${preprocess_dir}
+        """
