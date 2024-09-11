@@ -13,8 +13,7 @@
         R1 = soit
         P1D = """
             soit[^] => preprocess<satellite>
-
-            FETCHDATA_truecolor<satellite> & FETCHDATA_falsecolor<satellite> & FETCHDATA_landmask => preprocess<satellite> => extractfeatures<satellite> => cycle_end
+            FETCHDATA_truecolor<satellite> & FETCHDATA_falsecolor<satellite> & FETCHDATA_landmask & FETCHDATA_cloud<satellite> => preprocess<satellite> => extractfeatures<satellite> => cycle_end
             cycle_end[-P1D] => cycle_end
         """
         R1/P0Y = cycle_end => tracking & exportH5
@@ -63,6 +62,7 @@
             satellite=${CYLC_TASK_PARAM_satellite}
             truecolor_file = ${img_prefix}.${satellite}.truecolor.tiff
             falsecolor_file = ${img_prefix}.${satellite}.falsecolor.tiff
+            cloud_file = ${img_prefix}.${satellite}.cloud.tiff
             segmented_floes_file = ${img_prefix}.${satellite}.segmented_floes.tiff
     
     [[FETCHDATA_truecolor<satellite>]]
@@ -76,6 +76,12 @@
         script = """
             ${FSDPROC} load ${falsecolor_file} --datetime ${date} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs ${crs}
         """
+
+    [[FETCHDATA_cloud<satellite>]]
+        inherit = FETCHDATA<satellite>
+        script = """
+            ${FSDPROC} load ${cloud_file} --datetime ${date} --scale ${scale} --satellite ${satellite} --kind cloud --bbox ${bounding_box} --crs ${crs}
+        """
     
     [[FETCHDATA_landmask]]
         inherit = FETCHDATA
@@ -88,7 +94,13 @@
         inherit = FETCHDATA<satellite>
         # Preprocess the satellite imagery and convert to binary
         script = """
+            {% if PREPROCESSING == "Original" %}
             ${IFT} preprocess_single -t ${truecolor_file} -r ${falsecolor_file} -l ${landmask_binarized_file} -d ${landmask_binarized_dilated_file} -o ${segmented_floes_file}
+            {% elif PREPROCESSING == "Buckley" %}
+            mkdir -p ${segmented_floes_file}.work/
+            ${FSDPROC} process ${truecolor_file} ${cloud_file} ${landmask_file} ${segmented_floes_file}.work/
+            cp ${segmented_floes_file}.work/final.tif ${segmented_floes_file}
+            {% endif %}
         """
 
     [[extractfeatures]]
