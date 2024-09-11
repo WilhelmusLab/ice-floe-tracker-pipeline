@@ -12,8 +12,9 @@
     [[graph]]
         R1 = soit
         P1D = """
-            soit[^]
-            FETCHDATA<satellite> & FETCHDATA_landmask => preprocess<satellite> => extractfeatures<satellite> => cycle_end
+            soit[^] => preprocess<satellite>
+
+            FETCHDATA_truecolor<satellite> & FETCHDATA_falsecolor<satellite> & FETCHDATA_landmask => preprocess<satellite> => extractfeatures<satellite> => cycle_end
             cycle_end[-P1D] => cycle_end
         """
         R1/P0Y = cycle_end => tracking & exportH5
@@ -23,9 +24,6 @@
     [[root]]
         [[[environment]]]
             # Update these variables with your run parameters
-            location = {{ LOCATION }}
-            startdate = {{ START }}
-            enddate = {{ END }}
             date=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format CCYY-MM-DD)
             date_without_dashes=${date//-/}
             crs = {{ CRS }} # "EPSG:3413" for polar stereographic: left_x@top_y@right_x@lower_y
@@ -37,56 +35,45 @@
             minfloearea = {{ MINFLOEAREA }}
             maxfloearea = {{ MAXFLOEAREA }}
 
-            fetchdata_dir = "${CYLC_WORKFLOW_SHARE_DIR}"
-            truecolor_dir = "${fetchdata_dir}"
-            falsecolor_dir = "${fetchdata_dir}"
-
             scale = 250  # pixel scale in units of the CRS
-            landmask_file = ${fetchdata_dir}/landmask.tiff
-
-            results_dir = "${CYLC_WORKFLOW_SHARE_DIR}"
-            soit_dir = "${results_dir}"
-            landmask_dir = "${results_dir}"
-            preprocess_dir = "${results_dir}"
-            tracker_dir = "${results_dir}"
-
-            report_dir = "${CYLC_WORKFLOW_SHARE_DIR}/report"
-
-            PASS_TIME="pipx run --path ${CYLC_WORKFLOW_RUN_DIR}/lib/pass_time.py"
             
-            IFT="julia --project=${CYLC_WORKFLOW_RUN_DIR}/IFTPipeline.jl/ ${CYLC_WORKFLOW_RUN_DIR}/IFTPipeline.jl/src/cli.jl"
+            results_dir = "${CYLC_WORKFLOW_SHARE_DIR}"
+            img_prefix = "${results_dir}/${date_without_dashes}.${scale}m"
+            landmask_file = "${img_prefix}.landmask.tiff"
+            landmask_binarized_file = "${img_prefix}.landmask.binarized.tiff"
+            landmask_binarized_dilated_file = "${img_prefix}.landmask.binarized.dilated.tiff"
 
+            PASS_TIME="pipx run --path ${CYLC_WORKFLOW_RUN_DIR}/lib/pass_time.py"            
+            IFT="julia --project=${CYLC_WORKFLOW_RUN_DIR}/IFTPipeline.jl/ ${CYLC_WORKFLOW_RUN_DIR}/IFTPipeline.jl/src/cli.jl"
             FSDPROC="pipx run --editable --spec git+https://github.com/WilhelmusLab/ebseg.git@add-band721-support fsdproc --debug"
 
     [[soit]]
         # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
-        pre-script = """
-            mkdir -p ${soit_dir}
-        """
         script = """
-            ${PASS_TIME} --csvoutpath ${soit_dir} \
-            --startdate ${startdate} --enddate ${enddate} \
+            ${PASS_TIME} --csvoutpath ${results_dir} \
+            --startdate {{ START }} --enddate {{ END }} \
             --centroid-lat ${centroid_lat} --centroid-lon ${centroid_lon} \
             --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
         """
 
-    [[<satellite>]]
+        
+    [[FETCHDATA]]
+    [[FETCHDATA<satellite>]]
         [[[environment]]]
             satellite=${CYLC_TASK_PARAM_satellite}
-            truecolor_file = ${truecolor_dir}/${date_without_dashes}.${satellite}.truecolor.${scale}m.tiff
-            falsecolor_file = ${falsecolor_dir}/${date_without_dashes}.${satellite}.falsecolor.${scale}m.tiff
-            segmented_floes_file = ${date_without_dashes}.${satellite}.segmented_floes.${scale}m.jls
-
-    [[FETCHDATA]]
-        pre-script = """
-            mkdir -p ${truecolor_dir}
-            mkdir -p ${falsecolor_dir} 
-        """
-
-    [[FETCHDATA<satellite>]]
-        inherit = FETCHDATA, <satellite>
+            truecolor_file = ${img_prefix}.${satellite}.truecolor.tiff
+            falsecolor_file = ${img_prefix}.${satellite}.falsecolor.tiff
+            segmented_floes_file = ${img_prefix}.${satellite}.segmented_floes.tiff
+    
+    [[FETCHDATA_truecolor<satellite>]]
+        inherit = FETCHDATA<satellite>
         script = """
             ${FSDPROC} load ${truecolor_file} --datetime ${date} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox ${bounding_box} --crs ${crs}
+        """
+
+    [[FETCHDATA_falsecolor<satellite>]]
+        inherit = FETCHDATA<satellite>
+        script = """
             ${FSDPROC} load ${falsecolor_file} --datetime ${date} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox ${bounding_box} --crs ${crs}
         """
     
@@ -97,13 +84,9 @@
             ${IFT} landmask_single -i ${landmask_file} -o ${landmask_binarized_file} -d ${landmask_binarized_dilated_file}
         """
 
-
     [[preprocess<satellite>]]
-        inherit = <satellite>
+        inherit = FETCHDATA<satellite>
         # Preprocess the satellite imagery and convert to binary
-        pre-script = """
-            mkdir -p ${preprocess_dir}
-        """
         script = """
             ${IFT} preprocess_single -t ${truecolor_file} -r ${falsecolor_file} -l ${landmask_dir}/generated_landmask.jls -o ${segmented_floes_file}
         """
