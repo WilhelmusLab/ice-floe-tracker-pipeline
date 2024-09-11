@@ -25,15 +25,19 @@ end
 function mkpreprocess_single!(settings)
 @add_arg_table! settings["preprocess_single"] begin
         "--truecolor", "-t"
-        help = "Truecolor image file"
+        help = "Truecolor image file (.tiff)"
         required = true
 
         "--falsecolor", "-r"
-        help = "Falsecolor image file"
+        help = "Falsecolor image file (.tiff)"
         required = true
 
         "--landmask", "-l"
-        help = "Land mask image file (.jls)"
+        help = "Landmask image file (.tiff)"
+        required = true
+
+        "--landmask-dilated", "-d"
+        help = "Landmask image file (dilated, .tiff)"
         required = true
 
         "--output", "-o"
