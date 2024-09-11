@@ -91,10 +91,10 @@
         """
     
     [[FETCHDATA_landmask]]
-        inherit=FETCHDATA
+        inherit = FETCHDATA
         script="""
-            ${FSDPROC} load ${landmask_file} --datetime ${startdate} --scale ${scale} --kind landmask --bbox ${bounding_box} --crs ${crs}
-            ${IFT} landmask ${landmask_file} ${landmask_dir}/generated_landmask.jls
+            ${FSDPROC} load ${landmask_file} --datetime ${date} --scale ${scale} --kind landmask --bbox ${bounding_box} --crs ${crs}
+            ${IFT} landmask_single -i ${landmask_file} -o ${landmask_binarized_file} -d ${landmask_binarized_dilated_file}
         """
 
 

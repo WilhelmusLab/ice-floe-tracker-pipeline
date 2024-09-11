@@ -5,6 +5,7 @@ This module contains wrapper functions for IceFloeTracker.jl pipeline.
 """
 module IFTPipeline
 using ArgParse
+using FileIO
 using LoggingExtras
 using IceFloeTracker
 using IceFloeTracker: DataFrames, Dates, @dateformat_str, DataFrame, nrow, rename!, Not, select!, Date, Time, DateTime
@@ -35,6 +36,7 @@ export cache_vector, sharpen,
     load_cloudmask,
     disc_ice_water,
     landmask,
+    landmask_single,
     track,
     mkclipreprocess!,
     mkcliextract!,

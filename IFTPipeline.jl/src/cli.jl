@@ -4,7 +4,7 @@ using ArgParse
 using LoggingExtras
 using IceFloeTracker
 using IFTPipeline
-using IFTPipeline: mkclipreprocess!, mkcliextract!, mkclitrack!, mkclilandmask!, mkcli!
+using IFTPipeline: mkclipreprocess!, mkcliextract!, mkclitrack!, mkclilandmask!, mkclilandmask_single!, mkcli!
 using Serialization
 
 
@@ -43,6 +43,10 @@ function main(args)
     @add_arg_table! settings begin
         "landmask"
         help = "Generate land mask images"
+        action = :command
+
+        "landmask_single"
+        help = "Generate individual dilated and undilated land mask images (TIFFs)"
         action = :command
 
         "preprocess"
