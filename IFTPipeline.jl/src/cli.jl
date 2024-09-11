@@ -49,6 +49,10 @@ function main(args)
         help = "Preprocess truecolor/falsecolor images"
         action = :command
 
+        "preprocess_single"
+        help = "Preprocess one set of truecolor/falsecolor images"
+        action = :command
+
         "extractfeatures"
         help = "Extract ice floe features from segmented floe image"
         action = :command

@@ -24,6 +24,7 @@ include("h5.jl")
 export cache_vector, sharpen,
     sharpen_gray,
     preprocess,
+    preprocess_single,
     cloudmask,
     extractfeatures,
     get_ice_labels,

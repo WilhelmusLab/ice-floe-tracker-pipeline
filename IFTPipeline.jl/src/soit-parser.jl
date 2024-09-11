@@ -10,12 +10,25 @@ The SOIT output file is a csv file with columns :Date, :sat1, :sat2, ... :satn, 
 """
 function process_soit(passtimesdir::String)
     # check there is a file at passtimesdir starting with "passtimes_lat" with extension .csv
-    pth = filter(x -> occursin(r"^passtimes_lat.*\.csv$", x), readdir(passtimesdir))
-    isempty(pth) && error("No csv file found at $passtimesdir starting with 'passtimes_lat'")
-    length(pth) > 1 && error("More than one csv file found at $passtimesdir starting with 'passtimes_lat'")
+    if isdir(passtimesdir)
+        pth = filter(x -> occursin(r"^passtimes_lat.*\.csv$", x), readdir(passtimesdir))
+        isempty(pth) && error("No csv file found at $passtimesdir starting with 'passtimes_lat'")
+        length(pth) > 1 && error("More than one csv file found at $passtimesdir starting with 'passtimes_lat'")
+        passtimes_file=joinpath(passtimesdir, pth[1])
+    elseif isfile(passtimesdir)
+        passtimes_file = passtimesdir
+    else
+        throw("couldn't find passtimes file at $passtimesdir")
+    end
+    @info "loading passtimes from $passtimes_file"
 
-    data, cols = readdlm(joinpath(passtimesdir, pth[1]), ','; header=true)
-    df = DataFrame(data, vec(cols))[1:end-1, :]
+    data, cols = readdlm(passtimes_file, ','; header=true)
+    @info data
+    @info cols
+    df = DataFrame(data, vec(cols))
+    @info df
+    df = DataFrame(data, vec(cols))[1:end, :]
+    @info df
 
     # filter out rows with value "" in the first column
     filter!(row -> row[1] != "", df)

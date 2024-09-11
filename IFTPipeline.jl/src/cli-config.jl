@@ -22,6 +22,26 @@ function mkclipreprocess!(settings)
     end
     return nothing
 end
+function mkpreprocess_single!(settings)
+@add_arg_table! settings["preprocess_single"] begin
+        "--truecolor", "-t"
+        help = "Truecolor image file"
+        required = true
+
+        "--falsecolor", "-r"
+        help = "Falsecolor image file"
+        required = true
+
+        "--landmask", "-l"
+        help = "Land mask image file (.jls)"
+        required = true
+
+        "--output", "-o"
+        help = "Output directory"
+        required = true
+    end
+    return nothing
+end
 
 function mkcliextract!(settings)
     @add_arg_table! settings["extractfeatures"] begin
@@ -207,6 +227,7 @@ function mkcli!(settings, common_args)
     d = Dict(
         "landmask" => mkclilandmask!,
         "preprocess" => mkclipreprocess!,
+        "preprocess_single" => mkpreprocess_single!,
         "extractfeatures" => mkcliextract!,
         "makeh5files" => mkclimakeh5!,
         "track" => mkclitrack!

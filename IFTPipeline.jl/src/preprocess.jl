@@ -256,3 +256,25 @@ function preprocess(; truedir::T, fcdir::T, lmdir::T, passtimesdir::T, output::T
     serialize(joinpath(output, "passtimes.jls"), soitdf.pass_time)
     return nothing
 end
+
+
+function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, output::T) where {T<:AbstractString}
+
+    @info "Processing images: $truecolor, $falsecolor, $landmask"
+    truecolor_img = loadimg(; dir=dirname(truecolor), fname=basename(truecolor))
+    falsecolor_img = loadimg(; dir=dirname(falsecolor), fname=basename(falsecolor))
+    landmask_img = deserialize(landmask)
+
+    @info "Removing alpha channel if it exists"
+    rgb_truecolor_img = RGB.(truecolor_img)
+    rgb_falsecolor_img = RGB.(falsecolor_img)
+
+    @info "Segmenting floes started"
+    segmented_floes = preprocess(rgb_truecolor_img, rgb_falsecolor_img, landmask_img)
+    @info "Segmenting floes complete"
+    
+    @info "Writing segmented floes to $output"
+    serialize(output, segmented_floes)
+
+    return nothing
+end

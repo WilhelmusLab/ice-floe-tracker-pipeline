@@ -10,10 +10,10 @@
     initial cycle point = {{ START }}
     final cycle point = {{ END }}
     [[graph]]
-        R1 = soit & FETCHDATA_landmask
+        R1 = soit
         P1D = """
-            FETCHDATA_landmask[^] & soit[^] => preprocess
-            FETCHDATA<satellite> => preprocess => extractfeatures => cycle_end
+            soit[^]
+            FETCHDATA<satellite> & FETCHDATA_landmask => preprocess<satellite> => extractfeatures<satellite> => cycle_end
             cycle_end[-P1D] => cycle_end
         """
         R1/P0Y = cycle_end => tracking & exportH5
@@ -58,11 +58,24 @@
 
             FSDPROC="pipx run --editable --spec git+https://github.com/WilhelmusLab/ebseg.git@add-band721-support fsdproc --debug"
 
+    [[soit]]
+        # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
+        pre-script = """
+            mkdir -p ${soit_dir}
+        """
+        script = """
+            ${PASS_TIME} --csvoutpath ${soit_dir} \
+            --startdate ${startdate} --enddate ${enddate} \
+            --centroid-lat ${centroid_lat} --centroid-lon ${centroid_lon} \
+            --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
+        """
+
     [[<satellite>]]
         [[[environment]]]
             satellite=${CYLC_TASK_PARAM_satellite}
             truecolor_file = ${truecolor_dir}/${date_without_dashes}.${satellite}.truecolor.${scale}m.tiff
             falsecolor_file = ${falsecolor_dir}/${date_without_dashes}.${satellite}.falsecolor.${scale}m.tiff
+            segmented_floes_file = ${date_without_dashes}.${satellite}.segmented_floes.${scale}m.jls
 
     [[FETCHDATA]]
         pre-script = """
@@ -84,25 +97,15 @@
             ${IFT} landmask ${landmask_file} ${landmask_dir}/generated_landmask.jls
         """
 
-    [[soit]]
-        # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
-        pre-script = """
-            mkdir -p ${soit_dir}
-        """
-        script = """
-            ${PASS_TIME} --csvoutpath ${soit_dir} \
-            --startdate ${startdate} --enddate ${enddate} \
-            --centroid-lat ${centroid_lat} --centroid-lon ${centroid_lon} \
-            --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
-        """
 
-    [[preprocess]]
+    [[preprocess<satellite>]]
+        inherit = <satellite>
         # Preprocess the satellite imagery and convert to binary
         pre-script = """
             mkdir -p ${preprocess_dir}
         """
         script = """
-            ${IFT} preprocess -t ${truecolor_dir} -r ${falsecolor_dir} -l ${landmask_dir} -p ${soit_dir} -o ${preprocess_dir}
+            ${IFT} preprocess_single -t ${truecolor_file} -r ${falsecolor_file} -l ${landmask_dir}/generated_landmask.jls -o ${segmented_floes_file}
         """
 
     [[extractfeatures]]
