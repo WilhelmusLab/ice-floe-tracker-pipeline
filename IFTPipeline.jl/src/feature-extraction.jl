@@ -90,3 +90,21 @@ function extractfeatures(;
     serialize(joinpath(output, "floe_props.jls"), props)
     return nothing
 end
+
+function extractfeatures_single(;
+    input::String, output::String, minarea::Int64, maxarea::Int64, features::Array{String}
+)
+    @info "Loading segmented floes as a binarized image from $input"
+    segmented_floes = BitMatrix(FileIO.load(input))
+
+    @info "Extracting features from each floe: $features"
+    props = IFTPipeline.extractfeatures(segmented_floes; minarea=minarea, maxarea=maxarea, features=features)
+
+    @info "Extracted properties:"
+    @info props
+
+    @info "Writing to $output"
+    FileIO.save(output, props)
+    return nothing
+end
+

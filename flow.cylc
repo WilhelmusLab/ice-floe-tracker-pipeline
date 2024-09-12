@@ -13,7 +13,7 @@
         R1 = soit
         P1D = """
             soit[^] => preprocess<satellite>
-            FETCHDATA_truecolor<satellite> & FETCHDATA_falsecolor<satellite> & FETCHDATA_landmask & FETCHDATA_cloud<satellite> => preprocess<satellite> => extractfeatures<satellite> => cycle_end
+            FETCHDATA_truecolor<satellite> & FETCHDATA_falsecolor<satellite> & FETCHDATA_landmask & FETCHDATA_cloud<satellite> => preprocess<satellite> => cycle_end
             cycle_end[-P1D] => cycle_end
         """
         R1/P0Y = cycle_end => tracking & exportH5
@@ -27,7 +27,7 @@
             date_without_dashes=${date//-/}
             
             results_dir = "${CYLC_WORKFLOW_SHARE_DIR}"
-            img_prefix = "${results_dir}/${date_without_dashes}.${scale}m"
+            img_prefix = "${results_dir}/${date_without_dashes}.{{ SCALE }}m"
             landmask_file = "${img_prefix}.landmask.tiff"
             landmask_binarized_file = "${img_prefix}.landmask.binarized.tiff"
             landmask_binarized_dilated_file = "${img_prefix}.landmask.binarized.dilated.tiff"
@@ -47,56 +47,60 @@
 
         
     [[FETCHDATA]]
-    [[FETCHDATA<satellite>]]
         [[[environment]]]
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date}"
+    
+    [[FETCHDATA<satellite>]]
+        inherit = FETCHDATA
+        [[[environment]]]
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date}"
             satellite=${CYLC_TASK_PARAM_satellite}
             truecolor_file = ${img_prefix}.${satellite}.truecolor.tiff
             falsecolor_file = ${img_prefix}.${satellite}.falsecolor.tiff
             cloud_file = ${img_prefix}.${satellite}.cloud.tiff
             segmented_floes_file = ${img_prefix}.${satellite}.segmented_floes.tiff
+            segmented_floes_props_file = ${img_prefix}.${satellite}.segmented_floes.props.csv
     
     [[FETCHDATA_truecolor<satellite>]]
         inherit = FETCHDATA<satellite>
         script = """
-            ${FSDPROC} load ${truecolor_file} --datetime ${date} --scale ${scale} --satellite ${satellite} --kind truecolor --bbox {{ BBOX }} --crs {{ CRS }}
+            ${FSDPROC} load ${truecolor_file} --satellite ${satellite} --kind truecolor ${fsdprocargs}
         """
 
     [[FETCHDATA_falsecolor<satellite>]]
         inherit = FETCHDATA<satellite>
         script = """
-            ${FSDPROC} load ${falsecolor_file} --datetime ${date} --scale ${scale} --satellite ${satellite} --kind bands721 --bbox {{ BBOX }} --crs {{ CRS }}
+            ${FSDPROC} load ${falsecolor_file} --satellite ${satellite} --kind bands721 ${fsdprocargs} 
         """
 
     [[FETCHDATA_cloud<satellite>]]
         inherit = FETCHDATA<satellite>
         script = """
-            ${FSDPROC} load ${cloud_file} --datetime ${date} --scale ${scale} --satellite ${satellite} --kind cloud --bbox {{ BBOX }} --crs {{ CRS }}
+            ${FSDPROC} load ${cloud_file} --satellite ${satellite} --kind cloud ${fsdprocargs}
         """
     
     [[FETCHDATA_landmask]]
         inherit = FETCHDATA
         script="""
-            ${FSDPROC} load ${landmask_file} --datetime ${date} --scale ${scale} --kind landmask --bbox {{ BBOX }} --crs {{ CRS }}
+            ${FSDPROC} load ${landmask_file} --kind landmask ${fsdprocargs}
             ${IFT} landmask_single -i ${landmask_file} -o ${landmask_binarized_file} -d ${landmask_binarized_dilated_file}
         """
 
     [[preprocess<satellite>]]
         inherit = FETCHDATA<satellite>
-        # Preprocess the satellite imagery and convert to binary
         script = """
             {% if PREPROCESSING == "Original" %}
             ${IFT} preprocess_single -t ${truecolor_file} -r ${falsecolor_file} -l ${landmask_binarized_file} -d ${landmask_binarized_dilated_file} -o ${segmented_floes_file}
+            ${IFT} extractfeatures_single --input ${segmented_floes_file} --output ${segmented_floes_props_file} --minarea {{ MINFLOEAREA }} --maxarea {{ MAXFLOEAREA }}
+            
             {% elif PREPROCESSING == "Buckley" %}
-            mkdir -p ${segmented_floes_file}.work/
-            ${FSDPROC} process ${truecolor_file} ${cloud_file} ${landmask_file} ${segmented_floes_file}.work/
-            cp ${segmented_floes_file}.work/final.tif ${segmented_floes_file}
+            workdir="${segmented_floes_file}.work"
+            mkdir -p "${workdir}"
+            ${FSDPROC} process ${truecolor_file} ${cloud_file} ${landmask_file} ${workdir}
+            cp ${workdir}/final.tif ${segmented_floes_file}
+            cp ${workdir}/props.csv ${segmented_floes_props_file}
+            
             {% endif %}
-        """
-
-    [[extractfeatures]]
-        # Identify floes and extract floe metrics from binary processed images
-        script = """
-            ${IFT} extractfeatures -i ${preprocess_dir} -o ${preprocess_dir} --minarea {{ MINFLOEAREA }} --maxarea {{ MAXFLOEAREA }}
         """
 
     [[tracking]]

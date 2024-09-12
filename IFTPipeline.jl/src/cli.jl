@@ -4,7 +4,7 @@ using ArgParse
 using LoggingExtras
 using IceFloeTracker
 using IFTPipeline
-using IFTPipeline: mkclipreprocess!, mkcliextract!, mkclitrack!, mkclilandmask!, mkclilandmask_single!, mkcli!
+using IFTPipeline: mkclipreprocess!, mkcliextract!, mkcliextract_single!, mkclitrack!, mkclilandmask!, mkclilandmask_single!, mkcli!
 using Serialization
 
 
@@ -59,6 +59,10 @@ function main(args)
 
         "extractfeatures"
         help = "Extract ice floe features from segmented floe image"
+        action = :command
+
+        "extractfeatures_single"
+        help = "Extract ice floe features from a single segmented floe image"
         action = :command
 
         "makeh5files"
