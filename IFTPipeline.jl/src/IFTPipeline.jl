@@ -41,6 +41,7 @@ export cache_vector, sharpen,
     mkclipreprocess!,
     mkcliextract!,
     mkclitrack!,
+    mkclitrack_single!,
     mkfilenames,
     makeh5files,
     getlatlon

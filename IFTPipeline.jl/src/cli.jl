@@ -4,7 +4,7 @@ using ArgParse
 using LoggingExtras
 using IceFloeTracker
 using IFTPipeline
-using IFTPipeline: mkclipreprocess!, mkcliextract!, mkcliextract_single!, mkclitrack!, mkclilandmask!, mkclilandmask_single!, mkcli!
+using IFTPipeline: mkclipreprocess!, mkcliextract!, mkcliextract_single!, mkclitrack!, mkclitrack_single!, mkclilandmask!, mkclilandmask_single!, mkcli!
 using Serialization
 
 
@@ -70,6 +70,10 @@ function main(args)
         action = :command
 
         "track"
+        help = "Pair ice floes in day k with ice floes in day k+1"
+        action = :command
+
+        "track_single"
         help = "Pair ice floes in day k with ice floes in day k+1"
         action = :command
     end

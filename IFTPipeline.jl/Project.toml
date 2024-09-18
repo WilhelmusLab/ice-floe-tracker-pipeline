@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 Folds = "41a02a25-b8f0-4f67-bc48-60067656b558"
