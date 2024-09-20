@@ -34,22 +34,64 @@
     @info props[1, :]
 
     # cropfloe
-    @test cropfloe(floesimg=img1, min_row=1, min_col=1, max_row=4, max_col=4, label=1) == [
+    @test cropfloe(img1, 1, 1,  4, 4, 1) == [
         0 0 0 0
         0 1 1 0
         0 1 1 0
         0 0 0 0
     ]
 
-    @test cropfloe(floesimg=img1, min_row=1, min_col=4, max_row=5, max_col=8, label=2) == [
+    @test cropfloe(img1, 1, 4, 5, 8, 2) == [
         0 0 0 0 0
         0 1 1 1 0
         0 1 1 1 0
         0 0 1 1 0
         0 0 0 0 0
     ]
-
-    @test cropfloe(floesimg=img1, min_row=1, min_col=8, max_row=6, max_col=13, label=3) == [
+        
+    @test cropfloe(img1, 1, 8, 6, 13, 3) == [
+        0 0 0 0 0 0
+        0 1 1 1 1 0
+        0 1 1 1 1 0
+        0 1 1 1 1 0
+        0 1 1 1 0 0
+        0 0 0 0 0 0          
+        ]
+            
+    @test cropfloe(img1, 5, 1, 10, 7, 4) == [
+        0 0 0 0 0 0 0
+        0 1 1 1 1 0 0
+        0 1 0 0 0 0 0
+        0 1 0 0 0 0 0
+        0 1 1 1 1 1 0
+        0 0 0 0 0 0 0        
+    ]
+                
+    @test cropfloe(img1, 5, 1, 10, 7, 5) == [
+        0 0 0 0 0 0 0
+        0 0 0 0 0 1 0
+        0 0 1 1 1 1 0
+        0 0 1 1 0 0 0
+        0 0 0 0 0 0 0 
+        0 0 0 0 0 0 0        
+    ]
+                  
+    @test cropfloe(img1, 1) == [
+        0 0 0 0
+        0 1 1 0
+        0 1 1 0
+        0 0 0 0
+    ]
+            
+    @test cropfloe(img1, 2) == [
+        0 0 0 0 0
+        0 1 1 1 0
+        0 1 1 1 0
+        0 0 1 1 0
+        0 0 0 0 0
+    ]
+    
+    @test cropfloe(img1, 3) == [
         0 0 0 0 0 0
         0 1 1 1 1 0
         0 1 1 1 1 0
@@ -58,7 +100,7 @@
         0 0 0 0 0 0          
     ]
 
-    @test cropfloe(floesimg=img1, min_row=5, min_col=1, max_row=10, max_col=7, label=4) == [
+    @test cropfloe(img1, 4) == [
         0 0 0 0 0 0 0
         0 1 1 1 1 0 0
         0 1 0 0 0 0 0
@@ -67,14 +109,12 @@
         0 0 0 0 0 0 0        
     ]
     
-    @test cropfloe(floesimg=img1, min_row=5, min_col=1, max_row=10, max_col=7, label=5) == [
-        0 0 0 0 0 0 0
-        0 0 0 0 0 1 0
-        0 0 1 1 1 1 0
-        0 0 1 1 0 0 0
-        0 0 0 0 0 0 0 
-        0 0 0 0 0 0 0        
+    @test cropfloe(img1, 5) == [
+        0 0 0 0 0 0
+        0 0 0 0 1 0
+        0 1 1 1 1 0
+        0 1 1 0 0 0
+        0 0 0 0 0 0         
     ]
-
-
+        
 end
