@@ -21,7 +21,6 @@ include("preprocess.jl")
 include("feature-extraction.jl")
 include("tracker.jl")
 include("h5.jl")
-include("regionprops-labeled.jl")
 
 export cache_vector, sharpen,
     sharpen_gray,
@@ -45,8 +44,7 @@ export cache_vector, sharpen,
     mkclitrack_single!,
     mkfilenames,
     makeh5files,
-    getlatlon,
-    cropfloe
-
+    getlatlon
+    
 export IceFloeTracker
 end
