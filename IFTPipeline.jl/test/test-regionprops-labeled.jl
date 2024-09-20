@@ -34,14 +34,14 @@
     @info props[1, :]
 
     # cropfloe
-    @test cropfloe(img1, props, 1) == [
+    @test cropfloe(floesimg=img1, min_row=1, min_col=1, max_row=4, max_col=4, label=1) == [
         0 0 0 0
         0 1 1 0
         0 1 1 0
         0 0 0 0
     ]
 
-    @test cropfloe(img1, props, 2) == [
+    @test cropfloe(floesimg=img1, min_row=1, min_col=4, max_row=5, max_col=8, label=2) == [
         0 0 0 0 0
         0 1 1 1 0
         0 1 1 1 0
@@ -49,7 +49,7 @@
         0 0 0 0 0
     ]
 
-    @test cropfloe(img1, props, 3) == [
+    @test cropfloe(floesimg=img1, min_row=1, min_col=8, max_row=6, max_col=13, label=3) == [
         0 0 0 0 0 0
         0 1 1 1 1 0
         0 1 1 1 1 0
@@ -58,7 +58,7 @@
         0 0 0 0 0 0          
     ]
 
-    @test cropfloe(img1, props, 4) == [
+    @test cropfloe(floesimg=img1, min_row=5, min_col=1, max_row=10, max_col=7, label=4) == [
         0 0 0 0 0 0 0
         0 1 1 1 1 0 0
         0 1 0 0 0 0 0
@@ -67,7 +67,7 @@
         0 0 0 0 0 0 0        
     ]
     
-    @test cropfloe(img1, props, 5) == [
+    @test cropfloe(floesimg=img1, min_row=5, min_col=1, max_row=10, max_col=7, label=5) == [
         0 0 0 0 0 0 0
         0 0 0 0 0 1 0
         0 0 1 1 1 1 0
@@ -75,4 +75,6 @@
         0 0 0 0 0 0 0 
         0 0 0 0 0 0 0        
     ]
+
+
 end
