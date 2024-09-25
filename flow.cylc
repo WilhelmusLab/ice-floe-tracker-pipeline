@@ -128,9 +128,6 @@
 
     [[tracking]]
         # Pair and track identified floes across days
-        pre-script = """
-            mkdir -p ${tracker_dir}
-        """
         script = """
             images=(${results_dir}/*.segmented_floes.tiff)
             props=${images[@]/.tiff/.props.csv}
