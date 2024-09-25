@@ -132,8 +132,12 @@
             mkdir -p ${tracker_dir}
         """
         script = """
-            sample_img=$(ls -d1 ${truecolor_dir}/* | head -1)
-            ${IFT} track --imgs ${preprocess_dir} --props ${preprocess_dir} --passtimes ${preprocess_dir} --latlon ${sample_img} --output ${tracker_dir}
+            images=(${results_dir}/*.segmented_floes.tiff)
+            props=${images[@]/.tiff/.props.csv}
+            landmasks=(${results_dir}/*.landmask.tiff)
+            passtimes=${images[@]/.segmented_floes.tiff/.overpass.txt}
+
+            ${IFT} track_single --imgs ${images[@]} --props ${props[@]} --latlon ${landmasks[0]} --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') --output ${results_dir}/floes.tracked.csv
         """
 
     [[exportH5]]
