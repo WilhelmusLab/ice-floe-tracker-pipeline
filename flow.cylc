@@ -76,6 +76,13 @@
             cloud_file = ${img_prefix}.${satellite}.cloud.tiff
             segmented_floes_file = ${img_prefix}.${satellite}.segmented_floes.tiff
             segmented_floes_props_file = ${img_prefix}.${satellite}.segmented_floes.props.csv
+            overpass_time_file = ${img_prefix}.${satellite}.overpass.txt
+    
+    [[FETCHDATA_soit_daily<satellite>]]
+    inherit = FETCHDATA<satellite>
+        script = """
+            isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format "CCYY-MM-DDThh:mm:ss" > ${overpass_time_file}
+        """
     
     [[FETCHDATA_truecolor<satellite>]]
         inherit = FETCHDATA<satellite>
