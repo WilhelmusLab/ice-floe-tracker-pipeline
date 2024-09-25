@@ -27,6 +27,10 @@
 # 2. A stable internet connection is also required.
 
 # Package imports.
+import functools
+import itertools
+import pprint
+from typing import Literal
 import requests
 import json
 import datetime
@@ -35,81 +39,67 @@ import numpy as np
 import csv
 import math
 import argparse
+import logging
+
+_logger = logging.getLogger(__name__)
 
 # URLs for space track login.
 uriBase = "https://www.space-track.org"
 requestLogin = "/ajaxauth/login"
 
 
-# Define error.
-class MyError(Exception):
-    def __init___(self, args):
-        Exception.__init__(
-            self, "my exception was raised with arguments {0}".format(args)
-        )
-        self.args = args
-
-
-def _parsedate(date):
-    return datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%m-%d-%Y").split("-")
-
-
-def get_passtimes(start_date, end_date, csvoutpath, lat, lon, SPACEUSER, SPACEPSWD):
+def get_passtimes(start_date, end_date, csvoutpath, lat, lon, SPACEUSER, SPACEPSWD, satellite: Literal["aqua", "terra"]):
     siteCred = {"identity": SPACEUSER, "password": SPACEPSWD}
     print(f"Outpath {csvoutpath}")
     print(f"Timeframe starts on {start_date}, and ends on {end_date}")
     print(f"Coordinates (x, y): ({lat}, {lon})")
 
-    end_date = getNextDay(end_date)
-
-    aquaData, terraData = get_Data(siteCred, start_date, end_date)
-
+    data = get_Data(siteCred, start_date, end_date, satellite)
+    _logger.debug(f"{data=}")
+    
     # Load in orbital mechanics tool timescale.
     ts = load.timescale()
 
     # Specify area of interest.
     aoi = wgs84.latlon(lat, lon)
 
-    # Define today and tomorrow.
-    today = start_date
-    tomorrow = getNextDay(start_date)
 
     # Define 2D array of values to be added to results CSV.
     rows = []
 
     # Loop through each day until the end date of interest is reached.
-    while not np.array_equiv(tomorrow, end_date):
+    for today in itertools.takewhile(lambda d: d <= end_date, date_generator(start_date)):
         # Get UTC time values of the start of today and the start of tomorrow.
         # Passes between these times are considered.
         t0 = to_utc(today)
-        t1 = to_utc(tomorrow)
+        t1 = to_utc(today + datetime.timedelta(days=1))
+        _logger.debug(f"{t0=}, {t1=}")
 
-        min_diff_index, closest_aqua_epoch_to_t0 = getclosestepoch(t0, aquaData)
-        aqua_tleline1, aqua_tleline2 = get_tli_lines(aquaData[min_diff_index])
-        aqua = EarthSatellite(aqua_tleline1, aqua_tleline2, "AQUA", ts)
+        min_diff_index, _ = getclosestepoch(t0, data)
+        tleline1, tleline2 = get_tli_lines(data[min_diff_index])
+        results = EarthSatellite(tleline1, tleline2, satellite.upper(), ts)
 
-        min_diff_index, closest_terra_epoch_to_t0 = getclosestepoch(t0, terraData)
-        terra_tleline1, terra_tleline2 = get_tli_lines(terraData[min_diff_index])
-        terra = EarthSatellite(terra_tleline1, terra_tleline2, "TERRA", ts)
-
-        aqua_closest, terra_closest = getclosest(aqua, terra, aoi, t0, t1)
+        closest = getclosest(results, aoi, t0, t1, satellite=satellite)
 
         # Add closest passes of the day to array of passes.
-        rows.append(["-".join(today), aqua_closest, terra_closest])
+        rows.append([closest])
 
-        today = getNextDay(today)
-        tomorrow = getNextDay(today)
+    csvwrite(rows, csvoutpath)
 
-    csvwrite(start_date, end_date, lat, lon, rows, csvoutpath)
+
+# Define date range
+def date_generator(start: datetime.datetime, step: datetime.timedelta = datetime.timedelta(days=1)):
+    d = start
+    while True:
+        yield d
+        d += step
 
 
 # Write CSV of all pass information.
-def csvwrite(startdate, enddate, lat, lon, rows, outpath):
-    fields = ["Date", "Aqua pass time", "Terra pass time"]
-    filename = f"{outpath}/passtimes_lat{lat}_lon{lon}_{''.join(startdate)}_{''.join(enddate)}.csv"
-    with open(filename, "w", newline="") as csvfile:
+def csvwrite(rows, outpath):
+    
+    with open(outpath, "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(fields)
         csvwriter.writerows(rows)
 
 
@@ -164,6 +154,7 @@ def get_epochs(dataset):
 
 def getclosestepoch(t0, dataset):
     epochs = get_epochs(dataset)
+    _logger.debug(f"{dataset=}, {epochs=}")
 
     # sequentially compute the absolute difference between the epoch and t0
     # keeping track of the index and value of the minimum difference
@@ -171,6 +162,7 @@ def getclosestepoch(t0, dataset):
     min_diff_index = 0
     for i, epoch in enumerate(epochs):
         diff = abs(t0 - epoch)
+        _logger.debug(f"{i=}, {epoch=}, {diff=}, {min_diff=}")
         if diff < min_diff:
             min_diff = diff
             min_diff_index = i
@@ -200,10 +192,10 @@ def timestamp_to_utc(timestamp):
 
 def to_utc(t):
     ts = load.timescale()
-    return ts.utc(int(t[2]), int(t[0]), int(t[1]))
+    return ts.utc(t)
 
 
-def get_Data(credentials: dict, start_date, end_date):
+def get_Data(credentials: dict, start_date, end_date, satellite: Literal["aqua", "terra"]):
     # URLs for space track login.
     uriBase = "https://www.space-track.org"
     requestLogin = "/ajaxauth/login"
@@ -213,124 +205,126 @@ def get_Data(credentials: dict, start_date, end_date):
         # Log in with username and password.
         resp = session.post(uriBase + requestLogin, data=credentials)
         if resp.status_code != 200:
-            raise MyError(
-                resp, "POST fail on login. Your username/password may be incorrect."
-            )
+            _logger.debug(resp)
+            message = "POST fail on login. Your username/password may be incorrect. {0}".format(resp)
+            raise IOError(message)
+
+        cat_id_mapping = {
+            "aqua": "27424",
+            "terra": "25994"
+            }
+        cat_id = cat_id_mapping[satellite]
 
         # Retrieve Aqua TLEs from space track.
-        resp = session.get(
-            f"https://www.space-track.org/basicspacedata/query/class/gp_history/NORAD_CAT_ID/27424/orderby/TLE_LINE1%20ASC/EPOCH/{start_date[2]}-{start_date[0]}-{start_date[1]}--{end_date[2]}-{end_date[0]}-{end_date[1]}/format/json"
-        )
+        url = f"https://www.space-track.org/basicspacedata/query/class/gp_history/NORAD_CAT_ID/{cat_id}/orderby/TLE_LINE1%20ASC/EPOCH/{start_date}--{end_date}/format/json"
+        _logger.debug(f"{url=}")
+        resp = session.get(url)
         if resp.status_code != 200:
-            print(resp)
-            raise MyError(resp, "GET fail on request")
+            _logger.debug(resp)
+            message = "GET fail on request. {0}.format(resp)"
+            raise IOError(message)
 
         # Turn JSON into Python dict.
-        aquaData = json.loads(resp.text)
+        data = json.loads(resp.text)
 
-        # Retrieve Terra TLEs from space track.
-        resp = session.get(
-            f"https://www.space-track.org/basicspacedata/query/class/gp_history/NORAD_CAT_ID/25994/orderby/TLE_LINE1%20ASC/EPOCH/{start_date[2]}-{start_date[0]}-{start_date[1]}--{end_date[2]}-{end_date[0]}-{end_date[1]}/format/json"
-        )
-        if resp.status_code != 200:
-            print(resp)
-            raise MyError(resp, "GET fail on request")
-
-        # Turn JSON into Python dict.
-        terraData = json.loads(resp.text)
+        _logger.debug("\n"+pprint.pformat(data))
 
         # No more requests.
         session.close()
-    return aquaData, terraData
+    return data
 
 
-def getclosest(aqua, terra, aoi, t0, t1, altitude_degrees=30):
-    def process_passes(satellite, events, times):
-        passes = []
-        pass_dict = {}
+def process_passes(satellite, events, times, aoi):
+    passes = []
+    pass_dict = {}
 
-        for i, (event, ti) in enumerate(zip(events, times)):
-            geocentric = satellite.at(ti)
-            difference = satellite - aoi
-            topocentric = difference.at(ti)
+    for i, (event, ti) in enumerate(zip(events, times)):
+        geocentric = satellite.at(ti)
+        difference = satellite - aoi
+        topocentric = difference.at(ti)
 
-            if event == 0:  # Rise
-                pass_dict = {}
-                riselat, riselon = wgs84.latlon_of(geocentric)
-                pass_dict["rise_lat"] = riselat.degrees
-                pass_dict["rise_lon"] = riselon.degrees
+        if event == 0:  # Rise
+            _logger.debug(f"Rise: {ti=}")
+            pass_dict = {}
+            riselat, riselon = wgs84.latlon_of(geocentric)
+            pass_dict["rise_lat"] = riselat.degrees
+            pass_dict["rise_lon"] = riselon.degrees
 
-            elif event == 1:  # Overpass
-                alt, az, distance = topocentric.altaz()
-                pass_dict["distance"] = distance.km
-                pass_dict["time"] = ti.utc_strftime("%Y %b %d %H:%M:%S")
-                overlat, overlon = wgs84.latlon_of(geocentric)
-                pass_dict["over_lat"] = overlat.degrees
-                pass_dict["over_lon"] = overlon.degrees
+        elif event == 1:  # Overpass
+            _logger.debug(f"Overpass: {ti=}")
+            _logger.debug(f"ti type: {type(ti)}")
+            alt, az, distance = topocentric.altaz()
+            pass_dict["distance"] = distance.km
+            pass_dict["time"] = ti.utc_iso()
+            overlat, overlon = wgs84.latlon_of(geocentric)
+            pass_dict["over_lat"] = overlat.degrees
+            pass_dict["over_lon"] = overlon.degrees
 
-                # Handle edge case for first overpass without prior rise
-                if i == 0:
-                    pass_dict["rise_lat"] = float("nan")
-                    pass_dict["rise_lon"] = float("nan")
-                # Handle edge case for last overpass without subsequent set
-                if i == len(events) - 1:
-                    pass_dict["set_lat"] = float("nan")
-                    pass_dict["set_lon"] = float("nan")
-                    passes.append(pass_dict)
-
-            else:  # Set
-                setlat, setlon = wgs84.latlon_of(geocentric)
-                pass_dict["set_lat"] = setlat.degrees
-                pass_dict["set_lon"] = setlon.degrees
+            # Handle edge case for first overpass without prior rise
+            if i == 0:
+                pass_dict["rise_lat"] = float("nan")
+                pass_dict["rise_lon"] = float("nan")
+            # Handle edge case for last overpass without subsequent set
+            if i == len(events) - 1:
+                pass_dict["set_lat"] = float("nan")
+                pass_dict["set_lon"] = float("nan")
                 passes.append(pass_dict)
 
-        return passes
+        else:  # Set
+            _logger.debug(f"Set: {ti=}")
+            setlat, setlon = wgs84.latlon_of(geocentric)
+            pass_dict["set_lat"] = setlat.degrees
+            pass_dict["set_lon"] = setlon.degrees
+            passes.append(pass_dict)
 
-    def find_closest_pass(passes, ascending=True):
-        least_distance = math.inf
-        closest_time = ""
+    return passes
 
-        for pass_dict in passes:
-            if not np.isnan(pass_dict["rise_lat"]):
-                is_ascending = (
-                    (pass_dict["rise_lat"] < pass_dict["over_lat"])
-                    if ascending
-                    else (pass_dict["rise_lat"] > pass_dict["over_lat"])
-                )
-                if is_ascending and pass_dict["distance"] < least_distance:
-                    least_distance = pass_dict["distance"]
-                    closest_time = pass_dict["time"]
-            else:
-                is_ascending = (
-                    (pass_dict["set_lat"] > pass_dict["over_lat"])
-                    if ascending
-                    else (pass_dict["set_lat"] < pass_dict["over_lat"])
-                )
-                if is_ascending and pass_dict["distance"] < least_distance:
-                    least_distance = pass_dict["distance"]
-                    closest_time = pass_dict["time"]
+def find_closest_pass(passes, ascending=True):
+    least_distance = math.inf
+    closest_time = ""
 
-        return closest_time.split(" ")[3] if closest_time else ""
+    for pass_dict in passes:
+        if not np.isnan(pass_dict["rise_lat"]):
+            is_ascending = (
+                (pass_dict["rise_lat"] < pass_dict["over_lat"])
+                if ascending
+                else (pass_dict["rise_lat"] > pass_dict["over_lat"])
+            )
+            if is_ascending and pass_dict["distance"] < least_distance:
+                least_distance = pass_dict["distance"]
+                closest_time = pass_dict["time"]
+        else:
+            is_ascending = (
+                (pass_dict["set_lat"] > pass_dict["over_lat"])
+                if ascending
+                else (pass_dict["set_lat"] < pass_dict["over_lat"])
+            )
+            if is_ascending and pass_dict["distance"] < least_distance:
+                least_distance = pass_dict["distance"]
+                closest_time = pass_dict["time"]
 
-    aqua_t, aqua_events = aqua.find_events(
+    return closest_time
+
+def getclosest(data, aoi, t0, t1, satellite: Literal["aqua", "terra"], altitude_degrees=30):
+
+    data_t, data_events = data.find_events(
         aoi, t0, t1, altitude_degrees=altitude_degrees
     )
-    terra_t, terra_events = terra.find_events(
-        aoi, t0, t1, altitude_degrees=altitude_degrees
-    )
+    _logger.debug(f"data_t: {[t for t in data_t]}")
+    _logger.debug(f"{data_events=}")
+    
+    passes = process_passes(data, data_events, data_t, aoi)
+    _logger.debug(f"{passes=}")
 
-    aqua_passes = process_passes(aqua, aqua_events, aqua_t)
-    terra_passes = process_passes(terra, terra_events, terra_t)
+    closest = find_closest_pass(passes, ascending={"aqua": True, "terra": False}[satellite])
+    _logger.debug(f"{closest=}")
 
-    aqua_closest, terra_closest = [
-        find_closest_pass(passes, ascending=ascending)
-        for passes, ascending in zip([aqua_passes, terra_passes], [True, False])
-    ]
-
-    return aqua_closest, terra_closest
+    return closest
 
 
 def main():
+    logging.basicConfig(level=logging.DEBUG)
+
     parser = argparse.ArgumentParser(
         description="Aqua and Terra Satellite Overpass time tool"
     )
@@ -348,13 +342,13 @@ def main():
     )
     parser.add_argument(
         "--startdate",
-        type=_parsedate,
+        type=datetime.date.fromisoformat,
         dest="start_date",
         help="Start date in format YYYY-MM-DD",
     )
     parser.add_argument(
         "--enddate",
-        type=_parsedate,
+        type=datetime.date.fromisoformat,
         dest="end_date",
         help="End date in format YYYY-MM-DD",
     )
@@ -378,6 +372,12 @@ def main():
         "--csvoutpath",
         type=str,
         help="Path to output CSV file",
+    )
+    parser.add_argument(
+        "--satellite",
+        choices=["aqua", "terra"],
+        type=str,
+        help="Which satellite to get data for",
     )
 
     args = parser.parse_args()
