@@ -17,6 +17,7 @@
         P1D = """
             INIT[^]:succeed-all & soit[^] => preprocess<satellite>
             INIT[^]:succeed-all => FETCHDATA_truecolor<satellite> & FETCHDATA_falsecolor<satellite> & FETCHDATA_landmask & FETCHDATA_cloud<satellite> => preprocess<satellite> => cycle_end
+            FETCHDATA_soit_daily<satellite> => cycle_end
             cycle_end[-P1D] => cycle_end
         """
         R1/P0Y = cycle_end => tracking & exportH5
@@ -55,9 +56,9 @@
         # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
         script = """
             ${PASS_TIME} --csvoutpath ${results_dir} \
-            --startdate {{ START }} --enddate {{ END }} \
-            --centroid-lat {{ CENTROID_LAT }} --centroid-lon {{ CENTROID_LON }} \
-            --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
+                --startdate {{ START }} --enddate {{ END }} \
+                --centroid-lat {{ CENTROID_LAT }} --centroid-lon {{ CENTROID_LON }} \
+                --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
         """
 
         
