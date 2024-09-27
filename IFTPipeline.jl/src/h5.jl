@@ -178,10 +178,16 @@ function makeh5files_single(; passtime::DateTime, iftversion::Union{String, Noth
         
         mx = maximum(labeled_)
         T = choose_dtype(mx)
-        g["labeled_image"] = T.(labeled_)
+        # write_dataset(g, "labeled_image", T.(labeled_))
+        imgdata = T.(permutedims(labeled_))
+        obj, dtype = create_dataset(g, "labeled_image", imgdata)
+        attrs(obj)["CLASS"] = "IMAGE"
+        attrs(obj)["IMAGE_SUBCLASS"] = "IMAGE_INDEXED"
+        attrs(obj)["IMAGE_MINMAXRANGE"] = [minimum(imgdata), maximum(imgdata)]
 
-        attrs(g)["Description of labeled_image"] = "Connected components of the segmented floe image using a 3x3 structuring element. The property matrix consists of the properties of each connected component."
-        
+        attrs(obj)["description"] = "Connected components of the segmented floe image using a 3x3 structuring element. The property matrix consists of the properties of each connected component."
+        write_dataset(obj, dtype, imgdata)
+
     end
     return nothing
 end
