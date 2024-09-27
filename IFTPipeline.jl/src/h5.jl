@@ -24,21 +24,13 @@ Choose the appropriate unsigned integer type based on a maximum value.
       * `UInt32` if `mx` is less than or equal to 4294967295.
 """
 function choose_dtype(mx::T) where {T <: Integer}
-    if mx < 0
-        throw("$mx is negative and can't be represented as an unsigned integer")
-    elseif mx <= 2^8 - 1 
-        return UInt8
-    elseif mx <= 2^16 - 1 
-        return UInt16
-    elseif mx <= 2^32 - 1 
-        return UInt32
-    elseif mx <= 2^64 - 1 
-        return UInt64
-    elseif mx <= 2^128 - 1 
-        return UInt128
-    else
-        throw("$mx can't be held in an unsigned integer of less than or equal to 128 bits")
+    types = [UInt8, UInt16, UInt32, UInt64, UInt128]
+    for t_ in types
+        if typemin(t_) <= mx <= typemax(t_)
+            return t_
+        end
     end
+    throw("$mx can't be represented by any of $types")
 end
 
 
