@@ -44,6 +44,7 @@ export cache_vector, sharpen,
     mkclitrack_single!,
     mkfilenames,
     makeh5files,
+    makeh5files_single,
     getlatlon
     
 export IceFloeTracker

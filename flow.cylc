@@ -19,8 +19,10 @@
             INIT[^]:succeed-all => FETCHDATA_truecolor<satellite> & FETCHDATA_falsecolor<satellite> & FETCHDATA_landmask & FETCHDATA_cloud<satellite> => preprocess<satellite> => cycle_end
             FETCHDATA_soit_daily<satellite> => cycle_end
             cycle_end[-P1D] => cycle_end
+            
+            preprocess<satellite> & FETCHDATA_soit_daily<satellite> => exportH5
         """
-        R1/P0Y = cycle_end => tracking & exportH5
+        R1/P0Y = cycle_end => tracking 
 
 
 [runtime]
@@ -77,6 +79,7 @@
             segmented_floes_file = ${img_prefix}.${satellite}.segmented_floes.tiff
             segmented_floes_props_file = ${img_prefix}.${satellite}.segmented_floes.props.csv
             overpass_time_file = ${img_prefix}.${satellite}.overpass.txt
+            hdf5_archive_file = ${img_prefix}.${satellite}.results.h5
     
     [[FETCHDATA_soit_daily<satellite>]]
     inherit = FETCHDATA<satellite>
@@ -125,6 +128,19 @@
             
             {% endif %}
         """
+    
+    [[exportH5<satellite>]]
+        inherit = FETCHDATA<satellite>
+        # Package intermediate and final outputs into HDF5 files
+        script = """
+        ${IFT} makeh5files_single \
+            --passtime $(cat ${overpass_time_file}) \
+            --truecolor ${truecolor_file} \
+            --falsecolor ${falsecolor_file} \
+            --labeled ${segmented_floes_file} \
+            --props ${segmented_floes_props_file} \
+            --output ${hdf5_archive_file}
+        """
 
     [[tracking]]
         # Pair and track identified floes across days
@@ -137,12 +153,3 @@
             ${IFT} track_single --imgs ${images[@]} --props ${props[@]} --latlon ${landmasks[0]} --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') --output ${results_dir}/floes.tracked.csv
         """
 
-    [[exportH5]]
-        # Package intermediate and final outputs into HDF5 files
-        pre-script = """
-            mkdir -p ${preprocess_dir}/hdf5-files
-        """
-        script = """
-        sample_img=$(ls -d1 ${truecolor_dir}/* | head -1)
-        ${IFT} makeh5files --pathtosampleimg ${sample_img} --resdir ${preprocess_dir}
-        """

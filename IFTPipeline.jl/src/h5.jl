@@ -133,3 +133,49 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
     end
     return nothing
 end
+
+
+function makeh5files_single(; passtime::DateTime, iftversion::Union{String, Nothing}=nothing, truecolor::String, falsecolor::String, labeled::String, props::String, output::String)
+    latlondata = getlatlon(truecolor)
+    ptsunix = Int64(Dates.datetime2unix(passtime))
+    labeled_ = Integer.(rawview(channelview((FileIO.load(labeled)))))
+    
+    if isnothing(iftversion)
+        iftversion = string(IceFloeTracker.IFTVERSION)
+    end
+    
+    props_ = DataFrame(CSV.File(props))
+    colstodrop = [:row_centroid, :col_centroid, :min_row, :min_col, :max_row, :max_col]
+    converttounits!(props_, latlondata, colstodrop)
+    
+    h5open(output, "w") do file
+        # Add top-level attributes
+        attrs(file)["fname_falsecolor"] = falsecolor
+        attrs(file)["fname_truecolor"] = truecolor
+        attrs(file)["iftversion"] = iftversion
+        attrs(file)["crs"] = latlondata["crs"]
+        attrs(file)["reference"] = "https://doi.org/10.1016/j.rse.2019.111406"
+        attrs(file)["contact"] = "mmwilhelmus@brown.edu"
+
+        g = create_group(file, "index")
+        g["time"] = ptsunix
+        g["x"] = latlondata["X"]
+        g["y"] = latlondata["Y"]
+
+        g = create_group(file, "floe_properties")
+        g["properties"] = Matrix(props_)
+        attrs(g)["Description of properties"] = """Generated using the `regionprops` function from the `skimage` package. See https://scikit-image.org/docs/0.20.x/api/skimage.measure.html#regionprops
+
+        Area units (`area`, `convex_area`) are in sq. kilometers, length units (`minor_axis_length`, `major_axis_length`, and `perimeter`) in kilometers, and `orientation` in radians (see the description of properties attribute.) Latitude and longitude coordinates are in degrees, and the stereographic coordinates`x` and `y` are in meters relative to the NSIDC north polar stereographic projection.
+        """
+        g["column_names"] = names(props_)
+        
+        mx = maximum(labeled_)
+        T = choose_dtype(mx)
+        g["labeled_image"] = T.(labeled_)
+
+        attrs(g)["Description of labeled_image"] = "Connected components of the segmented floe image using a 3x3 structuring element. The property matrix consists of the properties of each connected component."
+        
+    end
+    return nothing
+end

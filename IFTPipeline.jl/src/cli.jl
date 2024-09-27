@@ -69,6 +69,10 @@ function main(args)
         help = "Make HDF5 files from extracted floe features"
         action = :command
 
+        "makeh5files_single"
+        help = "Make HDF5 files from extracted floe features"
+        action = :command
+
         "track"
         help = "Pair ice floes in day k with ice floes in day k+1"
         action = :command
