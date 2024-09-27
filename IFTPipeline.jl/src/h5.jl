@@ -164,7 +164,7 @@ function makeh5files_single(; passtime::DateTime, iftversion::Union{String, Noth
         g["y"] = latlondata["Y"]
 
         g = create_group(file, "floe_properties")
-        write_dataset(g, "properties", [copy(row) for row in eachrow(props_)])
+        write_dataset(g, "properties", [copy(row) for row in eachrow(props_)])  # `copy(row)` converts the DataSetRow to a NamedTuple
         attrs(g)["Description of properties"] = """ Area units (`area`, `convex_area`) are in sq. kilometers, length units (`minor_axis_length`, `major_axis_length`, and `perimeter`) in kilometers, and `orientation` in radians (see the description of properties attribute.) Latitude and longitude coordinates are in degrees, and the stereographic coordinates`x` and `y` are in meters relative to the NSIDC north polar stereographic projection. Generated using the `regionprops` function from the `skimage` package. See https://scikit-image.org/docs/0.20.x/api/skimage.measure.html#regionprops
         """
         
