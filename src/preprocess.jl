@@ -147,7 +147,7 @@ function preprocess(
     # 2. Intermediate images
     @info "Finding ice labels"
     ice_labels = IceFloeTracker.find_ice_labels(
-        falsecolor_image, landmask_imgs.non_dilated
+        falsecolor_image, landmask_imgs.dilated
     )
 
     @info "Sharpening truecolor image"
