@@ -52,3 +52,7 @@ jobs:
       - uses: julia-actions/julia-runtest@v1
         env:
           PYTHON: python
+
+      - name: Display installed packages and versions
+        run: |
+          julia -e 'using Pkg; Pkg.status()'
