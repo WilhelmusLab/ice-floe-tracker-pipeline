@@ -1,0 +1,54 @@
+name: Manual CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      pkg_url:
+        description: 'URL to a branch for Pkg installation'
+        required: true
+        default: 'https://github.com/WilhelmusLab/IceFloeTracker.jl'
+
+jobs:
+  manual_test:
+    name: Julia Manual Test with Custom Dev Branch
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - '1.9'
+        arch:
+          - x64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: update pip
+        run: python -m pip install -U pip
+
+      - name: install python deps
+        run: python -m pip install -U -r requirements.txt
+
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+          arch: ${{ matrix.arch }}
+
+      - uses: julia-actions/cache@v2
+
+      - name: Install Julia package from custom branch
+        run: |
+          julia -e 'using Pkg; Pkg.add(PackageSpec(url="${{ github.event.inputs.pkg_url }}"))'
+
+      - uses: julia-actions/julia-buildpkg@v1
+        env:
+          PYTHON: python
+
+      - uses: julia-actions/julia-runtest@v1
+        env:
+          PYTHON: python
