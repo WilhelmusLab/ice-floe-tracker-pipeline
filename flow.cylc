@@ -40,7 +40,7 @@
 
             PASS_TIME="pipx run --path ${CYLC_WORKFLOW_RUN_DIR}/lib/pass_time.py"            
             IFT="julia --project=${CYLC_WORKFLOW_RUN_DIR}/IFTPipeline.jl/ ${CYLC_WORKFLOW_RUN_DIR}/IFTPipeline.jl/src/cli.jl"
-            FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg.git@update-regionprops-names fsdproc --debug"
+            FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg.git@main fsdproc --debug"
 
     [[INIT]]
     [[INIT_soit]]
