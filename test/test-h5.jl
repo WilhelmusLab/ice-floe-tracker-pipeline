@@ -75,6 +75,7 @@ h5path = joinpath(resdir, "hdf5-files", "20220914T1244.aqua.labeled_image.250m.h
     @test typeof(props) == Matrix{Float64}
     close(fid)
 
+    @test_throws "can't be represented" choose_dtype(-1) 
     @test choose_dtype(100) == UInt8
     @test choose_dtype(300) == UInt16
     @test choose_dtype(70_000) == UInt32
