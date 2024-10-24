@@ -34,7 +34,7 @@ jobs:
       - name: update pip
         run: python -m pip install -U pip
       - name: install python deps
-        run: python -m pip install -U -r requirements.txt
+        run: python -m pip install -U -r ../requirements.txt
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
