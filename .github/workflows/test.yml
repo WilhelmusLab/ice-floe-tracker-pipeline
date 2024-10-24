@@ -48,6 +48,8 @@ jobs:
         env:
           PYTHON: python
       - uses: julia-actions/julia-processcoverage@v1
+        with:
+          directories: IFTPipeline.jl/src
       - uses: codecov/codecov-action@v4
         with:
           files: lcov.info
