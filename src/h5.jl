@@ -19,18 +19,21 @@ Choose the appropriate unsigned integer type based on a maximum value.
 
 # Returns
     
-      * `UInt8` if `mx` is less than or equal to 255.
-      * `UInt16` if `mx` is less than or equal to 65535.
-      * `UInt32` if `mx` is less than or equal to 4294967295.
+      * `UInt8` if 0 ≤ `mx` ≤ 255.
+      * `UInt16` if 0 ≤ `mx` ≤ 65535.
+      * `UInt32` if 0 ≤ `mx` ≤ 2^32 - 1.
+      * `UInt64` if 0 ≤ `mx` ≤ 2^64 - 1.
+      * `UInt128` if 0 ≤ `mx` ≤ 2^128 - 1.
+
 """
-function choose_dtype(mx)
-    types = [UInt8, UInt16, UInt32]
-    for (i, t) in enumerate(types)
-        b = 2^(2^(2 + i)) - 1
-        if mx <= b
-            return t
+function choose_dtype(mx::T) where {T <: Integer}
+    types = [UInt8, UInt16, UInt32, UInt64, UInt128]
+    for t_ in types
+        if typemin(t_) <= mx <= typemax(t_)
+            return t_
         end
     end
+    throw("$mx can't be represented by any of $types")
 end
 
 
