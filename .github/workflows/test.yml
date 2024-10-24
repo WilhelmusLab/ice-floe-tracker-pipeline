@@ -38,13 +38,9 @@ jobs:
           arch: ${{ matrix.arch }}
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
-        with:
-          project: IFTPipeline.jl
         env:
           PYTHON: python
       - uses: julia-actions/julia-runtest@v1
-        with:
-          project: IFTPipeline.jl  
         env:
           PYTHON: python
       - uses: julia-actions/julia-processcoverage@v1
