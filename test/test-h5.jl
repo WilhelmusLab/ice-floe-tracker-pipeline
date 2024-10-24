@@ -78,6 +78,10 @@ h5path = joinpath(resdir, "hdf5-files", "20220914T1244.aqua.labeled_image.250m.h
     @test choose_dtype(100) == UInt8
     @test choose_dtype(300) == UInt16
     @test choose_dtype(70_000) == UInt32
+    @test choose_dtype(18_446_744_073_709_551_615) == UInt64
+    @test choose_dtype(18_446_744_073_709_551_616) == UInt128
+    @test choose_dtype(340_282_366_920_938_463_463_374_607_431_768_211_455) == UInt128
+    @test_throws "can't be represented" choose_dtype(340_282_366_920_938_463_463_374_607_431_768_211_456) 
 end
 
 # clean up
