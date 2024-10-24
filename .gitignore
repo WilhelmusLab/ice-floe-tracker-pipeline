@@ -10,8 +10,6 @@ workflow/cylc-run/*
 workflow/report/*
 !workflow/report/README.md
 
-test/__temp__
-
 icetest.sh
 trackplayground.jl
 
@@ -21,5 +19,3 @@ trackplayground.jl
 *.simg
 
 .JuliaFormatter.toml
-
-test/test_inputs/input_pipeline/*.jls
