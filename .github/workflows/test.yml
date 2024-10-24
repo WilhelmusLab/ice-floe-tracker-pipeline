@@ -12,6 +12,9 @@ jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: ./IFTPipeline.jl
     strategy:
       fail-fast: false
       matrix:
@@ -38,18 +41,12 @@ jobs:
           arch: ${{ matrix.arch }}
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
-        with:
-          project: IFTPipeline.jl
         env:
           PYTHON: python
       - uses: julia-actions/julia-runtest@v1
-        with:
-          project: IFTPipeline.jl
         env:
           PYTHON: python
       - uses: julia-actions/julia-processcoverage@v1
-        with:
-          directories: IFTPipeline.jl/src
       - uses: codecov/codecov-action@v4
         with:
           files: lcov.info
