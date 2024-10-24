@@ -25,3 +25,4 @@ trackplayground.jl
 test/test_inputs/input_pipeline/*.jls
 
 .spacerc
+example_data/
