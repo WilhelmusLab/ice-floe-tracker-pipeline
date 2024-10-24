@@ -1,6 +1,6 @@
 FROM julia:1.9-bookworm
 ENV TERM=xterm
-ENV JULIA_PROJECT=/opt/ice-floe-tracker-pipeline
+ENV JULIA_PROJECT=/opt/ice-floe-tracker-pipeline/IFTPipeline.jl
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
 ENV JULIA_BUILD='ENV["PYTHON"]=""; using Pkg; Pkg.build()'
