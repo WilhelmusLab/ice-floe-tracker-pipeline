@@ -22,4 +22,5 @@ RUN git clone --single-branch --branch main --depth 1 ${IFTPIPELINE_REPO} ${JULI
 RUN ${JULIA} --project=${JULIA_PROJECT} -e 'ENV["PYTHON"]=""; using Pkg; Pkg.build()'
 RUN ${JULIA} --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.instantiate()'
 ENV JULIA_DEPOT_PATH="/usr/local/bin/julia:$JULIA_DEPOT_PATH"
+SHELL ["/bin/bash", "-c"]
 ENTRYPOINT [ ${JULIA}, "--project=${JULIA_PROJECT}", ${LOCAL_PATH_TO_IFT_CLI} ]
