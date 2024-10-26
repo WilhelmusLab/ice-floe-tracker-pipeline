@@ -3,7 +3,6 @@ FROM julia:1.11-bookworm
 # DEPENDENCIES
 #===========================================
 ENV TERM=xterm
-RUN apt-get -y update
 
 # Python environment build
 #===========================================
