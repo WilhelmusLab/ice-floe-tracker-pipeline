@@ -25,8 +25,6 @@ ENV JULIA_PROJECT='/opt/ice-floe-tracker-pipeline/IFTPipeline.jl'
 COPY ./IFTPipeline.jl ${JULIA_PROJECT}
 RUN julia --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.instantiate(); Pkg.test();'
 
-# RUN julia --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.instantiate(); Pkg.precompile(); Pkg.build(; verbose = true);'
-
 # # CLI setup
 # #===========================================
 
