@@ -255,7 +255,8 @@ function setuplogger(option::Int64, command::Symbol)
     end
 end
 
-function main(args)
+function main()
+    
     settings = ArgParseSettings(; autofix_names=true)
 
     @add_arg_table! settings begin
@@ -288,7 +289,7 @@ function main(args)
 
     mkcli!(settings, command_common_args)
 
-    parsed_args = parse_args(args, settings; as_symbols=true)
+    parsed_args = parse_args(settings; as_symbols=true)
 
     command = parsed_args[:_COMMAND_]
     command_args = parsed_args[command]
@@ -307,5 +308,5 @@ function main(args)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
-    main(ARGS)
+    main()
 end
