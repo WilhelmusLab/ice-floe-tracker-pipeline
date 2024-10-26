@@ -25,28 +25,18 @@ jobs:
             arch: x64
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: update pip
-        run: python -m pip install -U pip
-      - name: install python deps
-        run: python -m pip install -U -r requirements.txt
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
       - uses: julia-actions/cache@v2
+      - run: julia --project=PythonSetup.jl PythonSetup.jl/setup.jl
       - uses: julia-actions/julia-buildpkg@v1
         with:
           project: IFTPipeline.jl
-        env:
-          PYTHON: python
       - uses: julia-actions/julia-runtest@v1
         with:
           project: IFTPipeline.jl
-        env:
-          PYTHON: python
       - uses: julia-actions/julia-processcoverage@v1
         with:
           directories: IFTPipeline.jl/src
