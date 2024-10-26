@@ -25,4 +25,4 @@ RUN julia --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.test();'
 #===========================================
 SHELL ["/bin/bash", "-c"]
 ENV LOCAL_PATH_TO_IFT_CLI="${JULIA_PROJECT}/src/cli.jl"
-ENTRYPOINT ${JULIA} --project=${JULIA_PROJECT} ${LOCAL_PATH_TO_IFT_CLI}
+ENTRYPOINT julia --project=${JULIA_PROJECT} ${LOCAL_PATH_TO_IFT_CLI}
