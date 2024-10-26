@@ -3,8 +3,7 @@ FROM julia:1.11-bookworm
 # DEPENDENCIES
 #===========================================
 ENV TERM=xterm
-RUN apt-get -y update && \
-    apt-get install -y git python3.11 python3-pip python3-venv gdal-bin libgdal-dev
+RUN apt-get -y update
 
 # Python environment build
 #===========================================
