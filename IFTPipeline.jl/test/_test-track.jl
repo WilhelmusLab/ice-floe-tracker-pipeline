@@ -6,7 +6,7 @@ settings = ArgParseSettings(; autofix_names=true)
 end
 IFTPipeline.mkclitrack!(settings)
 
-params_path = "../../config/sample-tracker-params.toml"
+params_path = "test_inputs/sample-tracker-params.toml"
 latlonrefimage = "test_inputs/NE_Greenland_truecolor.2020162.aqua.250m.tiff"
 data_path = "test_inputs/tracker/"
 temp = mkpath(joinpath(@__DIR__, "__temp__"))
