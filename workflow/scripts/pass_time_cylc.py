@@ -1,3 +1,12 @@
+# /// script
+# requires-python = "==3.9"
+# dependencies = [
+#   "requests==2.31.0",
+#   "skyfield==1.45.0",
+#   "numpy==1.26",
+# ]
+# ///
+
 # Code developed by Simon Hatcher (2022)
 # Adapted for use in a Cylc pipeline for IceFloeTracker by Timothy Divoll (2023)
 
