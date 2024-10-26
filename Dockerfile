@@ -8,21 +8,18 @@ RUN apt-get -y update && \
 
 # Python environment build
 #===========================================
-ENV PYTHON_SETUP_PROJECT='/opt/PythonSetup.jl'
-COPY ./PythonSetup.jl ${PYTHON_SETUP_PROJECT}
-RUN julia --project=${PYTHON_SETUP_PROJECT} ${PYTHON_SETUP_PROJECT}/setup.jl
+COPY ./PythonSetup.jl /opt/PythonSetup.jl
+RUN julia --project="/opt/PythonSetup.jl" "/opt/PythonSetup.jl/setup.jl"
 
 # IFT Pipeline package build
 #===========================================
-ENV JULIA_PROJECT='/opt/IFTPipeline.jl'
-COPY ./IFTPipeline.jl ${JULIA_PROJECT}
-RUN julia --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.instantiate();'
+COPY ./IFTPipeline.jl /opt/IFTPipeline.jl
+RUN julia --project="/opt/IFTPipeline.jl" -e 'using Pkg; Pkg.instantiate();'
 
 # Test the package
-# RUN julia --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.test();'
+RUN julia --project="/opt/IFTPipeline.jl" -e 'using Pkg; Pkg.test();'
 
 # CLI setup
 #===========================================
 SHELL ["/bin/bash", "-c"]
-ENV LOCAL_PATH_TO_IFT_CLI="${JULIA_PROJECT}/src/cli.jl"
 ENTRYPOINT ["julia", "--project=/opt/IFTPipeline.jl", "/opt/IFTPipeline.jl/src/cli.jl" ]
