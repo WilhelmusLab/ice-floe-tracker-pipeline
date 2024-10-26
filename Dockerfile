@@ -8,20 +8,13 @@ RUN apt-get -y update && \
 
 # Python environment build
 #===========================================
-WORKDIR /opt
-
-# Initialize an empty project which just has Conda and PyCall, in order to initialize an empty Conda `base` environment for PyCall
-RUN mkdir PyCallSetup
-RUN julia --project=PyCallSetup -e 'ENV["PYTHON"]=""; using Pkg; Pkg.add("Conda"); Pkg.add("PyCall"); Pkg.build("PyCall");'
-
-# Use conda to update the environment to have the correct version of python and other dependencies, then rebuild PyCall
-COPY ./environment.yaml PyCallSetup/
-RUN julia --project=PyCallSetup -e 'using Conda; Conda.runconda(Conda.Cmd(["env", "update", "-n", "base", "--file", "/opt/PyCallSetup/environment.yaml"])); using Pkg; Pkg.build("PyCall");'
+ENV PYTHON_SETUP_PROJECT='/opt/PythonSetup.jl'
+COPY ./PythonSetup.jl ${PYTHON_SETUP_PROJECT}
+RUN julia --project=${PYTHON_SETUP_PROJECT} ${PYTHON_SETUP_PROJECT}/setup.jl
 
 # IFT Pipeline package build
 #===========================================
-# Now build the environment which we care about
-ENV JULIA_PROJECT='/opt/ice-floe-tracker-pipeline/IFTPipeline.jl'
+ENV JULIA_PROJECT='/opt/IFTPipeline.jl'
 COPY ./IFTPipeline.jl ${JULIA_PROJECT}
 RUN julia --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.instantiate(); Pkg.test();'
 
