@@ -16,7 +16,10 @@ RUN julia --project=${PYTHON_SETUP_PROJECT} ${PYTHON_SETUP_PROJECT}/setup.jl
 #===========================================
 ENV JULIA_PROJECT='/opt/IFTPipeline.jl'
 COPY ./IFTPipeline.jl ${JULIA_PROJECT}
-RUN julia --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.instantiate(); Pkg.test();'
+RUN julia --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.instantiate();'
+
+# Test the package
+RUN julia --project=${JULIA_PROJECT} -e 'using Pkg; Pkg.test();'
 
 # CLI setup
 #===========================================
