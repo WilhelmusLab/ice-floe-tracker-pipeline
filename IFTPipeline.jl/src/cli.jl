@@ -228,31 +228,33 @@ end
 
 
 """
-    setuplogger(option::Int64, path::String)
-
-Setup logger for the ice floe tracker. If `option` is 0, log to file only. If `option` is 1, log to file and terminal.
+    setuplogger(command::Symbol, output::Union{String,Nothing})
+Setup logger for the ice floe tracker. 
+    
+If `output` is a directory path, log to that directory.
 """
-function setuplogger(option::Int64, command::Symbol)
-    output = joinpath(@__DIR__, "..", "report")
-    cmd = string(command)
+function setuplogger(command::Symbol, output::Union{String,Nothing}=nothing)
 
-    filelogger = FileLogger(joinpath(output, "$cmd-logfile.log")) # add command prefix to logfile name
+    if isnothing(output)
+        return TeeLogger(
+            global_logger()
+            )
+    else
+        cmd = string(command)
+        filelogger = FileLogger(joinpath(output, "$cmd-logfile.log")) # add command prefix to logfile name
 
-    # filter out debug messages
-    filtlogger = EarlyFilteredLogger(filelogger) do args
-        r = Logging.Info <= args.level <= Logging.Warn && args._module === IFTPipeline
-        return r
-    end
+        # filter out debug messages
+        filtlogger = EarlyFilteredLogger(filelogger) do args
+            r = Logging.Info <= args.level <= Logging.Warn && args._module === IFTPipeline
+            return r
+        end
 
-    if option == 0
-        return TeeLogger(filtlogger,
-        )
-    elseif option == 1
         return TeeLogger(
             global_logger(),
             filtlogger
         )
     end
+
 end
 
 function main()
@@ -283,9 +285,8 @@ function main()
 
     command_common_args = [
         "--log",
-        Dict(:help => "Show log on terminal; either 1 or 0", :required => false, :arg_type => Int,
-            :default => 0, :range_tester => (x -> x == 0 || x == 1)
-        )]
+        Dict(:help => "Path for logging outputs", :required => false, :arg_type => String)
+        ]
 
     mkcli!(settings, command_common_args)
 
@@ -294,12 +295,12 @@ function main()
     command = parsed_args[:_COMMAND_]
     command_args = parsed_args[command]
     command_func = getfield(IFTPipeline, Symbol(command))
-    logoption = command_args[:log]
+    log_path = command_args[:log]
 
     # delete log option from command_args so it doesn't get passed to command_func
     delete!(command_args, :log)
 
-    logger = setuplogger(logoption, command)
+    logger = setuplogger(command, log_path)
 
     with_logger(logger) do
         @time command_func(; command_args...)
