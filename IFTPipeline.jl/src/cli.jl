@@ -229,34 +229,19 @@ end
 
 
 """
-    setuplogger(command::Symbol, log_path::Union{String,Nothing})
+    setuplogger(command::Symbol, log_path::Union{String,Nothing}, debug::Bool)
 Setup logger for the ice floe tracker. 
     
 If `log_path` is a directory path, log to that directory.
 """
-function setuplogger(command::Symbol, log_path::Union{String,Nothing}=nothing)
+function setuplogger(debug::Bool=false)
 
-    if isnothing(log_path)
-        return global_logger()
+    if debug
+        debuglogger = ConsoleLogger(stderr, Logging.Debug)
+        return debuglogger
     else
-        if isdir(log_path)
-            cmd = string(command)
-            path = joinpath(log_path, "$cmd-logfile.log")
-        else
-            path = log_path
-        end
-        filelogger = FileLogger(path) # add command prefix to logfile name
-
-        # filter out debug messages
-        filtlogger = EarlyFilteredLogger(filelogger) do args
-            r = Logging.Info <= args.level && args._module === IFTPipeline
-            return r
-        end
-
-        return TeeLogger(
-            global_logger(),
-            filtlogger
-        )
+        infologger = ConsoleLogger(stderr, Logging.Info)
+        return infologger
     end
 
 end
@@ -289,7 +274,9 @@ function main()
 
     command_common_args = [
         "--log",
-        Dict(:help => "Path for logging outputs", :required => false, :arg_type => String)
+        Dict(:help => "Path for logging outputs", :required => false, :arg_type => String),
+        "--debug",
+        Dict(:help => "show debug output", :action => :store_true)
     ]
 
     mkcli!(settings, command_common_args)
@@ -300,11 +287,14 @@ function main()
     command_args = parsed_args[command]
     command_func = getfield(IFTPipeline, Symbol(command))
     log_path = command_args[:log]
+    debug = command_args[:debug]
 
-    # delete log option from command_args so it doesn't get passed to command_func
+    # delete log and debug options from command_args so they doesn't get passed to command_func
     delete!(command_args, :log)
+    delete!(command_args, :debug)
 
-    logger = setuplogger(command, log_path)
+    logger = setuplogger(debug)
+    
 
     with_logger(logger) do
         @time command_func(; command_args...)
