@@ -16,7 +16,7 @@ jobs:
 
             - name: Run SOIT
               run: |
-                pipx run ./workflow/scripts/pass_time_cylc.py \
+                pipx run ./satellite-overpass-identification-tool/scripts/satellite-overpass-identification-tool.py \
                 -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
                 --startdate 2013-03-31 --enddate 2013-05-01 \
                 --lat 76.0015 --lon -18.4315 \
