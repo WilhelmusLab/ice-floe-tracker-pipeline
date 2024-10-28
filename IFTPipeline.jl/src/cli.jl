@@ -3,6 +3,7 @@
 using ArgParse
 using LoggingExtras
 using IceFloeTracker
+using IFTPipeline
 using Serialization
 
 function mkclipreprocess!(settings)
