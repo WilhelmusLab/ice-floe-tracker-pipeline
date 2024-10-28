@@ -9,8 +9,8 @@ cp ${DATA_SOURCE}/landmask.tiff ${TEMPDIR}
 cp ${DATA_SOURCE}/passtimes_lat.csv ${TEMPDIR}
 SAMPLEIMG=${TEMPDIR}/20220914.terra.truecolor.250m.tiff
 
-${IFT} landmask ${TEMPDIR} ${TEMPDIR} 2>&1 | tee ${TEMPDIR}/landmask.log
-${IFT} preprocess -t ${TEMPDIR} -r ${TEMPDIR} -l ${TEMPDIR} -p ${TEMPDIR} -o ${TEMPDIR} 2>&1 | tee ${TEMPDIR}/preprocess.log
-${IFT} extractfeatures -i ${TEMPDIR} -o ${TEMPDIR}
-${IFT} track --imgs ${TEMPDIR} --props ${TEMPDIR} --passtimes ${TEMPDIR} --latlon ${SAMPLEIMG} -o ${TEMPDIR}
-${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir ${TEMPDIR}
+${IFT} landmask ${TEMPDIR} ${TEMPDIR} --log ${TEMPDIR}
+${IFT} preprocess -t ${TEMPDIR} -r ${TEMPDIR} -l ${TEMPDIR} -p ${TEMPDIR} -o ${TEMPDIR} --log ${TEMPDIR}
+${IFT} extractfeatures -i ${TEMPDIR} -o ${TEMPDIR} --log ${TEMPDIR}
+${IFT} track --imgs ${TEMPDIR} --props ${TEMPDIR} --passtimes ${TEMPDIR} --latlon ${SAMPLEIMG} -o ${TEMPDIR} --log ${TEMPDIR}
+${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir ${TEMPDIR} --log ${TEMPDIR}
