@@ -332,7 +332,10 @@ def getclosest(aqua, terra, aoi, t0, t1, altitude_degrees=30):
     return aqua_closest, terra_closest
 
 
-# description="Aqua and Terra Satellite Overpass time tool"
+app = typer.Typer()
+
+
+@app.command()
 def main(
     SPACEUSER: Annotated[
         str, 
@@ -391,6 +394,7 @@ def main(
         ),
     ],
 ):
+    """Aqua and Terra Satellite Overpass time tool"""
 
     get_passtimes(
         start_date=start_date,
@@ -404,4 +408,4 @@ def main(
 
 
 if __name__ == "__main__":
-    typer.run(main)
+    app()
