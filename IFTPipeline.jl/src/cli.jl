@@ -237,9 +237,7 @@ If `log_path` is a directory path, log to that directory.
 function setuplogger(command::Symbol, log_path::Union{String,Nothing}=nothing)
 
     if isnothing(log_path)
-        return TeeLogger(
-            global_logger()
-        )
+        return global_logger()
     else
         if isdir(log_path)
             cmd = string(command)
