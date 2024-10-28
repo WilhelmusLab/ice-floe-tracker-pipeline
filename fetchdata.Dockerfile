@@ -13,8 +13,8 @@ RUN pip3 install skyfield \
 
 # Build software
 #===========================================
-COPY fetchdata.sh /usr/local/bin
-COPY ./../satellite-overpass-identification-tool/pass_time_cylc.py /usr/local/bin
+COPY workflow/scripts/fetchdata.sh /usr/local/bin
+COPY satellite-overpass-identification-tool/pass_time_cylc.py /usr/local/bin
 RUN chmod a+x /usr/local/bin/pass_time_cylc.py
 RUN chmod a+x /usr/local/bin/fetchdata.sh
 CMD [ "/bin/bash", "-c" ]
