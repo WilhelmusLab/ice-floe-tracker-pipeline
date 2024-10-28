@@ -36,7 +36,7 @@ To run SOIT, you can run `pass_time_cylc.py` from the directory where you instal
 
 1. [Install pipx](https://pipx.pypa.io/stable/)
 2. Export SOIT username/password to environment variables as described above.
-3. Call `pipx run satellite-overpass-idenfitication-tool/satellite-overpass-identification-tool.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath <save_directory> --centroid_x <input_centroid_x> --centroid_y <input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD`
+3. Call `pipx run satellite-overpass-idenfitication-tool/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath <save_directory> --centroid_x <input_centroid_x> --centroid_y <input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD`
 
 ## Fetching data from NASA Worldview
 
