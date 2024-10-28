@@ -4,6 +4,7 @@
 #   "requests==2.31.0",
 #   "skyfield==1.45.0",
 #   "numpy==1.26",
+#   "typer"
 # ]
 # ///
 
@@ -33,7 +34,9 @@ from skyfield.api import wgs84, load, EarthSatellite
 import numpy as np
 import csv
 import math
-import argparse
+import typer
+import pathlib
+from typing_extensions import Annotated
 
 # URLs for space track login.
 uriBase = "https://www.space-track.org"
@@ -329,60 +332,76 @@ def getclosest(aqua, terra, aoi, t0, t1, altitude_degrees=30):
     return aqua_closest, terra_closest
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Aqua and Terra Satellite Overpass time tool"
-    )
-    parser.add_argument(
-        "--SPACEUSER",
-        "-u",
-        type=str,
-        help="space-track.org username",
-    )
-    parser.add_argument(
-        "--SPACEPSWD",
-        "-p",
-        type=str,
-        help="space-track.org password",
-    )
-    parser.add_argument(
-        "--startdate",
-        type=_parsedate,
-        dest="start_date",
-        help="Start date in format YYYY-MM-DD",
-    )
-    parser.add_argument(
-        "--enddate",
-        type=_parsedate,
-        dest="end_date",
-        help="End date in format YYYY-MM-DD",
-    )
-    parser.add_argument(
-        "--centroid-lat",
-        "--lat",
-        metavar="lat",
-        dest="lat",
-        type=float,
-        help="latitude of bounding box centroid",
-    )
-    parser.add_argument(
-        "--centroid-lon",
-        "--lon",
-        metavar="lon",
-        dest="lon",
-        type=float,
-        help="longitude of bounding box centroid",
-    )
-    parser.add_argument(
-        "--csvoutpath",
-        type=str,
-        help="Path to output CSV file",
-    )
+# description="Aqua and Terra Satellite Overpass time tool"
+def main(
+    SPACEUSER: Annotated[
+        str, 
+        typer.Option(
+            "--SPACEUSER", 
+            "-u", 
+            help="space-track.org username")
+    ],
+    SPACEPSWD: Annotated[
+        str,
+        typer.Option(
+            "--SPACEPSWD",
+            "-p",
+            help="space-track.org password",
+        ),
+    ],
+    start_date: Annotated[
+        str,
+        typer.Option(
+            "--startdate",
+            help="Start date in format YYYY-MM-DD",
+            metavar="YYYY-MM-DD",
+            parser=_parsedate,
+        ),
+    ],
+    end_date: Annotated[
+        str,
+        typer.Option(
+            "--enddate",
+            help="End date in format YYYY-MM-DD",
+            metavar="YYYY-MM-DD",
+            parser=_parsedate,
+        ),
+    ],
+    lat: Annotated[
+        float,
+        typer.Option(
+            "--centroid-lat",
+            "--lat",
+            help="latitude of bounding box centroid",
+        ),
+    ],
+    lon: Annotated[
+        float,
+        typer.Option(
+            "--centroid-lon",
+            "--lon",
+            help="longitude of bounding box centroid",
+        ),
+    ],
+    csvoutpath: Annotated[
+        pathlib.Path,
+        typer.Option(
+            "--csvoutpath",
+            help="Path to output CSV file",
+        ),
+    ],
+):
 
-    args = parser.parse_args()
-
-    get_passtimes(**vars(args))
+    get_passtimes(
+        start_date=start_date,
+        end_date=end_date,
+        csvoutpath=csvoutpath,
+        lat=lat,
+        lon=lon,
+        SPACEUSER=SPACEUSER,
+        SPACEPSWD=SPACEPSWD,
+    )
 
 
 if __name__ == "__main__":
-    main()
+    typer.run(main)
