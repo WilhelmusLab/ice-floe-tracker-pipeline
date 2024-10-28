@@ -228,20 +228,25 @@ end
 
 
 """
-    setuplogger(command::Symbol, output::Union{String,Nothing})
+    setuplogger(command::Symbol, log_path::Union{String,Nothing})
 Setup logger for the ice floe tracker. 
     
-If `output` is a directory path, log to that directory.
+If `log_path` is a directory path, log to that directory.
 """
-function setuplogger(command::Symbol, output::Union{String,Nothing}=nothing)
+function setuplogger(command::Symbol, log_path::Union{String,Nothing}=nothing)
 
-    if isnothing(output)
+    if isnothing(log_path)
         return TeeLogger(
             global_logger()
-            )
+        )
     else
-        cmd = string(command)
-        filelogger = FileLogger(joinpath(output, "$cmd-logfile.log")) # add command prefix to logfile name
+        if isdir(log_path)
+            cmd = string(command)
+            path = joinpath(log_path, "$cmd-logfile.log")
+        else
+            path = log_path
+        end
+        filelogger = FileLogger(path) # add command prefix to logfile name
 
         # filter out debug messages
         filtlogger = EarlyFilteredLogger(filelogger) do args
@@ -286,7 +291,7 @@ function main()
     command_common_args = [
         "--log",
         Dict(:help => "Path for logging outputs", :required => false, :arg_type => String)
-        ]
+    ]
 
     mkcli!(settings, command_common_args)
 
