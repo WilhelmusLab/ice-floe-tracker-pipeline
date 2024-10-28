@@ -249,7 +249,7 @@ function setuplogger(command::Symbol, log_path::Union{String,Nothing}=nothing)
 
         # filter out debug messages
         filtlogger = EarlyFilteredLogger(filelogger) do args
-            r = Logging.Info <= args.level <= Logging.Warn && args._module === IFTPipeline
+            r = Logging.Info <= args.level && args._module === IFTPipeline
             return r
         end
 
