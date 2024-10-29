@@ -33,6 +33,7 @@ from skyfield.api import wgs84, load, EarthSatellite
 import numpy as np
 import csv
 import math
+import argparse
 
 # URLs for space track login.
 uriBase = "https://www.space-track.org"
@@ -326,7 +327,6 @@ def getclosest(aqua, terra, aoi, t0, t1, altitude_degrees=30):
     ]
 
     return aqua_closest, terra_closest
-
 
 
 def main():
