@@ -235,18 +235,8 @@ Setup logger for the ice floe tracker.
     
 If `log_path` is a directory path, log to that directory.
 """
-function setuplogger(debug::Bool=false)
-    
-    
-    if debug
-        log_level = Logging.Debug
-    else
-        log_level = Logging.Info
-    end
-    
-    _ConsoleLogger(stream, min_level) = MinLevelLogger(global_logger(), min_level)
-    logger = TeeLogger(_ConsoleLogger(stderr, log_level))
-
+function setuplogger()
+    logger = global_logger()
     return logger
 end
 
@@ -275,13 +265,9 @@ function main()
         help = "Pair ice floes in day k with ice floes in day k+1"
         action = :command
     end
-
-    command_common_args = [
-        "--log",
-        Dict(:help => "Path for logging outputs", :required => false, :arg_type => String),
-        "--debug",
-        Dict(:help => "show debug output", :action => :store_true)
-    ]
+    
+    command_common_args = []
+    
 
     mkcli!(settings, command_common_args)
 
@@ -290,22 +276,9 @@ function main()
     command = parsed_args[:_COMMAND_]
     command_args = parsed_args[command]
     command_func = getfield(IFTPipeline, Symbol(command))
-    log_path = command_args[:log]
-    debug = command_args[:debug]
 
-    # delete log and debug options from command_args so they doesn't get passed to command_func
-    delete!(command_args, :log)
-    delete!(command_args, :debug)
-
-    logger = setuplogger(debug)
-
-    with_logger(logger) do
-        @debug "debug message"
-        @info "info message"
-        @warn "warning message"
-        @error "error message"
-        # @time command_func(; command_args...)
-    end
+    @time command_func(; command_args...)
+    
     return nothing
 end
 
