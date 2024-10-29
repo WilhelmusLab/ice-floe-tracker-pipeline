@@ -1,8 +1,6 @@
 #!/usr/bin/env julia
 
 using ArgParse
-using Logging
-using LoggingExtras
 using IceFloeTracker
 using IFTPipeline
 using Serialization
