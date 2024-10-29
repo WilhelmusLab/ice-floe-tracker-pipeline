@@ -2,6 +2,7 @@
 
 using ArgParse
 using LoggingExtras
+using Logging
 using IceFloeTracker
 using IFTPipeline
 using Serialization
@@ -235,14 +236,13 @@ Setup logger for the ice floe tracker.
 If `log_path` is a directory path, log to that directory.
 """
 function setuplogger(debug::Bool=false)
-
+    
     if debug
-        debuglogger = ConsoleLogger(stderr, Logging.Debug)
-        return debuglogger
+        logger = ConsoleLogger(stderr, Logging.Debug)
     else
-        infologger = ConsoleLogger(stderr, Logging.Info)
-        return infologger
+        logger = ConsoleLogger(stderr, Logging.Info)
     end
+    return logger
 
 end
 
@@ -294,7 +294,6 @@ function main()
     delete!(command_args, :debug)
 
     logger = setuplogger(debug)
-    
 
     with_logger(logger) do
         @time command_func(; command_args...)
