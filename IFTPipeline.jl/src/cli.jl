@@ -229,17 +229,6 @@ function mkcli!(settings, common_args)
 end
 
 
-"""
-    setuplogger(command::Symbol, log_path::Union{String,Nothing}, debug::Bool)
-Setup logger for the ice floe tracker. 
-    
-If `log_path` is a directory path, log to that directory.
-"""
-function setuplogger()
-    logger = global_logger()
-    return logger
-end
-
 function main()
     
     settings = ArgParseSettings(; autofix_names=true)
@@ -277,6 +266,8 @@ function main()
     command_args = parsed_args[command]
     command_func = getfield(IFTPipeline, Symbol(command))
 
+    @debug "debug message"
+    @info "info message"
     @time command_func(; command_args...)
     
     return nothing
