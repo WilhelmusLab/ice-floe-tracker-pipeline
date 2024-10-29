@@ -1,5 +1,5 @@
 # /// script
-# requires-python = "==3.9"
+# requires-python = "==3.11"
 # dependencies = [
 #   "requests==2.31.0",
 #   "skyfield==1.45.0",
