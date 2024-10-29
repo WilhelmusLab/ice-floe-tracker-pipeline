@@ -11,7 +11,7 @@ cp ${DATA_SOURCE}/landmask.tiff ${TEMPDIR}
 cp ${DATA_SOURCE}/passtimes_lat.csv ${TEMPDIR}
 SAMPLEIMG=${TEMPDIR}/20220914.terra.truecolor.250m.tiff
 
-JULIA_DEBUG=all ${IFT} landmask ${TEMPDIR} ${TEMPDIR} |& tee ${TEMPDIR}/landmask.log
+${IFT} landmask ${TEMPDIR} ${TEMPDIR} |& tee ${TEMPDIR}/landmask.log
 # ${IFT} preprocess -t ${TEMPDIR} -r ${TEMPDIR} -l ${TEMPDIR} -p ${TEMPDIR} -o ${TEMPDIR} --debug
 # ${IFT} extractfeatures -i ${TEMPDIR} -o ${TEMPDIR} --debug
 # ${IFT} track --imgs ${TEMPDIR} --props ${TEMPDIR} --passtimes ${TEMPDIR} --latlon ${SAMPLEIMG} -o ${TEMPDIR} --debug
