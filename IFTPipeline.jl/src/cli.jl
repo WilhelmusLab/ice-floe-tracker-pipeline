@@ -1,8 +1,8 @@
 #!/usr/bin/env julia
 
 using ArgParse
-using LoggingExtras
 using Logging
+using LoggingExtras
 using IceFloeTracker
 using IFTPipeline
 using Serialization
@@ -237,13 +237,17 @@ If `log_path` is a directory path, log to that directory.
 """
 function setuplogger(debug::Bool=false)
     
+    
     if debug
-        logger = ConsoleLogger(stderr, Logging.Debug)
+        log_level = Logging.Debug
     else
-        logger = ConsoleLogger(stderr, Logging.Info)
+        log_level = Logging.Info
     end
-    return logger
+    
+    _ConsoleLogger(stream, min_level) = MinLevelLogger(global_logger(), min_level)
+    logger = TeeLogger(_ConsoleLogger(stderr, log_level))
 
+    return logger
 end
 
 function main()
@@ -296,7 +300,11 @@ function main()
     logger = setuplogger(debug)
 
     with_logger(logger) do
-        @time command_func(; command_args...)
+        @debug "debug message"
+        @info "info message"
+        @warn "warning message"
+        @error "error message"
+        # @time command_func(; command_args...)
     end
     return nothing
 end
