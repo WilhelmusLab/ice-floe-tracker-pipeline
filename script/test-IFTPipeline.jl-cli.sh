@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
+PROJECTDIR=../IFTPipeline.jl
+
 # Scripts
-IFT="julia --project=../ ../src/cli.jl"
+IFT="julia --project=${PROJECTDIR} ${PROJECTDIR}/src/cli.jl"
 
 # Data source and target
-DATA_SOURCE=test_inputs/input_pipeline
-TEMPDIR=$(mktemp -d -p __temp__)
+DATA_SOURCE=${PROJECTDIR}/test/test_inputs/input_pipeline
+TEMPDIR=$(mktemp -d)
 echo "TEMPDIR=${TEMPDIR}"
 
 # Initialize data directory
