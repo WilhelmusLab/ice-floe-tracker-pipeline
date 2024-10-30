@@ -15,6 +15,7 @@ on:
 env:
   REGISTRY: hub.docker.com
   IMAGE_NAME: brownccv/icefloetracker-julia
+  TEST_TAG: brownccv/icefloetracker-julia:test
 
 jobs:
   build_and_push:
@@ -39,7 +40,18 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE_NAME }}
-
+      
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: ${{ env.TEST_TAG }}
+      
+      - name: Test
+        run: IFT="docker run --rm ${{ env.TEST_TAG }}" ./script/test-IFTPIpeline.jl-cli.sh
+      
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
