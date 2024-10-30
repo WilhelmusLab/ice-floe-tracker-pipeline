@@ -30,7 +30,7 @@ jobs:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
       - uses: julia-actions/cache@v2
-      - run: julia --project=PythonSetup.jl PythonSetup.jl/setup.jl
+      - run: julia --project=PythonSetupForIFTPipeline.jl PythonSetupForIFTPipeline.jl/setup.jl
       - uses: julia-actions/julia-buildpkg@v1
         with:
           project: IFTPipeline.jl
