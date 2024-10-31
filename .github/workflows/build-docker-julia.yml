@@ -49,8 +49,9 @@ jobs:
           load: true
           tags: ${{ env.TEST_TAG }}
       
-      - name: Test
-        run: IFT="docker run --rm ${{ env.TEST_TAG }}" ./script/test-IFTPIpeline.jl-cli.sh
+      - name: Test CLI
+        working-directory: ./script
+        run: IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}" ./test-IFTPIpeline.jl-cli.sh
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
