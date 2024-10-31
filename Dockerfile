@@ -6,8 +6,8 @@ ENV TERM=xterm
 
 # Python environment build
 #===========================================
-COPY ./PythonSetup.jl /opt/PythonSetup.jl
-RUN julia --project="/opt/PythonSetup.jl" "/opt/PythonSetup.jl/setup.jl"
+COPY ./PythonSetupForIFTPipeline.jl /opt/PythonSetupForIFTPipeline.jl
+RUN julia --project="/opt/PythonSetupForIFTPipeline.jl" "/opt/PythonSetupForIFTPipeline.jl/setup.jl"
 
 # IFT Pipeline package build
 #===========================================
