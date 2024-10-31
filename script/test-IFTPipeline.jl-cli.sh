@@ -12,18 +12,15 @@
 echo "IFT=${IFT}"
 
 # Data target
-TEMPDIR=$(mktemp -d)
+TEMPDIR=$(mktemp -d -p .)
 : "${DATA_TARGET:=$TEMPDIR}"
 echo "DATA_TARGET=${DATA_TARGET}"
 
 # Initialize data directory
-: "${DATA_SOURCE:=../IFTPipeline.jl/test/test_inputs/input_pipeline}"
+: "${DATA_SOURCE:=./input_data}"
 echo "DATA_SOURCE=${DATA_SOURCE}"
-ls /
-ls /mnt
-cp ${DATA_SOURCE}/20220914.{terra,aqua}.{true,false}color.250m.tiff ${DATA_TARGET}
-cp ${DATA_SOURCE}/landmask.tiff ${DATA_TARGET}
-cp ${DATA_SOURCE}/passtimes_lat.csv ${DATA_TARGET}
+
+cp -r ${DATA_SOURCE}/* ${DATA_TARGET}/
 SAMPLEIMG=${DATA_TARGET}/20220914.terra.truecolor.250m.tiff
 
 # Set up debug messages
