@@ -21,13 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Test CLI
-        working-directory: ./script
-        run: |
-          pwd 
-          ls 
-          IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}" ./test-IFTPipeline.jl-cli.sh
-      
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -53,7 +46,11 @@ jobs:
           platforms: linux/amd64
           load: true
           tags: ${{ env.TEST_TAG }}
-      
+            
+      - name: Test CLI
+        working-directory: ./script
+        run: IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}" ./test-IFTPipeline.jl-cli.sh
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
