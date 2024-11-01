@@ -48,7 +48,7 @@ jobs:
           tags: ${{ env.TEST_TAG }}
             
       - name: Test CLI
-        working-directory: ./script
+        working-directory: ./test
         run: IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}" ./test-IFTPipeline.jl-cli.sh
 
       - name: Build and push Docker image
