@@ -23,7 +23,7 @@ jobs:
 
       - name: Test CLI
         working-directory: ./script
-        run: pwd && ls && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}" test-IFTPIpeline.jl-cli.sh
+        run: pwd && ls && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}" ./test-IFTPIpeline.jl-cli.sh
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
