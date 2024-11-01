@@ -1,3 +1,11 @@
+# /// script
+# requires-python = "==3.11"
+# dependencies = [
+#   "jinja2",
+#   "pandas",
+# ]
+# ///
+
 from jinja2 import Environment, FileSystemLoader # templating engine
 import pandas as pd, os, argparse
 
