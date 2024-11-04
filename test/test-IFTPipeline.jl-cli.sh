@@ -41,6 +41,7 @@ do
     HDF5FILE=${DATA_TARGET}/20220914.${satellite}.h5
     ${IFT} preprocess_single --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --landmask ${LANDMASK_NON_DILATED} --landmask-dilated ${LANDMASK_DILATED} --output ${SEGMENTED}
     ${IFT} extractfeatures_single --input ${SEGMENTED} --output ${FLOEPROPERTIES}
+    ${IFT} makeh5files_single --passtime "2022-09-14T12:00:00" --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --labeled ${SEGMENTED} --props ${FLOEPROPERTIES} --output ${HDF5FILE}
 done
 
 ${IFT} track_single --imgs ${DATA_TARGET}/20220914.{aqua,terra}.segmented.250m.tiff --props ${DATA_TARGET}/20220914.{aqua,terra}.segmented.250m.props.csv --latlon ${TRUECOLOR} --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" --output ${DATA_TARGET}/paired-floes.csv
