@@ -33,6 +33,7 @@ LANDMASK_DILATED=${DATA_TARGET}/landmask.dilated.tiff
 TRUECOLOR=${DATA_TARGET}/20220914.terra.truecolor.250m.tiff
 FALSECOLOR=${DATA_TARGET}/20220914.terra.falsecolor.250m.tiff
 SEGMENTED=${DATA_TARGET}/20220914.terra.segmented.250m.tiff
+FLOEPROPERTIES=${DATA_TARGET}/20220914.terra.segmented.250m.props.csv
 
 # Run the processing (single file)
 ${IFT} landmask_single -i ${LANDMASK} -o ${LANDMASK_NON_DILATED} -d ${LANDMASK_DILATED}
