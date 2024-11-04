@@ -36,6 +36,108 @@ function track(; args...)
     return nothing
 end
 
+"""
+    track_single(
+        imgs::Array{String},
+        props::Array{String},
+        passtimes::Array{DateTime},
+        latlon::String,
+        output::String,
+        ...
+)
+Pair floes in the floe library using an equivalent implementation as in the MATLAB script `final_2020.m` from https://github.com/WilhelmusLab/ice-floe-tracker/blob/main/existing_code/final_2020.m.
+
+# Arguments
+- `imgs`: segmented images filenames (.tiff)
+- `props`: corresponding floe properties filenames (.csv)
+- `passtimes`: corresponding pass-times for each image
+- `latlon`: an example image with geospatial data (e.g., the original true-color image, .tiff)
+- `output`: filename for output file (.csv)
+- tracker parameters (see source code)
+
+Following are the default set of thresholds `condition_thresholds` used for floe matching:
+- Condition 1: time elapsed `dt` from image `k` to image `k+1` and distance between floes centroids `dist`: `t1=(dt = (30, 100, 1300), dist=(15, 30, 120))`
+- Condition 2: area of floe i `area`, and the computed ratios for area, major axis,  minor axis, and convex area of floes `i` and `j` in days `k` and `k+1`, respectively: `t2=(area=1200, arearatio=0.28, majaxisratio=0.10, minaxisratio=0.12, convexarearatio=0.14)`
+- Condition 3: as in the previous condition but set as follows: `t3=(area=1200, arearatio=0.18, majaxisratio=0.07, minaxisratio=0.08, convexarearatio=0.09)`
+"""
+function track_single(; 
+    imgs::Array{String},
+    props::Array{String},
+    passtimes::Array{DateTime},
+    latlon::String,
+    output::String,
+    area::Int64=1200,
+    dist::Array{Int}=[15, 30, 120],
+    dt_thresh::Array{Int}=[30, 100, 1300],
+    Sarearatio::Float64=0.18,
+    Smajaxisratio::Float64=0.1,
+    Sminaxisratio::Float64=0.12,
+    Sconvexarearatio::Float64=0.14,
+    Larearatio::Float64=0.28,
+    Lmajaxisratio::Float64=0.1,
+    Lminaxisratio::Float64=0.15,
+    Lconvexarearatio::Float64=0.14,
+    mxrot::Int64=10,
+    psi::Float64=0.95,
+    sz::Int64=16,
+    comp::Float64=0.25,
+    mm::Float64=0.22,
+    corr::Float64=0.68,
+    area2::Float64=0.236,
+    area3::Float64=0.18,
+)
+
+    # Load the files – can we drop the memory requirements by doing two at once?
+    @info "Loading $imgs"
+    imgs_ = [Integer.(rawview(channelview((FileIO.load(img))))) for img in imgs]
+
+    @info "Loading $props"
+    props_ = [DataFrame(CSV.File(prop)) for prop in props]
+    @info "Loaded: $props_"
+
+    @info "Using passtimes=$passtimes"
+
+    condition_thresholds = (
+        t1=(
+            dt=dt_thresh, 
+            dist=dist
+        ),
+        t2=(
+            area=area,
+            arearatio=Larearatio,
+            convexarearatio=Lconvexarearatio,
+            majaxisratio=Lmajaxisratio,
+            minaxisratio=Lminaxisratio,
+        ),
+        t3=(
+            area=area,
+            arearatio=Sarearatio,
+            convexarearatio=Sconvexarearatio,
+            majaxisratio=Smajaxisratio,
+            minaxisratio=Sminaxisratio,
+        ),
+    )
+
+    mc_thresholds = (
+        comp=(
+            mxrot=mxrot, 
+            sz=sz, 
+            comp=comp, 
+            mm=mm, 
+            psi=psi
+        ),
+        goodness=(
+            corr=corr, 
+            area2=area2, 
+            area3=area3
+        ),
+    )
+
+    labeled_floes = IceFloeTracker.pairfloes(imgs_, props_, passtimes, latlon, condition_thresholds, mc_thresholds)
+    FileIO.save(output, labeled_floes)
+    return nothing
+end
+
 function parse_params(params::AbstractString)
     params = parsefile(params)
     area = params["area"]

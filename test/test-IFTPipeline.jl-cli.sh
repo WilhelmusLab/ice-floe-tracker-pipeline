@@ -29,16 +29,21 @@ export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker"
 # Run the processing (single files)
 LANDMASK=${DATA_TARGET}/landmask.tiff
 LANDMASK_NON_DILATED=${DATA_TARGET}/landmask.non-dilated.tiff
-LANDMASK_DILATED=${DATA_TARGET}/landmask.dilated.tiff 
-TRUECOLOR=${DATA_TARGET}/20220914.terra.truecolor.250m.tiff
-FALSECOLOR=${DATA_TARGET}/20220914.terra.falsecolor.250m.tiff
-SEGMENTED=${DATA_TARGET}/20220914.terra.segmented.250m.tiff
-FLOEPROPERTIES=${DATA_TARGET}/20220914.terra.segmented.250m.props.csv
-
-# Run the processing (single file)
+LANDMASK_DILATED=${DATA_TARGET}/landmask.dilated.tiff
 ${IFT} landmask_single -i ${LANDMASK} -o ${LANDMASK_NON_DILATED} -d ${LANDMASK_DILATED}
-${IFT} preprocess_single --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --landmask ${LANDMASK_NON_DILATED} --landmask-dilated ${LANDMASK_DILATED} --output ${SEGMENTED}
-${IFT} extractfeatures_single --input ${SEGMENTED} --output ${FLOEPROPERTIES}
+
+for satellite in "aqua" "terra"
+do
+    TRUECOLOR=${DATA_TARGET}/20220914.${satellite}.truecolor.250m.tiff
+    FALSECOLOR=${DATA_TARGET}/20220914.${satellite}.falsecolor.250m.tiff
+    SEGMENTED=${DATA_TARGET}/20220914.${satellite}.segmented.250m.tiff
+    FLOEPROPERTIES=${DATA_TARGET}/20220914.${satellite}.segmented.250m.props.csv
+    ${IFT} preprocess_single --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --landmask ${LANDMASK_NON_DILATED} --landmask-dilated ${LANDMASK_DILATED} --output ${SEGMENTED}
+    ${IFT} extractfeatures_single --input ${SEGMENTED} --output ${FLOEPROPERTIES}
+done
+
+${IFT} track_single --imgs "${DATA_TARGET}/20220914.{aqua,terra}.segmented.250m.tiff" --props "${DATA_TARGET}/20220914.{aqua,terra}.segmented.250m.props.csv" --latlon ${TRUECOLOR} --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" --output ${DATA_TARGET}/paired-floes.csv
+
 
 
 # Run the processing (batch)
