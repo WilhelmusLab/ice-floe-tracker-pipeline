@@ -43,7 +43,7 @@ do
     ${IFT} extractfeatures_single --input ${SEGMENTED} --output ${FLOEPROPERTIES}
 done
 
-${IFT} track_single --imgs "${DATA_TARGET}/20220914.{aqua,terra}.segmented.250m.tiff" --props "${DATA_TARGET}/20220914.{aqua,terra}.segmented.250m.props.csv" --latlon ${TRUECOLOR} --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" --output ${DATA_TARGET}/paired-floes.csv
+${IFT} track_single --imgs ${DATA_TARGET}/20220914.{aqua,terra}.segmented.250m.tiff --props ${DATA_TARGET}/20220914.{aqua,terra}.segmented.250m.props.csv --latlon ${TRUECOLOR} --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" --output ${DATA_TARGET}/paired-floes.csv
 
 
 
