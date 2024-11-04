@@ -13,6 +13,8 @@ using Folds
 using HDF5
 using TOML: parsefile
 using Pkg
+using FileIO
+
 include("cli.jl")
 include("soit-parser.jl")
 include("landmask.jl")
@@ -34,6 +36,7 @@ export cache_vector, sharpen,
     load_cloudmask,
     disc_ice_water,
     landmask,
+    landmask_single,
     track,
     mkclipreprocess!,
     mkcliextract!,
