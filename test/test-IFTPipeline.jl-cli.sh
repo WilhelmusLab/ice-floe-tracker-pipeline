@@ -34,11 +34,11 @@ TRUECOLOR=${DATA_TARGET}/20220914.terra.truecolor.250m.tiff
 FALSECOLOR=${DATA_TARGET}/20220914.terra.falsecolor.250m.tiff
 SEGMENTED=${DATA_TARGET}/20220914.terra.segmented.250m.tiff
 
+# Run the processing (single file)
 ${IFT} landmask_single -i ${LANDMASK} -o ${LANDMASK_NON_DILATED} -d ${LANDMASK_DILATED}
 ${IFT} preprocess_single --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --landmask ${LANDMASK_NON_DILATED} --landmask-dilated ${LANDMASK_DILATED} --output ${SEGMENTED}
 
 
-exit
 # Run the processing (batch)
 ${IFT} landmask ${DATA_TARGET} ${DATA_TARGET}
 ${IFT} preprocess -t ${DATA_TARGET} -r ${DATA_TARGET} -l ${DATA_TARGET} -p ${DATA_TARGET} -o ${DATA_TARGET}
