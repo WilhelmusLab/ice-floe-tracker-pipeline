@@ -38,6 +38,7 @@ do
     FALSECOLOR=${DATA_TARGET}/20220914.${satellite}.falsecolor.250m.tiff
     SEGMENTED=${DATA_TARGET}/20220914.${satellite}.segmented.250m.tiff
     FLOEPROPERTIES=${DATA_TARGET}/20220914.${satellite}.segmented.250m.props.csv
+    HDF5FILE=${DATA_TARGET}/20220914.${satellite}.h5
     ${IFT} preprocess_single --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --landmask ${LANDMASK_NON_DILATED} --landmask-dilated ${LANDMASK_DILATED} --output ${SEGMENTED}
     ${IFT} extractfeatures_single --input ${SEGMENTED} --output ${FLOEPROPERTIES}
 done
