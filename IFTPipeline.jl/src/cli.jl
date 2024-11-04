@@ -68,11 +68,6 @@ function mkclimakeh5!(settings)
     return nothing
 end
 
-"""
-    mkclitrack!(settings)
-
-Set up command line interface for the `track` command.
-"""
 function mkclitrack!(settings)
     add_arg_group!(settings["track"], "arguments")
     @add_arg_table! settings["track"] begin
