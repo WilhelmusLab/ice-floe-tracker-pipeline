@@ -27,7 +27,13 @@ SAMPLEIMG=${DATA_TARGET}/20220914.terra.truecolor.250m.tiff
 export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" 
 
 # Run the processing (single files)
-${IFT} landmask_single -i ${DATA_TARGET}/landmask.tiff -o ${DATA_TARGET}/landmask.non-dilated.tiff -d ${DATA_TARGET}/landmask.dilated.tiff 
+LANDMASK=${DATA_TARGET}/landmask.tiff
+LANDMASK_NON_DILATED=${DATA_TARGET}/landmask.non-dilated.tiff
+LANDMASK_DILATED={DATA_TARGET}/landmask.dilated.tiff 
+
+${IFT} landmask_single -i ${LANDMASK} -o ${LANDMASK_NON_DILATED} -d ${LANDMASK_DILATED}
+
+
 
 # Run the processing (batch)
 ${IFT} landmask ${DATA_TARGET} ${DATA_TARGET}
