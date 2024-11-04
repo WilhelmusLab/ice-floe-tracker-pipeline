@@ -30,6 +30,31 @@ function mkclipreprocess!(settings)
     return nothing
 end
 
+function mkclipreprocess_single!(settings)
+    @add_arg_table! settings["preprocess_single"] begin
+            "--truecolor", "-t"
+            help = "Truecolor image file (.tiff)"
+            required = true
+    
+            "--falsecolor", "-r"
+            help = "Falsecolor image file (.tiff)"
+            required = true
+    
+            "--landmask", "-l"
+            help = "Landmask image file (.tiff)"
+            required = true
+    
+            "--landmask-dilated", "-d"
+            help = "Landmask image file (dilated, .tiff)"
+            required = true
+    
+            "--output", "-o"
+            help = "Path to output segmented image file (.tiff)"
+            required = true
+    end
+    return nothing
+end
+
 function mkcliextract!(settings)
     @add_arg_table! settings["extractfeatures"] begin
         "--input", "-i"
@@ -227,6 +252,7 @@ function mkcli!(settings, common_args)
         "landmask" => mkclilandmask!,
         "landmask_single" => mkclilandmask_single!,
         "preprocess" => mkclipreprocess!,
+        "preprocess_single" => mkclipreprocess_single!,
         "extractfeatures" => mkcliextract!,
         "makeh5files" => mkclimakeh5!,
         "track" => mkclitrack!
@@ -254,6 +280,10 @@ function main()
         action = :command
 
         "preprocess"
+        help = "Preprocess truecolor/falsecolor images"
+        action = :command
+
+        "preprocess_single"
         help = "Preprocess truecolor/falsecolor images"
         action = :command
 
