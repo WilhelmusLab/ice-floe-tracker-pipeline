@@ -283,6 +283,7 @@ function mkcli!(settings, common_args)
         "preprocess" => mkclipreprocess!,
         "preprocess_single" => mkclipreprocess_single!,
         "extractfeatures" => mkcliextract!,
+        "extractfeatures_single" => mkcliextract_single!,
         "makeh5files" => mkclimakeh5!,
         "track" => mkclitrack!
     )
