@@ -28,10 +28,13 @@ end
 
 """
     landmask_single(; input, output_non_dilated, output_dilated)
-Given an input directory with a landmask file, create a land/soft ice mask object with both dilated and non_dilated versions. The object is serialized to the snakemake output directory. 
-# Arguments
+
+    Given an input directory with a landmask file, create a land/soft ice mask object with both dilated and non_dilated versions. The object is serialized to the snakemake output directory. 
+
+    # Arguments
 - `input`: path to landmask source image
-- `output`: path to output file
+- `output_non_dilated`: path to output file for non-dilated landmask
+- `output_dilated`: path to output file for dilated landmask
 """
 function landmask_single(; input::String, output_non_dilated::String, output_dilated::String)
     @info "Using $input as landmask"
