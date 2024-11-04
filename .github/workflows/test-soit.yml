@@ -16,8 +16,8 @@ jobs:
 
             - name: Run SOIT
               run: |
-                pipx run ./satellite-overpass-identification-tool soit \
-                -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
+                pipx run --spec ./satellite-overpass-identification-tool soit \
+                --SPACEUSER ${{ secrets.SPACEUSER }} --SPACEPSWD ${{ secrets.SPACEPSWD }} \
                 --startdate 2013-03-31 --enddate 2013-05-01 \
                 --lat 76.0015 --lon -18.4315 \
                 --csvoutpath .
