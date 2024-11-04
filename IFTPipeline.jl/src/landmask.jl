@@ -1,5 +1,3 @@
-using FileIO
-
 """
     landmask(; input, output)
 

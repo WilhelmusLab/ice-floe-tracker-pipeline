@@ -13,6 +13,8 @@ using Folds
 using HDF5
 using TOML: parsefile
 using Pkg
+using FileIO
+
 include("cli.jl")
 include("soit-parser.jl")
 include("landmask.jl")
