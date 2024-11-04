@@ -14,6 +14,7 @@ on:
 env:
   REGISTRY: hub.docker.com
   IMAGE_NAME: brownccv/icefloetracker-soit
+  TEST_TAG: brownccv/icefloetracker-soit:test
 
 jobs:
   build_and_push:
@@ -43,7 +44,24 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./satellite-overpass-identification-tool
+          platforms: linux/amd64
+          load: true
+          tags: ${{ env.TEST_TAG }}
+          
+      - name: Test SOIT
+        run: docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }} \
+                -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
+                --startdate 2013-03-31 --enddate 2013-05-01 \
+                --lat 76.0015 --lon -18.4315 \
+                --csvoutpath .
+        
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./satellite-overpass-identification-tool
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  
