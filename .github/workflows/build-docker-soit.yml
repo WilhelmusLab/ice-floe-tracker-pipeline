@@ -49,11 +49,12 @@ jobs:
           tags: ${{ env.TEST_TAG }}
           
       - name: Test SOIT
-        run: docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }} \
-                -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
-                --startdate 2013-03-31 --enddate 2013-05-01 \
-                --lat 76.0015 --lon -18.4315 \
-                --csvoutpath .
+        run: |
+          docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }} \
+          -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
+          --startdate 2013-03-31 --enddate 2013-05-01 \
+          --lat 76.0015 --lon -18.4315 \
+          --csvoutpath .
         
 
       - name: Build and push Docker image
