@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-soit="pass_time_cylc:main"
+soit="satellite_overpass_identification_tool:main"
 
 [build-system]
 requires = ["hatchling"]
