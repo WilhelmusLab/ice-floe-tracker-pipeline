@@ -15,3 +15,7 @@ You can run the code anywhere by calling:
 pipx run --spec "git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool" soit
 ```
 
+You can run the Docker image by calling:
+```bash
+docker run -it brownccv/icefloetracker-soit
+```
