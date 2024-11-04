@@ -256,3 +256,41 @@ function preprocess(; truedir::T, fcdir::T, lmdir::T, passtimesdir::T, output::T
     serialize(joinpath(output, "passtimes.jls"), soitdf.pass_time)
     return nothing
 end
+
+"""
+    preprocess(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T) where {T<:AbstractString}
+
+Preprocess and segment floes in a single view. Save the segmented floes to `output`.
+
+# Arguments
+- `truecolor`: path to truecolor image
+- `falsecolor`: path to falsecolor image
+- `landmask`: path to landmask image
+- `landmask_dilated`: path to dilated landmask image
+- `output`: path to output file 
+"""
+function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T) where {T<:AbstractString}
+
+    @info "Processing images: $truecolor, $falsecolor, $landmask"
+    truecolor_img = loadimg(; dir=dirname(truecolor), fname=basename(truecolor))
+    falsecolor_img = loadimg(; dir=dirname(falsecolor), fname=basename(falsecolor))
+
+    # TODO: make symmetric landmask saving/loading functions
+    landmask = (
+        dilated=BitMatrix(FileIO.load(landmask_dilated)),
+        non_dilated=BitMatrix(FileIO.load(landmask)),
+    )
+
+    @info "Removing alpha channel if it exists"
+    rgb_truecolor_img = RGB.(truecolor_img)
+    rgb_falsecolor_img = RGB.(falsecolor_img)
+
+    @info "Segmenting floes started"
+    segmented_floes = preprocess(rgb_truecolor_img, rgb_falsecolor_img, landmask)
+    @info "Segmenting floes complete"
+
+    @info "Writing segmented floes to $output"
+    FileIO.save(output, segmented_floes)
+
+    return nothing
+end
