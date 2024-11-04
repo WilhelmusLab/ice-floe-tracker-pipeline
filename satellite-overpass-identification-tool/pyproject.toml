@@ -2,7 +2,7 @@
 name="satellite-overpass-identification-tool"
 version = "2024.11.4"
 authors = [
-    {name="Simon Hatcher", email = ""},
+    {name="Simon Hatcher"},
     {name="Timothy Divoll", email = "timothy_divoll@brown.edu"}
 ]
 requires-python = ">= 3.11"
