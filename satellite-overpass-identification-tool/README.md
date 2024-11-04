@@ -4,9 +4,9 @@ The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.
 
 ## Run the code
 
-You can run the local version of the code by calling
+You can run the local version of the code from this directory by calling
 ```bash
-pipx run -e satellite_overpass_identification_tool.py 
+pipx run . soit
 ```
 
 You can run the code anywhere by calling:
