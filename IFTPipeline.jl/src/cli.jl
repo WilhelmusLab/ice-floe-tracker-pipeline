@@ -205,9 +205,27 @@ function mkclilandmask!(settings)
     add_arg_table!(settings["landmask"], args...)
 end
 
+function mkclilandmask_single!(settings)
+    @add_arg_table! settings["landmask_single"] begin
+        "--input", "-i"
+        help = "Input image"
+        required = true
+
+        "--output_non_dilated", "-o"
+        help = "Output path for binarized landmask"
+        required = true
+
+        "--output_dilated", "-d"
+        help = "Output path for dilated, binarized landmask"
+        required = true
+    end
+    return nothing
+end
+
 function mkcli!(settings, common_args)
     d = Dict(
         "landmask" => mkclilandmask!,
+        "landmask_single" => mkclilandmask_single!,
         "preprocess" => mkclipreprocess!,
         "extractfeatures" => mkcliextract!,
         "makeh5files" => mkclimakeh5!,
@@ -228,6 +246,10 @@ function main()
 
     @add_arg_table! settings begin
         "landmask"
+        help = "Generate land mask images"
+        action = :command
+
+        "landmask_single"
         help = "Generate land mask images"
         action = :command
 
