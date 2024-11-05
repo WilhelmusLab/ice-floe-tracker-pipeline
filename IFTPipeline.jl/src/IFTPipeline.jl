@@ -16,6 +16,7 @@ using Pkg
 using FileIO
 using Images
 using CSV
+using ImageSegmentation
 
 include("cli.jl")
 include("soit-parser.jl")
