@@ -14,6 +14,8 @@ using HDF5
 using TOML: parsefile
 using Pkg
 using FileIO
+using Images
+using CSV
 
 include("cli.jl")
 include("soit-parser.jl")
