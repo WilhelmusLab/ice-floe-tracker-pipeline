@@ -122,6 +122,45 @@ function mkclimakeh5!(settings)
     return nothing
 end
 
+function mkclimakeh5_single!(settings)
+    @add_arg_table! settings["makeh5files_single"] begin
+        "--iftversion"
+        help = "Version number of the IceFloeTracker.jl package"
+        required = false
+        arg_type = String
+
+        "--passtime"
+        help = "Satellite pass time"
+        required = true
+        arg_type = DateTime
+
+        "--truecolor"
+        help = "Path to truecolor image"
+        required = true
+        arg_type = String
+
+        "--falsecolor"
+        help = "Path to falsecolor image"
+        required = true
+        arg_type = String
+
+        "--labeled"
+        help = "Path to labeled image"
+        required = true
+        arg_type = String
+
+        "--props"
+        help = "Path to extracted features (csv)"
+        required = true
+        arg_type = String
+
+        "--output", "-o"
+        help = "Output file"
+        required = true
+    end
+    return nothing
+end
+
 function mkclitrack!(settings)
     add_arg_group!(settings["track"], "arguments")
     @add_arg_table! settings["track"] begin
@@ -420,6 +459,7 @@ function mkcli!(settings, common_args)
         "extractfeatures" => mkcliextract!,
         "extractfeatures_single" => mkcliextract_single!,
         "makeh5files" => mkclimakeh5!,
+        "makeh5files_single" => mkclimakeh5_single!,
         "track" => mkclitrack!,
         "track_single" => mkclitrack_single!,
     )
@@ -462,6 +502,10 @@ function main()
         action = :command
 
         "makeh5files"
+        help = "Make HDF5 files from extracted floe features"
+        action = :command
+
+        "makeh5files_single"
         help = "Make HDF5 files from extracted floe features"
         action = :command
 
