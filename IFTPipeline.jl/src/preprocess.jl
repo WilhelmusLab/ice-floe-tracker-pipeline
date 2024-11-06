@@ -291,7 +291,8 @@ function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_
 
     @info "Labeling floes"
     labeled_floes = label_components(segmented_floes)
-    labeled_floes_cast = convert(Array{choose_dtype(maximum(labeled_floes))}, labeled_floes)
+    _dtype = choose_dtype(maximum(labeled_floes))
+    labeled_floes_cast = convert(Array{_dtype}, labeled_floes)
     @debug "Labeled floes: $labeled_floes"
 
     @info "Writing segmented floes to $output"
