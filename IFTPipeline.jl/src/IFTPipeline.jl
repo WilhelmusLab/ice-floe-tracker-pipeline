@@ -17,6 +17,7 @@ using FileIO
 using Images
 using CSV
 using ImageSegmentation
+using FixedPointNumbers
 
 include("cli.jl")
 include("soit-parser.jl")
