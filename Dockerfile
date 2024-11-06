@@ -12,7 +12,7 @@ RUN julia --project="/opt/PythonSetupForIFTPipeline.jl" "/opt/PythonSetupForIFTP
 # IFT Pipeline package build
 #===========================================
 COPY ./IFTPipeline.jl /opt/IFTPipeline.jl
-RUN julia --project="/opt/IFTPipeline.jl" -e 'using Pkg; Pkg.instantiate();'
+RUN julia --project="/opt/IFTPipeline.jl" -e 'using Pkg; Pkg.rm("IceFloeTracker"); Pkg.add(url="https://github.com/WilhelmusLab/IceFloeTracker.jl", rev="main"); Pkg.instantiate()'
 
 # Test the package
 RUN julia --project="/opt/IFTPipeline.jl" -e 'using Pkg; Pkg.test();'
