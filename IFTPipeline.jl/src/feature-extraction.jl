@@ -48,16 +48,16 @@ julia> IFTPipeline.extractfeatures(bw_img; minarea=minarea, maxarea=maxarea, fea
 ```
 """
 function extractfeatures(
-    bw::T;
+    labeled_floes::AbstractArray{<:Integer};
     minarea::Int64=350,
     maxarea::Int64=90000,
     features::Union{Vector{Symbol},Vector{<:AbstractString}}
-)::DataFrame where {T<:AbstractArray{Bool}}
+)::DataFrame
     # assert the first area threshold is less than the second
     minarea >= maxarea &&
         throw(ArgumentError("The minimum area must be less than the maximum area."))
 
-    props = regionprops_table(label_components(bw, trues(3, 3)); properties=features)
+    props = regionprops_table(labeled_floes; properties=features)
 
     # filter by area using the area thresholds
     return props[minarea.<=props.area.<=maxarea, :]
@@ -94,11 +94,12 @@ end
 function extractfeatures_single(;
     input::String, output::String, minarea::Int64, maxarea::Int64, features::Array{String}
 )
-    @info "Loading segmented floes as a binarized image from $input"
-    segmented_floes = BitMatrix(FileIO.load(input))
+    @info "Loading segmented floes from $input"
+    image = FileIO.load(input)
+    labeled_floes = Int64.(reinterpret.(real.(image)))
 
     @info "Extracting features from each floe: $features"
-    props = IFTPipeline.extractfeatures(segmented_floes; minarea=minarea, maxarea=maxarea, features=features)
+    props = IFTPipeline.extractfeatures(labeled_floes; minarea=minarea, maxarea=maxarea, features=features)
 
     @info "Extracted properties:"
     @info props
