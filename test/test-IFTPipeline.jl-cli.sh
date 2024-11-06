@@ -40,17 +40,15 @@ for satellite in "aqua" "terra"
 do
     TRUECOLOR=20220914.${satellite}.truecolor.250m.tiff
     FALSECOLOR=20220914.${satellite}.falsecolor.250m.tiff
-    SEGMENTED=20220914.${satellite}.segmented.250m.tiff
-    FLOEPROPERTIES=20220914.${satellite}.segmented.250m.props.csv
+    LABELED=20220914.${satellite}.labeled.250m.tiff
+    FLOEPROPERTIES=20220914.${satellite}.labeled.250m.props.csv
     HDF5FILE=20220914.${satellite}.h5
-    ${IFT} preprocess_single --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --landmask ${LANDMASK_NON_DILATED} --landmask-dilated ${LANDMASK_DILATED} --output ${SEGMENTED}
-    ${IFT} extractfeatures_single --input ${SEGMENTED} --output ${FLOEPROPERTIES}
-    ${IFT} makeh5files_single --passtime "2022-09-14T12:00:00" --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --labeled ${SEGMENTED} --props ${FLOEPROPERTIES} --output ${HDF5FILE}
+    ${IFT} preprocess_single --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --landmask ${LANDMASK_NON_DILATED} --landmask-dilated ${LANDMASK_DILATED} --output ${LABELED}
+    ${IFT} extractfeatures_single --input ${LABELED} --output ${FLOEPROPERTIES}
+    ${IFT} makeh5files_single --passtime "2022-09-14T12:00:00" --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --labeled ${LABELED} --props ${FLOEPROPERTIES} --output ${HDF5FILE}
 done
 
-${IFT} track_single --imgs 20220914.{aqua,terra}.segmented.250m.tiff --props 20220914.{aqua,terra}.segmented.250m.props.csv --latlon ${TRUECOLOR} --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" --output paired-floes.csv
-
-
+${IFT} track_single --imgs 20220914.{aqua,terra}.labeled.250m.tiff --props 20220914.{aqua,terra}.labeled.250m.props.csv --latlon ${TRUECOLOR} --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" --output paired-floes.csv
 
 # Run the processing (batch)
 ${IFT} landmask ${DATA_TARGET} ${DATA_TARGET}
