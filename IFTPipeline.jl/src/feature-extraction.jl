@@ -108,3 +108,19 @@ function extractfeatures_single(;
     FileIO.save(output, props)
     return nothing
 end
+
+function load_labeled_img(path::AbstractString)
+    image = FileIO.load(path)
+    return image
+end
+
+function load_labeled_img(path::AbstractString, type::Type)
+    labeled_floes = load_labeled_img(path)
+    labeled_floes_cast = type.(labeled_floes)
+    return labeled_floes_cast
+end
+
+function save_labeled_img(image::AbstractArray, path::AbstractString)
+    image = FileIO.save(path, image)
+    return path
+end
