@@ -93,8 +93,8 @@ function track_single(;
     
     @info "Loading $props"
     props_ = [DataFrame(CSV.File(prop)) for prop in props]
-    # go through each of the props_ dataframes and convert each into the corresponding
-    # type from the image
+    # go through each of the props_ dataframes and convert each 
+    # into the element type from the corresponding image.
     for (img_, prop_) in zip(imgs_, props_)
         label_type = eltype(img_)
         @debug "converting labels to $label_type"
