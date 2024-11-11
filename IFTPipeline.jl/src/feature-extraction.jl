@@ -111,16 +111,31 @@ end
 
 function load_labeled_img(path::AbstractString)
     image = FileIO.load(path)
-    return image
-end
-
-function load_labeled_img(path::AbstractString, type::Type)
-    labeled_floes = load_labeled_img(path)
-    labeled_floes_cast = type.(labeled_floes)
-    return labeled_floes_cast
+    image_reinterpreted = convert_uint_from_gray(image)
+    return image_reinterpreted
 end
 
 function save_labeled_img(image::AbstractArray, path::AbstractString)
-    image = FileIO.save(path, image)
+    image_reinterpreted = convert_gray_from_uint(image)
+    FileIO.save(path, image_reinterpreted)
     return path
+end
+
+function convert_gray_from_uint(image::AbstractArray{T} where {T <: Union{UInt8, UInt16, UInt32, UInt64}})
+    if eltype(image) === UInt8
+        target_type = N0f8
+    elseif eltype(image) === UInt16
+        target_type = N0f16
+    elseif eltype(image) === UInt32
+        target_type = N0f32
+    elseif eltype(image) === UInt64
+        target_type = N0f64
+    end
+    image_reinterpreted  = Gray.(reinterpret.(target_type, image))
+    return image_reinterpreted
+end
+
+function convert_uint_from_gray(image)
+    image_reinterpreted = rawview(channelview(image))
+    return image_reinterpreted
 end
