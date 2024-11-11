@@ -89,6 +89,11 @@ function track_single(;
 
     # Load the files – can we drop the memory requirements by doing two at once?
     @info "Loading $imgs"
+    # We convert each of the images into Int so that it matches the type of the 
+    # `labels` column in the props, required for function dispatch later.
+    # An alternative which might be more memory efficient would be to
+    # go through each of the props_ dataframes and convert each into the corresponding
+    # type from the image
     imgs_ = [Int.(load_labeled_img(img)) for img in imgs]
 
     @info "Loading $props"
