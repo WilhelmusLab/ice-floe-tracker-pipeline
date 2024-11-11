@@ -4,26 +4,19 @@ using IFTPipeline: load_labeled_img, save_labeled_img
 function test_save_load(image::AbstractArray{T} where T <: Union{UInt8, UInt16, UInt32, UInt64}; extension::AbstractString=".tiff")
     
     filename = tempname() * extension
-    @info "filename: $filename"
     
-    # @info "original: $image"
-    
-    # @info "saving and loading the image"
     saved_image = save_labeled_img(image, filename)
     loaded_image = load_labeled_img(saved_image)
     
-    # @info "loaded: $loaded_image"
     @test isequal(image, loaded_image)
 end
 
 
 function test_cast_uncast(image::AbstractArray{T} where T <: Union{UInt8, UInt16, UInt32, UInt64})
     
-    # @info "casting and uncasting the image"
     casted_image = convert_gray_from_uint(image)
     uncasted_image = convert_uint_from_gray(casted_image)
     
-    # @info "loaded: $loaded_image"
     @test isequal(image, uncasted_image)
     @test isequal(eltype(image), eltype(uncasted_image))
 end
