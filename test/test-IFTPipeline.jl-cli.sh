@@ -21,8 +21,7 @@ echo "DATA_TARGET=${DATA_TARGET}"
 echo "DATA_SOURCE=${DATA_SOURCE}"
 
 cp -r ${DATA_SOURCE}/* ${DATA_TARGET}/
-cd ${DATA_TARGET}
-echo "in ${DATA_TARGET}"
+echo "in $(pwd)"
 
 SAMPLEIMG=20220914.terra.truecolor.250m.tiff
 
@@ -30,25 +29,46 @@ SAMPLEIMG=20220914.terra.truecolor.250m.tiff
 export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" 
 
 # Run the processing (single files)
-LANDMASK=landmask.tiff
-LANDMASK_NON_DILATED=landmask.non-dilated.tiff
-LANDMASK_DILATED=landmask.dilated.tiff
+LANDMASK=${DATA_TARGET}/landmask.tiff
+LANDMASK_NON_DILATED=${DATA_TARGET}/landmask.non-dilated.tiff
+LANDMASK_DILATED=${DATA_TARGET}/landmask.dilated.tiff
 
 ${IFT} landmask_single -i ${LANDMASK} -o ${LANDMASK_NON_DILATED} -d ${LANDMASK_DILATED}
 
 for satellite in "aqua" "terra"
 do
-    TRUECOLOR=20220914.${satellite}.truecolor.250m.tiff
-    FALSECOLOR=20220914.${satellite}.falsecolor.250m.tiff
-    LABELED=20220914.${satellite}.labeled.250m.tiff
-    FLOEPROPERTIES=20220914.${satellite}.labeled.250m.props.csv
-    HDF5FILE=20220914.${satellite}.h5
-    ${IFT} preprocess_single --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --landmask ${LANDMASK_NON_DILATED} --landmask-dilated ${LANDMASK_DILATED} --output ${LABELED}
-    ${IFT} extractfeatures_single --input ${LABELED} --output ${FLOEPROPERTIES}
-    ${IFT} makeh5files_single --passtime "2022-09-14T12:00:00" --truecolor ${TRUECOLOR} --falsecolor ${FALSECOLOR} --labeled ${LABELED} --props ${FLOEPROPERTIES} --output ${HDF5FILE}
+    TRUECOLOR=${DATA_TARGET}/20220914.${satellite}.truecolor.250m.tiff
+    FALSECOLOR=${DATA_TARGET}/20220914.${satellite}.falsecolor.250m.tiff
+    LABELED=${DATA_TARGET}/20220914.${satellite}.labeled.250m.tiff
+    FLOEPROPERTIES=${DATA_TARGET}/20220914.${satellite}.labeled.250m.props.csv
+    HDF5FILE=${DATA_TARGET}/20220914.${satellite}.h5
+    
+    ${IFT} preprocess_single \
+        --truecolor ${TRUECOLOR} \
+        --falsecolor ${FALSECOLOR} \
+        --landmask ${LANDMASK_NON_DILATED} \
+        --landmask-dilated ${LANDMASK_DILATED} \
+        --output ${LABELED}
+    
+    ${IFT} extractfeatures_single \
+        --input ${LABELED} \
+        --output ${FLOEPROPERTIES}
+    
+    ${IFT} makeh5files_single \
+        --passtime "2022-09-14T12:00:00" \
+        --truecolor ${TRUECOLOR} \
+        --falsecolor ${FALSECOLOR} \
+        --labeled ${LABELED} \
+        --props ${FLOEPROPERTIES} \
+        --output ${HDF5FILE}
 done
 
-${IFT} track_single --imgs 20220914.{aqua,terra}.labeled.250m.tiff --props 20220914.{aqua,terra}.labeled.250m.props.csv --latlon ${TRUECOLOR} --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" --output paired-floes.csv
+${IFT} track_single \
+    --imgs ${DATA_TARGET}/20220914.{aqua,terra}.labeled.250m.tiff \
+    --props ${DATA_TARGET}/20220914.{aqua,terra}.labeled.250m.props.csv \
+    --latlon ${TRUECOLOR} \
+    --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" \
+    --output ${DATA_TARGET}/paired-floes.csv
 
 # Run the processing (batch)
 ${IFT} landmask . .
