@@ -95,8 +95,7 @@ function extractfeatures_single(;
     input::String, output::String, minarea::Int64, maxarea::Int64, features::Array{String}
 )
     @info "Loading segmented floes from $input"
-    image = FileIO.load(input)
-    labeled_floes = Int64.(reinterpret.(real.(image)))
+    labeled_floes = Int.(load_labeled_img(input))
 
     @info "Extracting features from each floe: $features"
     props = IFTPipeline.extractfeatures(labeled_floes; minarea=minarea, maxarea=maxarea, features=features)
