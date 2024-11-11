@@ -1,0 +1,159 @@
+#!jinja2
+
+[scheduler]
+    allow implicit tasks = True
+
+[task parameters]
+    satellite = {{ SATELLITES | join(", ")}}
+
+[scheduling]
+    initial cycle point = {{ START }}
+    final cycle point = {{ END }}
+    [[graph]]
+        R1 = """
+            INIT 
+            INIT_soit => soit
+        """
+        P1D = """
+            INIT[^]:succeed-all & soit[^] => preprocess<satellite>
+            INIT[^]:succeed-all => FETCHDATA_truecolor<satellite> & FETCHDATA_falsecolor<satellite> & FETCHDATA_landmask & FETCHDATA_cloud<satellite> => preprocess<satellite> => cycle_end
+            FETCHDATA_soit_daily<satellite> => cycle_end
+            cycle_end[-P1D] => cycle_end
+            
+            preprocess<satellite> & FETCHDATA_soit_daily<satellite> => exportH5
+        """
+        R1/P0Y = cycle_end => tracking 
+
+
+[runtime]
+    [[root]]
+        [[[environment]]]
+            # Update these variables with your run parameters
+            date=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format CCYY-MM-DD)
+            date_without_dashes=${date//-/}
+            
+            results_dir = "${CYLC_WORKFLOW_SHARE_DIR}"
+            img_prefix = "${results_dir}/${date_without_dashes}.{{ SCALE }}m"
+            landmask_file = "${img_prefix}.landmask.tiff"
+            landmask_binarized_file = "${img_prefix}.landmask.binarized.tiff"
+            landmask_binarized_dilated_file = "${img_prefix}.landmask.binarized.dilated.tiff"
+
+            PASS_TIME="""pipx run --spec "git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool" soit"""
+            IFT="docker run -it brownccv/icefloetracker-julia"
+            FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg.git@main fsdproc --debug"
+
+    [[INIT]]
+    [[INIT_soit]]
+        inherit = INIT
+        script = """
+            ${PASS_TIME} --help
+        """
+    [[INIT_fsdproc]]
+        inherit = INIT
+        script = """
+            ${FSDPROC} --help
+        """
+    [[INIT_iftp]]
+        inherit = INIT
+        script = """
+            ${IFT} --help
+        """
+
+    [[soit]]
+        # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
+        script = """
+            ${PASS_TIME} --csvoutpath ${results_dir} \
+                --startdate {{ START }} --enddate {{ END }} \
+                --centroid-lat {{ CENTROID_LAT }} --centroid-lon {{ CENTROID_LON }} \
+                --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
+        """
+
+        
+    [[FETCHDATA]]
+        [[[environment]]]
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date}"
+    
+    [[FETCHDATA<satellite>]]
+        inherit = FETCHDATA
+        [[[environment]]]
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date}"
+            satellite=${CYLC_TASK_PARAM_satellite}
+            truecolor_file = ${img_prefix}.${satellite}.truecolor.tiff
+            falsecolor_file = ${img_prefix}.${satellite}.falsecolor.tiff
+            cloud_file = ${img_prefix}.${satellite}.cloud.tiff
+            segmented_floes_file = ${img_prefix}.${satellite}.segmented_floes.tiff
+            segmented_floes_props_file = ${img_prefix}.${satellite}.segmented_floes.props.csv
+            overpass_time_file = ${img_prefix}.${satellite}.overpass.txt
+            hdf5_archive_file = ${img_prefix}.${satellite}.results.h5
+    
+    [[FETCHDATA_soit_daily<satellite>]]
+    inherit = FETCHDATA<satellite>
+        script = """
+            isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format "CCYY-MM-DDThh:mm:ss" > ${overpass_time_file}
+        """
+    
+    [[FETCHDATA_truecolor<satellite>]]
+        inherit = FETCHDATA<satellite>
+        script = """
+            ${FSDPROC} load ${truecolor_file} --satellite ${satellite} --kind truecolor ${fsdprocargs}
+        """
+
+    [[FETCHDATA_falsecolor<satellite>]]
+        inherit = FETCHDATA<satellite>
+        script = """
+            ${FSDPROC} load ${falsecolor_file} --satellite ${satellite} --kind bands721 ${fsdprocargs} 
+        """
+
+    [[FETCHDATA_cloud<satellite>]]
+        inherit = FETCHDATA<satellite>
+        script = """
+            ${FSDPROC} load ${cloud_file} --satellite ${satellite} --kind cloud ${fsdprocargs}
+        """
+    
+    [[FETCHDATA_landmask]]
+        inherit = FETCHDATA
+        script="""
+            ${FSDPROC} load ${landmask_file} --kind landmask ${fsdprocargs}
+            ${IFT} landmask_single -i ${landmask_file} -o ${landmask_binarized_file} -d ${landmask_binarized_dilated_file}
+        """
+
+    [[preprocess<satellite>]]
+        inherit = FETCHDATA<satellite>
+        script = """
+            {% if PREPROCESSING == "Original" %}
+            ${IFT} preprocess_single -t ${truecolor_file} -r ${falsecolor_file} -l ${landmask_binarized_file} -d ${landmask_binarized_dilated_file} -o ${segmented_floes_file}
+            ${IFT} extractfeatures_single --input ${segmented_floes_file} --output ${segmented_floes_props_file} --minarea {{ MINFLOEAREA }} --maxarea {{ MAXFLOEAREA }}
+            
+            {% elif PREPROCESSING == "Buckley" %}
+            workdir="${segmented_floes_file}.work"
+            mkdir -p "${workdir}"
+            ${FSDPROC} process ${truecolor_file} ${cloud_file} ${landmask_file} ${workdir}
+            cp ${workdir}/final.tif ${segmented_floes_file}
+            cp ${workdir}/props.csv ${segmented_floes_props_file}
+            
+            {% endif %}
+        """
+    
+    [[exportH5<satellite>]]
+        inherit = FETCHDATA<satellite>
+        # Package intermediate and final outputs into HDF5 files
+        script = """
+        ${IFT} makeh5files_single \
+            --passtime $(cat ${overpass_time_file}) \
+            --truecolor ${truecolor_file} \
+            --falsecolor ${falsecolor_file} \
+            --labeled ${segmented_floes_file} \
+            --props ${segmented_floes_props_file} \
+            --output ${hdf5_archive_file}
+        """
+
+    [[tracking]]
+        # Pair and track identified floes across days
+        script = """
+            images=(${results_dir}/*.segmented_floes.tiff)
+            props=${images[@]/.tiff/.props.csv}
+            landmasks=(${results_dir}/*.landmask.tiff)
+            passtimes=${images[@]/.segmented_floes.tiff/.overpass.txt}
+
+            ${IFT} track_single --imgs ${images[@]} --props ${props[@]} --latlon ${landmasks[0]} --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') --output ${results_dir}/floes.tracked.csv
+        """
