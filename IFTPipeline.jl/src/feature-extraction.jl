@@ -166,5 +166,17 @@ See also: convert_gray_from_uint
 """
 function convert_uint_from_gray(image)
     image_reinterpreted = rawview(channelview(image))
-    return image_reinterpreted
+    element_type = eltype(image)
+    @info "$element_type"
+    if eltype(image) === Gray{N0f8}
+        target_type = UInt8
+    elseif eltype(image) === Gray{N0f16}
+        target_type = UInt16
+    elseif eltype(image) === Gray{N0f32}
+        target_type = UInt32
+    elseif eltype(image) === Gray{N0f64}
+        target_type = UInt64
+    end
+    image_recast = target_type.(image_reinterpreted)
+    return image_recast
 end
