@@ -296,7 +296,7 @@ function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_
     @debug "Labeled floes: $labeled_floes"
 
     @info "Writing segmented floes to $output"
-    FileIO.save(output, labeled_floes_cast)
+    save_labeled_img(labeled_floes_cast, output)
 
     return nothing
 end

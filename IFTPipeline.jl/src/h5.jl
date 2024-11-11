@@ -141,7 +141,7 @@ end
 function makeh5files_single(; passtime::DateTime, iftversion::Union{String, Nothing}=nothing, truecolor::String, falsecolor::String, labeled::String, props::String, output::String)
     latlondata = getlatlon(truecolor)
     ptsunix = Int64(Dates.datetime2unix(passtime))
-    labeled_ = Integer.(rawview(channelview((FileIO.load(labeled)))))
+    labeled_ = load_labeled_img(labeled)
 
     if isnothing(iftversion)
         iftversion = string(IceFloeTracker.IFTVERSION)

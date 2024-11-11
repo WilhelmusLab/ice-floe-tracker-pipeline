@@ -89,7 +89,7 @@ function track_single(;
 
     # Load the files – can we drop the memory requirements by doing two at once?
     @info "Loading $imgs"
-    imgs_ = [Int.(rawview(channelview((FileIO.load(img))))) for img in imgs]
+    imgs_ = [load_labeled_img(img) for img in imgs]
 
     @info "Loading $props"
     props_ = [DataFrame(CSV.File(prop)) for prop in props]
