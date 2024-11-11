@@ -48,7 +48,7 @@ julia> IFTPipeline.extractfeatures(bw_img; minarea=minarea, maxarea=maxarea, fea
 ```
 """
 function extractfeatures(
-    labeled_floes::AbstractArray{<:Integer};
+    floes::AbstractArray{<:Union{Integer,Bool}};
     minarea::Int64=350,
     maxarea::Int64=90000,
     features::Union{Vector{Symbol},Vector{<:AbstractString}}
@@ -57,7 +57,12 @@ function extractfeatures(
     minarea >= maxarea &&
         throw(ArgumentError("The minimum area must be less than the maximum area."))
 
-    props = regionprops_table(labeled_floes; properties=features)
+    if eltype(floes) == Bool
+        props = regionprops_table(label_components(floes, trues(3, 3)); properties=features)
+    else
+        props = regionprops_table(floes; properties=features)
+    end
+    @debug "loaded $props"
 
     # filter by area using the area thresholds
     return props[minarea.<=props.area.<=maxarea, :]
