@@ -51,9 +51,9 @@ done
 ${IFT} track_single --imgs 20220914.{aqua,terra}.labeled.250m.tiff --props 20220914.{aqua,terra}.labeled.250m.props.csv --latlon ${TRUECOLOR} --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" --output paired-floes.csv
 
 # Run the processing (batch)
-${IFT} landmask ${DATA_TARGET} ${DATA_TARGET}
-${IFT} preprocess -t ${DATA_TARGET} -r ${DATA_TARGET} -l ${DATA_TARGET} -p ${DATA_TARGET} -o ${DATA_TARGET}
-${IFT} extractfeatures -i ${DATA_TARGET} -o ${DATA_TARGET}
-${IFT} track --imgs ${DATA_TARGET} --props ${DATA_TARGET} --passtimes ${DATA_TARGET} --latlon ${SAMPLEIMG} -o ${DATA_TARGET}
-${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir ${DATA_TARGET}
+${IFT} landmask . .
+${IFT} preprocess -t . -r . -l . -p . -o .
+${IFT} extractfeatures -i . -o .
+${IFT} track --imgs . --props . --passtimes . --latlon ${SAMPLEIMG} -o .
+${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir .
 
