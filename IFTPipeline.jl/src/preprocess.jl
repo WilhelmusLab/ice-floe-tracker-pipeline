@@ -285,9 +285,8 @@ function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_
     rgb_truecolor_img = RGB.(truecolor_img)
     rgb_falsecolor_img = RGB.(falsecolor_img)
 
-    @info "Segmenting floes started"
+    @info "Segmenting floes"
     segmented_floes = preprocess(rgb_truecolor_img, rgb_falsecolor_img, landmask)
-    @debug "Segmenting floes complete: $segmented_floes"
 
     @info "Labeling floes"
     labeled_floes = label_components(segmented_floes)
