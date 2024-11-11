@@ -109,17 +109,39 @@ function extractfeatures_single(;
     return nothing
 end
 
+"""
+    load_labeled_img(path)
+
+Load an unsigned integer image from a file.
+
+See also: save_labeled_img
+"""
 function load_labeled_img(path::AbstractString)
     image = FileIO.load(path)
     image_reinterpreted = convert_uint_from_gray(image)
     return image_reinterpreted
 end
 
-function save_labeled_img(image::AbstractArray, path::AbstractString)
+"""
+    save_labeled_img(image, path)
+
+Save an unsigned integer image to an image file.
+
+See also: load_labeled_img
+"""
+function save_labeled_img(image::AbstractArray{T} where {T <: Union{UInt8, UInt16, UInt32, UInt64}}, path::AbstractString)
     image_reinterpreted = convert_gray_from_uint(image)
     FileIO.save(path, image_reinterpreted)
     return path
 end
+
+"""
+    convert_gray_from_uint(image)
+
+Convert an image from an unsigned integer format into a fixed-point Gray format.
+
+See also: convert_uint_from_gray
+"""
 
 function convert_gray_from_uint(image::AbstractArray{T} where {T <: Union{UInt8, UInt16, UInt32, UInt64}})
     if eltype(image) === UInt8
@@ -135,6 +157,13 @@ function convert_gray_from_uint(image::AbstractArray{T} where {T <: Union{UInt8,
     return image_reinterpreted
 end
 
+"""
+    convert_uint_from_gray(image)
+
+Convert an image from a fixed-point Gray format into unsigned integers.
+
+See also: convert_gray_from_uint
+"""
 function convert_uint_from_gray(image)
     image_reinterpreted = rawview(channelview(image))
     return image_reinterpreted
