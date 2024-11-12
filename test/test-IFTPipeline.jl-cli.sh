@@ -71,9 +71,9 @@ ${IFT} track_single \
     --output ${DATA_TARGET}/paired-floes.csv
 
 # Run the processing (batch)
-${IFT} landmask . .
-${IFT} preprocess -t . -r . -l . -p . -o .
-${IFT} extractfeatures -i . -o .
-${IFT} track --imgs . --props . --passtimes . --latlon ${SAMPLEIMG} -o .
-${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir .
+${IFT} landmask ${DATA_TARGET} ${DATA_TARGET}
+${IFT} preprocess -t ${DATA_TARGET} -r ${DATA_TARGET} -l ${DATA_TARGET} -p ${DATA_TARGET} -o ${DATA_TARGET}
+${IFT} extractfeatures -i ${DATA_TARGET} -o ${DATA_TARGET}
+${IFT} track --imgs ${DATA_TARGET} --props ${DATA_TARGET} --passtimes ${DATA_TARGET} --latlon ${SAMPLEIMG} -o ${DATA_TARGET}
+${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir ${DATA_TARGET}
 
