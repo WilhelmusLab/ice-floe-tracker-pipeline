@@ -42,7 +42,7 @@
 
             PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
             FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg.git@main fsdproc --debug"
-            IFT="docker run -v `pwd`:/app -w /app -t brownccv/icefloetracker-julia"
+            IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"   
 
     [[INIT]]
     [[INIT_soit]]
