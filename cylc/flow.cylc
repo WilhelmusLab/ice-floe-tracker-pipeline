@@ -64,7 +64,7 @@
     [[soit]]
         # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
         script = """
-            ${PASS_TIME} --csvoutpath ${results_dir} \
+            ${PASS_TIME} --csvoutpath . \
                 --startdate {{ START }} --enddate {{ END }} \
                 --centroid-lat {{ CENTROID_LAT }} --centroid-lon {{ CENTROID_LON }} \
                 --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
