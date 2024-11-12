@@ -27,13 +27,15 @@
 
 [runtime]
     [[root]]
+        
+        work sub-directory = ${CYLC_WORKFLOW_SHARE_DIR}
+        
         [[[environment]]]
             # Update these variables with your run parameters
             date=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format CCYY-MM-DD)
             date_without_dashes=${date//-/}
             
-            results_dir = "${CYLC_WORKFLOW_SHARE_DIR}"
-            img_prefix = "${results_dir}/${date_without_dashes}.{{ SCALE }}m"
+            img_prefix = "${date_without_dashes}.{{ SCALE }}m"
             landmask_file = "${img_prefix}.landmask.tiff"
             landmask_binarized_file = "${img_prefix}.landmask.binarized.tiff"
             landmask_binarized_dilated_file = "${img_prefix}.landmask.binarized.dilated.tiff"
