@@ -31,5 +31,5 @@ PyCall = "1.96"
 TOML = "1.0"
 
 [source.IceFloeTracker]
-rev = "main"
+rev = "fix-sort-shadowing"
 url = "https://github.com/WilhelmusLab/IceFloeTracker.jl"
