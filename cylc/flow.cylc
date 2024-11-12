@@ -42,7 +42,7 @@
 
             PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
             FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg.git@main fsdproc --debug"
-            IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"   
+            IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
 
     [[INIT]]
     [[INIT_soit]]
@@ -152,10 +152,10 @@
     [[tracking]]
         # Pair and track identified floes across days
         script = """
-            images=(${results_dir}/*.segmented_floes.tiff)
+            images=(*.segmented_floes.tiff)
             props=${images[@]/.tiff/.props.csv}
-            landmasks=(${results_dir}/*.landmask.tiff)
+            landmasks=(*.landmask.tiff)
             passtimes=${images[@]/.segmented_floes.tiff/.overpass.txt}
 
-            ${IFT} track_single --imgs ${images[@]} --props ${props[@]} --latlon ${landmasks[0]} --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') --output ${results_dir}/floes.tracked.csv
+            ${IFT} track_single --imgs ${images[@]} --props ${props[@]} --latlon ${landmasks[0]} --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') --output floes.tracked.csv
         """
