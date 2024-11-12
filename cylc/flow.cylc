@@ -28,7 +28,7 @@
 [runtime]
     [[root]]
         
-        work sub-directory = ${CYLC_WORKFLOW_SHARE_DIR}
+        work sub-directory = .
         
         [[[environment]]]
             # Update these variables with your run parameters
