@@ -62,7 +62,6 @@
                 --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
         """
 
-        
     [[<satellite>]]
         [[[environment]]]
             fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date}"
