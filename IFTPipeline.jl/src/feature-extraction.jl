@@ -133,7 +133,7 @@ Save an unsigned integer image to an image file.
 
 See also: load_labeled_img
 """
-function save_labeled_img(image::AbstractArray{T} where {T <: Union{UInt8, UInt16, UInt32, UInt64}}, path::AbstractString)
+function save_labeled_img(image::AbstractArray{<:Integer}, path::AbstractString)
     image_reinterpreted = convert_gray_from_uint(image)
     FileIO.save(path, image_reinterpreted)
     return path
@@ -147,15 +147,26 @@ Convert an image from an unsigned integer format into a fixed-point Gray format.
 See also: convert_uint_from_gray
 """
 
-function convert_gray_from_uint(image::AbstractArray{T} where {T <: Union{UInt8, UInt16, UInt32, UInt64}})
+function convert_gray_from_uint(image::AbstractArray{<:Integer})
     if eltype(image) === UInt8
         target_type = N0f8
+    elseif eltype(image) === Int8
+        target_type = Q0f7
     elseif eltype(image) === UInt16
         target_type = N0f16
+    elseif eltype(image) === Int16
+        target_type = Q0f15
     elseif eltype(image) === UInt32
         target_type = N0f32
+    elseif eltype(image) === Int32
+        target_type = Q0f31
     elseif eltype(image) === UInt64
         target_type = N0f64
+    elseif eltype(image) === Int64
+        target_type = Q0f63   
+    else
+        _elt = eltype(image)
+        @warn "missing mapping for _elt"
     end
     image_reinterpreted  = Gray.(reinterpret.(target_type, image))
     return image_reinterpreted
@@ -164,7 +175,7 @@ end
 """
     convert_uint_from_gray(image)
 
-Convert an image from a fixed-point Gray format into unsigned integers.
+Convert an image from a fixed-point Gray format into integers.
 
 See also: convert_gray_from_uint
 """
@@ -174,12 +185,23 @@ function convert_uint_from_gray(image)
     @info "$element_type"
     if eltype(image) === Gray{N0f8}
         target_type = UInt8
+    elseif eltype(image) === Gray{Q0f7}
+        target_type = Int8
     elseif eltype(image) === Gray{N0f16}
         target_type = UInt16
+    elseif eltype(image) === Gray{Q0f15}
+        target_type = Int16
     elseif eltype(image) === Gray{N0f32}
         target_type = UInt32
+    elseif eltype(image) === Gray{Q0f31}
+        target_type = Int32
     elseif eltype(image) === Gray{N0f64}
         target_type = UInt64
+    elseif eltype(image) === Gray{Q0f63}
+        target_type = Int64
+    else
+        _elt = eltype(image)
+        @warn "missing mapping for _elt"
     end
     image_recast = target_type.(image_reinterpreted)
     return image_recast
