@@ -15,12 +15,9 @@
             INIT_soit => soit
         """
         P1D = """
-            INIT[^]:succeed-all & soit[^] => preprocess<satellite>
-            INIT[^]:succeed-all => FETCHDATA_truecolor<satellite> & FETCHDATA_falsecolor<satellite> & FETCHDATA_landmask & FETCHDATA_cloud<satellite> => preprocess<satellite> => cycle_end
-            FETCHDATA_soit_daily<satellite> => cycle_end
+            INIT[^]:succeed-all => FETCHDATA<satellite>:succeed-all => preprocess<satellite> => cycle_end
+            preprocess<satellite> & FETCHDATA_soit_daily<satellite> => exportH5 => cycle_end
             cycle_end[-P1D] => cycle_end
-            
-            preprocess<satellite> & FETCHDATA_soit_daily<satellite> => exportH5
         """
         R1/P0Y = cycle_end => tracking 
 
@@ -71,25 +68,32 @@
         """
 
         
-    [[FETCHDATA]]
+    [[<satellite>]]
         [[[environment]]]
             fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date}"
+            
+            satellite=${CYLC_TASK_PARAM_satellite}
+            img_prefix = "${date_without_dashes}.{{ SCALE }}m.${satellite}/"
+
+            landmask_file = "${img_prefix}landmask.tiff"
+            landmask_binarized_file = "${img_prefix}landmask.binarized.tiff"
+            landmask_binarized_dilated_file = "${img_prefix}landmask.binarized.dilated.tiff"
+            truecolor_file = ${img_prefix}truecolor.tiff
+            falsecolor_file = ${img_prefix}falsecolor.tiff
+            cloud_file = ${img_prefix}cloud.tiff
+            segmented_floes_file = ${img_prefix}segmented_floes.tiff
+            segmented_floes_props_file = ${img_prefix}segmented_floes.props.csv
+            overpass_time_file = ${img_prefix}overpass.txt
+            hdf5_archive_file = ${img_prefix}results.h5
     
     [[FETCHDATA<satellite>]]
-        inherit = FETCHDATA
-        [[[environment]]]
-            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date}"
-            satellite=${CYLC_TASK_PARAM_satellite}
-            truecolor_file = ${img_prefix}.${satellite}.truecolor.tiff
-            falsecolor_file = ${img_prefix}.${satellite}.falsecolor.tiff
-            cloud_file = ${img_prefix}.${satellite}.cloud.tiff
-            segmented_floes_file = ${img_prefix}.${satellite}.segmented_floes.tiff
-            segmented_floes_props_file = ${img_prefix}.${satellite}.segmented_floes.props.csv
-            overpass_time_file = ${img_prefix}.${satellite}.overpass.txt
-            hdf5_archive_file = ${img_prefix}.${satellite}.results.h5
+        inherit = <satellite>
+        pre-script = """
+            mkdir -p ${img_prefix}
+        """
     
     [[FETCHDATA_soit_daily<satellite>]]
-    inherit = FETCHDATA<satellite>
+        inherit = FETCHDATA<satellite>
         script = """
             isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format "CCYY-MM-DDThh:mm:ss" > ${overpass_time_file}
         """
@@ -112,15 +116,15 @@
             ${FSDPROC} load ${cloud_file} --satellite ${satellite} --kind cloud ${fsdprocargs}
         """
     
-    [[FETCHDATA_landmask]]
-        inherit = FETCHDATA
+    [[FETCHDATA_landmask<satellite>]]
+        inherit = FETCHDATA<satellite>
         script="""
             ${FSDPROC} load ${landmask_file} --kind landmask ${fsdprocargs}
             ${IFT} landmask_single -i ${landmask_file} -o ${landmask_binarized_file} -d ${landmask_binarized_dilated_file}
         """
 
     [[preprocess<satellite>]]
-        inherit = FETCHDATA<satellite>
+        inherit = <satellite>
         script = """
             {% if PREPROCESSING == "Original" %}
             ${IFT} preprocess_single -t ${truecolor_file} -r ${falsecolor_file} -l ${landmask_binarized_file} -d ${landmask_binarized_dilated_file} -o ${segmented_floes_file}
@@ -137,7 +141,7 @@
         """
     
     [[exportH5<satellite>]]
-        inherit = FETCHDATA<satellite>
+        inherit = <satellite>
         # Package intermediate and final outputs into HDF5 files
         script = """
         ${IFT} makeh5files_single \
