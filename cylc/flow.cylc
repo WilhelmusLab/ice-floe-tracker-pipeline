@@ -31,11 +31,6 @@
             # Update these variables with your run parameters
             date=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format CCYY-MM-DD)
             date_without_dashes=${date//-/}
-            
-            img_prefix = "${date_without_dashes}.{{ SCALE }}m"
-            landmask_file = "${img_prefix}.landmask.tiff"
-            landmask_binarized_file = "${img_prefix}.landmask.binarized.tiff"
-            landmask_binarized_dilated_file = "${img_prefix}.landmask.binarized.dilated.tiff"
 
             PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
             FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg.git@main fsdproc --debug"
