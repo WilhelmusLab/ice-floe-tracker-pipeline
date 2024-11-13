@@ -11,6 +11,10 @@
 : "${IFT:=julia --project=`pwd`/../IFTPipeline.jl `pwd`/../IFTPipeline.jl/src/cli.jl}"
 echo "IFT=${IFT}"
 
+: "${FSDPROC:="pipx run --spec /workspaces/ice-floe-tracker-workspace/ebseg fsdproc --debug"}"
+echo "FSDPROC=${FSDPROC}"
+
+
 # Data target
 TEMPDIR=$(mktemp -d -p .)
 : "${DATA_TARGET:=$TEMPDIR}"
@@ -33,26 +37,64 @@ LANDMASK=${DATA_TARGET}/landmask.tiff
 LANDMASK_NON_DILATED=${DATA_TARGET}/landmask.non-dilated.tiff
 LANDMASK_DILATED=${DATA_TARGET}/landmask.dilated.tiff
 
-${IFT} landmask_single -i ${LANDMASK} -o ${LANDMASK_NON_DILATED} -d ${LANDMASK_DILATED}
+# ${IFT} landmask_single -i ${LANDMASK} -o ${LANDMASK_NON_DILATED} -d ${LANDMASK_DILATED}
 
+# for satellite in "aqua" "terra"
+# do
+#     TRUECOLOR=${DATA_TARGET}/20220914.${satellite}.truecolor.250m.tiff
+#     FALSECOLOR=${DATA_TARGET}/20220914.${satellite}.falsecolor.250m.tiff
+#     LABELED=${DATA_TARGET}/20220914.${satellite}.labeled.250m.tiff
+#     FLOEPROPERTIES=${DATA_TARGET}/20220914.${satellite}.labeled.250m.props.csv
+#     HDF5FILE=${DATA_TARGET}/20220914.${satellite}.h5
+    
+#     ${IFT} preprocess_single \
+#         --truecolor ${TRUECOLOR} \
+#         --falsecolor ${FALSECOLOR} \
+#         --landmask ${LANDMASK_NON_DILATED} \
+#         --landmask-dilated ${LANDMASK_DILATED} \
+#         --output ${LABELED}
+    
+#     ${IFT} extractfeatures_single \
+#         --input ${LABELED} \
+#         --output ${FLOEPROPERTIES}
+    
+#     ${IFT} makeh5files_single \
+#         --passtime "2022-09-14T12:00:00" \
+#         --truecolor ${TRUECOLOR} \
+#         --falsecolor ${FALSECOLOR} \
+#         --labeled ${LABELED} \
+#         --props ${FLOEPROPERTIES} \
+#         --output ${HDF5FILE}
+# done
+
+# ${IFT} track_single \
+#     --imgs ${DATA_TARGET}/20220914.{aqua,terra}.labeled.250m.tiff \
+#     --props ${DATA_TARGET}/20220914.{aqua,terra}.labeled.250m.props.csv \
+#     --latlon ${TRUECOLOR} \
+#     --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" \
+#     --output ${DATA_TARGET}/paired-floes.csv
+
+# # Run the processing (batch)
+# ${IFT} landmask ${DATA_TARGET} ${DATA_TARGET}
+# ${IFT} preprocess -t ${DATA_TARGET} -r ${DATA_TARGET} -l ${DATA_TARGET} -p ${DATA_TARGET} -o ${DATA_TARGET}
+# ${IFT} extractfeatures -i ${DATA_TARGET} -o ${DATA_TARGET}
+# ${IFT} track --imgs ${DATA_TARGET} --props ${DATA_TARGET} --passtimes ${DATA_TARGET} --latlon ${SAMPLEIMG} -o ${DATA_TARGET}
+# ${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir ${DATA_TARGET}
+
+# Run the processing (Buckley)
 for satellite in "aqua" "terra"
 do
     TRUECOLOR=${DATA_TARGET}/20220914.${satellite}.truecolor.250m.tiff
     FALSECOLOR=${DATA_TARGET}/20220914.${satellite}.falsecolor.250m.tiff
-    LABELED=${DATA_TARGET}/20220914.${satellite}.labeled.250m.tiff
-    FLOEPROPERTIES=${DATA_TARGET}/20220914.${satellite}.labeled.250m.props.csv
-    HDF5FILE=${DATA_TARGET}/20220914.${satellite}.h5
+    CLOUD=${DATA_TARGET}/20220914.${satellite}.cloud.250m.tiff
+    LABELED_DIR=${DATA_TARGET}/20220914.${satellite}.labeled-buckley.250m.tiff.work
+    LABELED=${DATA_TARGET}/20220914.${satellite}.labeled-buckley.250m.tiff
+    FLOEPROPERTIES=${DATA_TARGET}/20220914.${satellite}.labeled-buckley.250m.props.csv
+    HDF5FILE=${DATA_TARGET}/20220914.${satellite}.buckley.h5
     
-    ${IFT} preprocess_single \
-        --truecolor ${TRUECOLOR} \
-        --falsecolor ${FALSECOLOR} \
-        --landmask ${LANDMASK_NON_DILATED} \
-        --landmask-dilated ${LANDMASK_DILATED} \
-        --output ${LABELED}
-    
-    ${IFT} extractfeatures_single \
-        --input ${LABELED} \
-        --output ${FLOEPROPERTIES}
+    ${FSDPROC} process ${TRUECOLOR} ${CLOUD} ${LANDMASK} ${LABELED_DIR}
+    cp ${LABELED_DIR}/final.tif ${LABELED}
+    cp ${LABELED_DIR}/props.csv ${FLOEPROPERTIES}
     
     ${IFT} makeh5files_single \
         --passtime "2022-09-14T12:00:00" \
@@ -64,16 +106,8 @@ do
 done
 
 ${IFT} track_single \
-    --imgs ${DATA_TARGET}/20220914.{aqua,terra}.labeled.250m.tiff \
-    --props ${DATA_TARGET}/20220914.{aqua,terra}.labeled.250m.props.csv \
+    --imgs ${DATA_TARGET}/20220914.{aqua,terra}.labeled-buckley.250m.tiff \
+    --props ${DATA_TARGET}/20220914.{aqua,terra}.labeled-buckley.250m.props.csv \
     --latlon ${TRUECOLOR} \
     --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" \
-    --output ${DATA_TARGET}/paired-floes.csv
-
-# Run the processing (batch)
-${IFT} landmask ${DATA_TARGET} ${DATA_TARGET}
-${IFT} preprocess -t ${DATA_TARGET} -r ${DATA_TARGET} -l ${DATA_TARGET} -p ${DATA_TARGET} -o ${DATA_TARGET}
-${IFT} extractfeatures -i ${DATA_TARGET} -o ${DATA_TARGET}
-${IFT} track --imgs ${DATA_TARGET} --props ${DATA_TARGET} --passtimes ${DATA_TARGET} --latlon ${SAMPLEIMG} -o ${DATA_TARGET}
-${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir ${DATA_TARGET}
-
+    --output ${DATA_TARGET}/paired-floes-buckley.csv
