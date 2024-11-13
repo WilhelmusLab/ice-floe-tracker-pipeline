@@ -1,3 +1,9 @@
+[install]
+    [[symlink dirs]]
+        [[[localhost]]]
+            run = /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/cylc/run
+
 [platforms]
     [[localhost]]
         max batch submit size = 4
+        
