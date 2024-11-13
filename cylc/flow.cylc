@@ -156,10 +156,15 @@
     [[tracking]]
         # Pair and track identified floes across days
         script = """
-            images=(*.segmented_floes.tiff)
+            images=(*/segmented_floes.tiff)
             props=${images[@]/.tiff/.props.csv}
-            landmasks=(*.landmask.tiff)
-            passtimes=${images[@]/.segmented_floes.tiff/.overpass.txt}
+            landmasks=(*/landmask.tiff)
+            passtimes=${images[@]/segmented_floes.tiff/overpass.txt}
 
-            ${IFT} track_single --imgs ${images[@]} --props ${props[@]} --latlon ${landmasks[0]} --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') --output floes.tracked.csv
+            ${IFT} track_single \
+                --imgs ${images[@]} \
+                --props ${props[@]} \
+                --latlon ${landmasks[0]} \
+                --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') \
+                --output floes.tracked.csv
         """
