@@ -23,6 +23,10 @@
         R1/P0Y = done => tracking 
 
     [[queues]]
+        [[[fetchdata]]]
+            limit = 4
+            members = FETCHDATA
+        
         [[[preprocess]]]
             limit = 1
             members = PREPROCESS
