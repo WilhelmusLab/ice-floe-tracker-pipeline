@@ -32,6 +32,7 @@
     [[root]]
         
         work sub-directory = .
+        execution retry delays = PT15S, PT10M, PT1H, PT3H
         
         [[[environment]]]
             # Update these variables with your run parameters
