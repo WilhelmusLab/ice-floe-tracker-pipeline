@@ -12,5 +12,8 @@ cylc vip . --set-file example/beaufort-sea-march.conf -n beaufort-sea-march-buck
 cylc vip . --set-file example/fram-strait-june.conf -n fram-strait-june-original -s 'PREPROCESSING="Original"'
 cylc vip . --set-file example/fram-strait-june.conf -n fram-strait-june-buckley -s 'PREPROCESSING="Buckley"'
 
+cylc vip . --set-file example/fram-strait-april-may-2020.conf -n fram-strait-april-may-2020-original -s 'PREPROCESSING="Original"'
+cylc vip . --set-file example/fram-strait-april-may-2020.conf -n fram-strait-april-may-2020-buckley -s 'PREPROCESSING="Buckley"'
+
 cylc vip . --set-file example/ne-greenland.conf -n ne-greenland-original -s 'PREPROCESSING="Original"'
 cylc vip . --set-file example/ne-greenland.conf -n ne-greenland-buckley -s 'PREPROCESSING="Buckley"'
