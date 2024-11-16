@@ -12,7 +12,7 @@
     [[graph]]
         R1 = """
             INIT 
-            INIT_soit => soit
+            init_soit => soit
         """
         P1D = """
             INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all
@@ -49,17 +49,17 @@
             COLORIZE = "pipx run --spec /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/label-colorizer colorize"
 
     [[INIT]]
-    [[INIT_soit]]
+    [[init_soit]]
         inherit = INIT
         script = """
             ${PASS_TIME} --help
         """
-    [[INIT_fsdproc]]
+    [[init_fsdproc]]
         inherit = INIT
         script = """
             ${FSDPROC} --help
         """
-    [[INIT_iftp]]
+    [[init_iftp]]
         inherit = INIT
         script = """
             ${IFT} --help
@@ -98,31 +98,31 @@
     
     [[LOAD]]
 
-    [[LOAD_soit_daily<satellite>]]
+    [[load_soit_daily<satellite>]]
         inherit = LOAD, <satellite>
         script = """
             isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format "CCYY-MM-DDThh:mm:ss" > ${overpass_time_file}
         """
     
-    [[LOAD_truecolor<satellite>]]
+    [[load_truecolor<satellite>]]
         inherit = LOAD, <satellite>
         script = """
             ${FSDPROC} load ${truecolor_file} --satellite ${satellite} --kind truecolor ${fsdprocargs}
         """
 
-    [[LOAD_falsecolor<satellite>]]
+    [[load_falsecolor<satellite>]]
         inherit = LOAD, <satellite>
         script = """
             ${FSDPROC} load ${falsecolor_file} --satellite ${satellite} --kind bands721 ${fsdprocargs} 
         """
 
-    [[LOAD_cloud<satellite>]]
+    [[load_cloud<satellite>]]
         inherit = LOAD, <satellite>
         script = """
             ${FSDPROC} load ${cloud_file} --satellite ${satellite} --kind cloud ${fsdprocargs}
         """
     
-    [[LOAD_landmask<satellite>]]
+    [[load_landmask<satellite>]]
         inherit = LOAD, <satellite>
         script="""
             ${FSDPROC} load ${landmask_file} --kind landmask ${fsdprocargs}
