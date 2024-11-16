@@ -64,7 +64,7 @@
 
     [[<satellite>]]
         [[[environment]]]
-            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date}"
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --date ${date}"
             
             satellite=${CYLC_TASK_PARAM_satellite}
             img_prefix = "${date_without_dashes}.{{ SCALE }}m.${satellite}/"
