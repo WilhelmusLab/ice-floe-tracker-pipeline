@@ -15,8 +15,8 @@
             INIT_soit => soit
         """
         P1D = """
-            INIT[^]:succeed-all => FETCHDATA:succeed-all => PREPROCESS:succeed-all
-            FETCHDATA:succeed-all & PREPROCESS:succeed-all => done & exportH5
+            INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all
+            LOAD:succeed-all & PREPROCESS:succeed-all => done & exportH5
             done[-P1D] => done
 
         """
@@ -25,7 +25,7 @@
     [[queues]]
         [[[fetchdata]]]
             limit = 4
-            members = FETCHDATA
+            members = LOAD
         
         [[[preprocess]]]
             limit = 1
@@ -43,6 +43,9 @@
             date_without_dashes=${date//-/}
 
             PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
+            FSDPROC="fsdproc --debug"
+            #IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
+            IFT="julia --project=/workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl/src/cli.jl"
             COLORIZE = "pipx run --spec /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/label-colorizer colorize"
 
     [[INIT]]
@@ -93,34 +96,34 @@
             overpass_time_file = ${img_prefix}overpass.txt
             hdf5_archive_file = ${img_prefix}results.h5
     
-    [[FETCHDATA]]
+    [[LOAD]]
 
-    [[FETCHDATA_soit_daily<satellite>]]
-        inherit = FETCHDATA, <satellite>
+    [[LOAD_soit_daily<satellite>]]
+        inherit = LOAD, <satellite>
         script = """
             isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format "CCYY-MM-DDThh:mm:ss" > ${overpass_time_file}
         """
     
-    [[FETCHDATA_truecolor<satellite>]]
-        inherit = FETCHDATA, <satellite>
+    [[LOAD_truecolor<satellite>]]
+        inherit = LOAD, <satellite>
         script = """
             ${FSDPROC} load ${truecolor_file} --satellite ${satellite} --kind truecolor ${fsdprocargs}
         """
 
-    [[FETCHDATA_falsecolor<satellite>]]
-        inherit = FETCHDATA, <satellite>
+    [[LOAD_falsecolor<satellite>]]
+        inherit = LOAD, <satellite>
         script = """
             ${FSDPROC} load ${falsecolor_file} --satellite ${satellite} --kind bands721 ${fsdprocargs} 
         """
 
-    [[FETCHDATA_cloud<satellite>]]
-        inherit = FETCHDATA, <satellite>
+    [[LOAD_cloud<satellite>]]
+        inherit = LOAD, <satellite>
         script = """
             ${FSDPROC} load ${cloud_file} --satellite ${satellite} --kind cloud ${fsdprocargs}
         """
     
-    [[FETCHDATA_landmask<satellite>]]
-        inherit = FETCHDATA, <satellite>
+    [[LOAD_landmask<satellite>]]
+        inherit = LOAD, <satellite>
         script="""
             ${FSDPROC} load ${landmask_file} --kind landmask ${fsdprocargs}
             ${IFT} landmask_single -i ${landmask_file} -o ${landmask_binarized_file} -d ${landmask_binarized_dilated_file}
