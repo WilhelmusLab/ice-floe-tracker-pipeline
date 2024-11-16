@@ -39,8 +39,7 @@
             date_without_dashes=${date//-/}
 
             PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
-            FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg.git@main fsdproc --debug"
-            IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
+            COLORIZE = "pipx run --spec /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/label-colorizer colorize"
 
     [[INIT]]
     [[INIT_soit]]
@@ -141,6 +140,8 @@
             cp ${workdir}/props.csv ${segmented_floes_props_file}
             
             {% endif %}
+
+            ${COLORIZE} ${segmented_floes_file} ${colorized_segmented_floes_file}
         """
     
     [[exportH5<satellite>]]
