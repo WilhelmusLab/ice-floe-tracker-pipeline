@@ -4,7 +4,6 @@ import typer
 import pathlib
 import rasterio
 import numpy as np
-import copy
 from rasterio.enums import ColorInterp
 import colorsys
 
@@ -26,7 +25,7 @@ def main(input_path: pathlib.Path, output_path: pathlib.Path, mask_value: int = 
         rgba_values = {
             i: (*colorsys.hsv_to_rgb(*hsv_tuples[i]), 1) for i in all_values
         }
-        rgba_values[0] = (0, 0, 0, 0)
+        rgba_values[mask_value] = (0, 0, 0, 0)
 
         red = np.zeros(band1.shape)
         green = np.zeros(band1.shape)
@@ -50,4 +49,4 @@ def main(input_path: pathlib.Path, output_path: pathlib.Path, mask_value: int = 
             out_dataset.write(alpha, 4)
 
 if __name__ == "__main__":
-    main("/workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/test/tmp.hLPKdYZrDk/labeled.tiff", "/workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/test/tmp.hLPKdYZrDk/relabeled.tiff")
+    app()
