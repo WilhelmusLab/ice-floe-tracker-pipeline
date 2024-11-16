@@ -6,6 +6,7 @@ import rasterio
 import numpy as np
 from rasterio.enums import ColorInterp
 import colorsys
+import tqdm
 
 app = typer.Typer()
 
@@ -38,7 +39,7 @@ def main(
         blue = np.zeros(band1.shape)
         alpha = np.zeros(band1.shape)
 
-        for (x, y), value in np.ndenumerate(band1):
+        for (x, y), value in tqdm.tqdm(np.ndenumerate(band1), total=np.prod(band1.shape)):
             rgba = rgba_values[value]
             red[x, y] = int(255 * rgba[0])
             green[x, y] = int(255 * rgba[1])
