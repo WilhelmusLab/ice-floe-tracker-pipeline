@@ -35,7 +35,6 @@
 [runtime]
     [[root]]
         work sub-directory = .
-        execution retry delays = PT15S, PT10M, PT1H, PT3H
         
         [[[environment]]]
             # Update these variables with your run parameters
@@ -66,7 +65,7 @@
         """
 
     [[soit]]
-        # Convert param lists to indexable bash arrays and fetch Aqua and Terra satellite times for each location
+        execution retry delays = PT15S, PT10M, PT1H, PT3H
         script = """
             ${PASS_TIME} --csvoutpath . \
                 --startdate {{ START }} --enddate {{ END }} \
@@ -97,6 +96,7 @@
             hdf5_archive_file = ${img_prefix}results.h5
     
     [[LOAD]]
+        execution retry delays = PT15S, PT10M, PT1H, PT3H
 
     [[load_soit_daily<satellite>]]
         inherit = LOAD, <satellite>
@@ -130,6 +130,7 @@
         """
 
     [[PREPROCESS]]
+        execution retry delays = PT10M
 
     [[preprocess<satellite>]]
         inherit = PREPROCESS, <satellite>
@@ -165,6 +166,7 @@
         """
 
     [[tracking]]
+        execution retry delays = PT10M
         # Pair and track identified floes across days
         script = """
             images=(*/segmented_floes.tiff)
