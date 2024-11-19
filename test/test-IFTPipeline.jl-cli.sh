@@ -19,6 +19,8 @@
 echo "IFT=${IFT}"
 : "${FSDPROC:=pipx run --spec /workspaces/ice-floe-tracker-workspace/ebseg fsdproc --debug}"
 echo "FSDPROC=${FSDPROC}"
+: "${COLORIZE:=pipx run --spec `pwd`/../label-colorizer/ colorize }"
+echo "COLORIZE=${COLORIZE}"
 
 # Set up debug messages
 export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" 
@@ -51,6 +53,7 @@ preprocess_original () {
     TRUECOLOR=${DATA_TARGET}/truecolor.tiff
     FALSECOLOR=${DATA_TARGET}/falsecolor.tiff
     LABELED=${DATA_TARGET}/labeled.tiff
+    COLORIZED=${DATA_TARGET}/labeled.colorized.tiff
     FLOEPROPERTIES=${DATA_TARGET}/labeled.props.csv
     HDF5FILE=${DATA_TARGET}/results.h5
     OVERPASS=${DATA_TARGET}/overpass.txt
@@ -70,6 +73,8 @@ preprocess_original () {
     ${IFT} extractfeatures_single \
         --input ${LABELED} \
         --output ${FLOEPROPERTIES}
+
+    ${COLORIZE} ${LABELED} ${COLORIZED}
     
     ${IFT} makeh5files_single \
         --passtime `cat ${OVERPASS}` \
@@ -86,9 +91,11 @@ preprocess_buckley () {
     initialize_test_directory $1 $2
 
     TRUECOLOR=${DATA_TARGET}/truecolor.tiff
+    FALSECOLOR=${DATA_TARGET}/falsecolor.tiff
     CLOUD=${DATA_TARGET}/cloud.tiff
     LANDMASK=${DATA_TARGET}/landmask.tiff
     LABELED=${DATA_TARGET}/labeled.tiff
+    COLORIZED=${DATA_TARGET}/labeled.colorized.tiff
     LABELEDDIR=${LABELED}.work/
     FLOEPROPERTIES=${DATA_TARGET}/labeled.props.csv
     HDF5FILE=${DATA_TARGET}/results.h5
@@ -97,6 +104,7 @@ preprocess_buckley () {
     ${FSDPROC} process ${TRUECOLOR} ${CLOUD} ${LANDMASK} ${LABELEDDIR}
     cp ${LABELEDDIR}/final.tif ${LABELED}
     cp ${LABELEDDIR}/props.csv ${FLOEPROPERTIES}
+    ${COLORIZE} ${LABELED} ${COLORIZED}
         
     ${IFT} makeh5files_single \
         --passtime `cat ${OVERPASS}` \
