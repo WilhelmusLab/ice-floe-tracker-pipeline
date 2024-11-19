@@ -23,7 +23,7 @@ def main(
         assert in_dataset.count == 1  # one band
         band1 = in_dataset.read(1)
 
-        max_value = band1.max()
+        max_value = int(band1.max())
         all_values = range(1, max_value + 1)
 
         rng = np.random.default_rng(seed)
