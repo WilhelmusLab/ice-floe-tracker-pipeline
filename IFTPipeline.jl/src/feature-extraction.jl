@@ -148,25 +148,23 @@ See also: convert_uint_from_gray
 """
 
 function convert_gray_from_uint(image::AbstractArray{<:Integer})
-    if eltype(image) === UInt8
-        target_type = N0f8
-    elseif eltype(image) === Int8
-        target_type = Q0f7
-    elseif eltype(image) === UInt16
-        target_type = N0f16
-    elseif eltype(image) === Int16
-        target_type = Q0f15
-    elseif eltype(image) === UInt32
-        target_type = N0f32
-    elseif eltype(image) === Int32
-        target_type = Q0f31
-    elseif eltype(image) === UInt64
-        target_type = N0f64
-    elseif eltype(image) === Int64
-        target_type = Q0f63   
-    else
-        _elt = eltype(image)
-        @warn "missing mapping for _elt"
+    img_type = eltype(image)
+    type_map = Dict(
+        UInt8 => N0f8,
+        Int8 => Q0f7,
+        UInt16 => N0f16,
+        Int16 => Q0f15,
+        UInt32 => N0f32,
+        Int32 => Q0f31,
+        UInt64 => N0f64,
+        Int64 => Q0f63
+    )
+    
+    # Lookup the target type in the dictionary. If not found call the do block to throw the warning
+    target_type = get(type_map, img_type) do
+        @warn "Missing mapping for $img_type"
+        return img_type # Fallback to the original type if not found
+    end
     end
     image_reinterpreted  = Gray.(reinterpret.(target_type, image))
     return image_reinterpreted
