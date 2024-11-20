@@ -196,7 +196,7 @@
                 -d ${landmask_binarized_dilated_file} \
                 -o ${segmented_floes_file}
             
-            ${IFT} extractfeatures_single 
+            ${IFT} extractfeatures_single \
                 --input ${segmented_floes_file} \
                 --output ${segmented_floes_props_file} \
                 --minarea {{ MINFLOEAREA }} \
