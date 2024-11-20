@@ -12,7 +12,7 @@ function test_save_load(image::AbstractArray{T} where T <: Union{UInt8, Int8, UI
 end
 
 
-function test_cast_uncast(image::AbstractArray{T} where T <: Union{UInt8, Int8, UInt16, Int16, UInt32, Int32, UInt64, Int64})
+function test_cast_uncast(image)
     
     casted_image = convert_gray_from_uint(image)
     uncasted_image = convert_uint_from_gray(casted_image)
