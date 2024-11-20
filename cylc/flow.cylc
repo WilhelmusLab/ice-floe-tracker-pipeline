@@ -43,21 +43,54 @@
             # Update these variables with your run parameters
             date=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format CCYY-MM-DD)
             date_without_dashes=${date//-/}
-
-            PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
             
+            {% if IFT_INSTALL == "Local" %}
+                IFT="julia --project=/workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl/src/cli.jl"
+            {% elif IFT_INSTALL == "Docker" %}
+                IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
+            {% elif IFT_INSTALL == "Apptainer" %}
+                IFT="apptainer run docker://brownccv/icefloetracker-julia"
+            {% else %}
+                 {{ raise('IFT_INSTALL not recognized.') }}
+            {% endif %}
+
             {% if FSDPROC_INSTALL == "Local" %}
                 FSDPROC="pipx run --spec /workspaces/ice-floe-tracker-workspace/ebseg fsdproc --debug"
             {% elif FSDPROC_INSTALL == "Source" %}
                 FSDPROC="pipx run --spec https://github.com/WilhelmusLab/ebseg.git fsdproc --debug"
             {% elif FSDPROC_INSTALL == "Docker" %}
-                {{ raise('FSDPROC_INSTALL Docker not implemented.') }}
+                {{ raise('FSDPROC_INSTALL `Docker` not implemented.') }}
+            {% elif FSDPROC_INSTALL == "Apptainer" %}
+                {{ raise('FSDPROC_INSTALL `Apptainer` not implemented.') }}
             {% else %}
                  {{ raise('FSDPROC_INSTALL not recognized.') }}
             {% endif %}
-            #IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
-            IFT="julia --project=/workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl/src/cli.jl"
-            COLORIZE = "pipx run --spec /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/label-colorizer colorize"
+
+            {% if PASS_TIME_INSTALL == "Local" %}
+                {{ raise('PASS_TIME_INSTALL `Local` not implemented.') }}
+            {% elif PASS_TIME_INSTALL == "Source" %}
+                PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
+            {% elif PASS_TIME_INSTALL == "Docker" %}
+                {{ raise('PASS_TIME_INSTALL `Docker` not implemented.') }}
+            {% elif PASS_TIME_INSTALL == "Apptainer" %}
+                {{ raise('PASS_TIME_INSTALL `Apptainer` not implemented.') }}
+            {% else %}
+                 {{ raise('PASS_TIME_INSTALL not recognized.') }}
+            {% endif %}
+
+            {% if COLORIZE_INSTALL == "Local" %}
+                COLORIZE = "pipx run --spec /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/label-colorizer colorize"
+            {% elif COLORIZE_INSTALL == "Source" %}
+                COLORIZE = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/A2h-add-new-cylc-workflow#egg=label-colorizer&subdirectory=label-colorizer colorize"
+            {% elif COLORIZE_INSTALL == "Docker" %}
+                {{ raise('COLORIZE_INSTALL `Docker` not implemented.') }}
+            {% elif COLORIZE_INSTALL == "Apptainer" %}
+                {{ raise('COLORIZE_INSTALL `Apptainer` not implemented.') }}
+            {% else %}
+                 {{ raise('COLORIZE_INSTALL not recognized.') }}
+            {% endif %}
+
+            JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker"
 
     [[INIT]]
     [[init_soit]]
