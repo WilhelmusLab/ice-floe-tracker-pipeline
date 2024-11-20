@@ -1,7 +1,7 @@
 using Images
 using IFTPipeline: load_labeled_img, save_labeled_img
 
-function test_save_load(image::AbstractArray{T} where T <: Union{UInt8, Int8, UInt16, Int16, UInt32, Int32, UInt64, Int64}; extension::AbstractString=".tiff")
+function test_save_load(image; extension=".tiff")
     
     filename = tempname() * extension
     
