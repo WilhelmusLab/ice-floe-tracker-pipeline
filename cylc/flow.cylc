@@ -161,6 +161,8 @@
             cp ${workdir}/final.tif ${segmented_floes_file}
             cp ${workdir}/props.csv ${segmented_floes_props_file}
             
+            {% else %}
+                 {{ raise('PREPROCESSING type not recognized.') }}
             {% endif %}
 
             ${COLORIZE} ${segmented_floes_file} ${colorized_segmented_floes_file}
