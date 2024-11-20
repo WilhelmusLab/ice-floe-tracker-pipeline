@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # Use this file by calling like this:
-#   source ./test-IFTPipeline.jl-cli.sh && preprocess_original input_data/ne-greenland.20220913.terra.250m/
+#   source ./test-IFTPipeline.jl-cli.sh && preprocess_lopez input_data/ne-greenland.20220913.terra.250m/
 #   source ./test-IFTPipeline.jl-cli.sh && preprocess_buckley input_data/ne-greenland.20220913.terra.250m/
-#   source ./test-IFTPipeline.jl-cli.sh && PREPROCESS=preprocess_original track input_data/ne-greenland.2022091{3,4}.terra.250m/
+#   source ./test-IFTPipeline.jl-cli.sh && PREPROCESS=preprocess_lopez track input_data/ne-greenland.2022091{3,4}.terra.250m/
 #   source ./test-IFTPipeline.jl-cli.sh && track_original input_data/ne-greenland.2022091{3,4}.terra.250m/
 #   source ./test-IFTPipeline.jl-cli.sh && track_buckley input_data/ne-greenland.2022091{3.terra,4.aqua}.250m/
 
@@ -42,7 +42,7 @@ initialize_test_directory () {
     cp -r ${DATA_SOURCE}/* ${DATA_TARGET}/
 }
 
-preprocess_original () {
+preprocess_lopez () {
     DATA_SOURCE=$1
     DATA_TARGET=$2
     initialize_test_directory $1 $2
@@ -142,7 +142,7 @@ track () {
 
 
 track_original () {
-    PREPROCESS=preprocess_original track $@
+    PREPROCESS=preprocess_lopez track $@
 }
 
 track_buckley () {

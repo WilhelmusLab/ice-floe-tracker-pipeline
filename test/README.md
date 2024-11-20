@@ -9,14 +9,14 @@ source ./test-IFTPipeline.jl-cli.sh
 
 Then run the appropriate function with the dataset you would like to test. Preprocessing:
 ```bash
-preprocess_original input_data/ne-greenland.20220913.terra.250m/
+preprocess_lopez input_data/ne-greenland.20220913.terra.250m/
 preprocess_buckley input_data/ne-greenland.20220913.terra.250m/
 ```
 
 For tracking (and preprocessing), you need to pass all the source data directories you'd like to process:
 ```bash
 # `track` uses dependency injection to select the preprocessing pipeline
-PREPROCESS=preprocess_original track input_data/ne-greenland.2022091{3,4}.terra.250m/  
+PREPROCESS=preprocess_lopez track input_data/ne-greenland.2022091{3,4}.terra.250m/  
 
 # `track_original` and `track_buckley` are wrappers around `track`
 track_original input_data/ne-greenland.2022091{3,4}.terra.250m/
