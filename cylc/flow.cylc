@@ -24,10 +24,14 @@
     [[queues]]
         [[[fetchdata]]]
             limit = 4
-            members = LOAD
+            # Limit to 4 instances hitting the API at once. 
+            # Values higher than this might lead to throttling.
+            members = LOAD_IMAGE
         
         [[[preprocess]]]
-            limit = 1
+            limit = 2
+            # Limit to 2 instances only due to memory constraints. 
+            # Can be removed on a system with more memory or a scheduler.
             members = PREPROCESS
 
 
