@@ -126,7 +126,6 @@
         inherit = LOAD, <satellite>
         script="""
             ${FSDPROC} load ${landmask_file} --kind landmask ${fsdprocargs}
-            ${IFT} landmask_single -i ${landmask_file} -o ${landmask_binarized_file} -d ${landmask_binarized_dilated_file}
         """
 
     [[PREPROCESS]]
@@ -136,6 +135,7 @@
         inherit = PREPROCESS, <satellite>
         script = """
             {% if PREPROCESSING == "Lopez" %}
+            ${IFT} landmask_single -i ${landmask_file} -o ${landmask_binarized_file} -d ${landmask_binarized_dilated_file}
             ${IFT} preprocess_single -t ${truecolor_file} -r ${falsecolor_file} -l ${landmask_binarized_file} -d ${landmask_binarized_dilated_file} -o ${segmented_floes_file}
             ${IFT} extractfeatures_single --input ${segmented_floes_file} --output ${segmented_floes_props_file} --minarea {{ MINFLOEAREA }} --maxarea {{ MAXFLOEAREA }}
             
