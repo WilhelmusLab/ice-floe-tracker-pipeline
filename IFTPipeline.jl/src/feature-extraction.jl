@@ -165,7 +165,6 @@ function convert_gray_from_uint(image::AbstractArray{<:Integer})
         @warn "Missing mapping for $img_type"
         return img_type # Fallback to the original type if not found
     end
-    end
     image_reinterpreted  = Gray.(reinterpret.(target_type, image))
     return image_reinterpreted
 end
