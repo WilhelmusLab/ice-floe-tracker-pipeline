@@ -123,11 +123,8 @@
             mkdir -p ${img_prefix}
         """
         [[[environment]]]
-            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --date ${date}"
-            
             satellite=${CYLC_TASK_PARAM_satellite}
             img_prefix = "${date_without_dashes}.{{ SCALE }}m.${satellite}/"
-
             landmask_file = "${img_prefix}landmask.tiff"
             landmask_binarized_file = "${img_prefix}landmask.binarized.tiff"
             landmask_binarized_dilated_file = "${img_prefix}landmask.binarized.dilated.tiff"
