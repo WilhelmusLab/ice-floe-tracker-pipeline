@@ -15,8 +15,7 @@
             init_soit => soit
         """
         P1D = """
-            INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all
-            LOAD:succeed-all & PREPROCESS:succeed-all => done & exportH5
+            INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all => exportH5 => done
             done[-P1D] => done
 
         """
