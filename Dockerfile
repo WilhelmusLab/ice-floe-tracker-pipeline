@@ -15,6 +15,7 @@ fi ;
 
 # Python environment build
 #===========================================
+ENV CONDA_JL_HOME="/opt/conda-env/"
 COPY ./PythonSetupForIFTPipeline.jl /opt/PythonSetupForIFTPipeline.jl
 RUN julia --project="/opt/PythonSetupForIFTPipeline.jl" "/opt/PythonSetupForIFTPipeline.jl/setup.jl"
 
