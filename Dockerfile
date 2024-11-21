@@ -7,7 +7,6 @@ ENV TERM=xterm
 # Julia Processor Targets for Precompile
 # From https://github.com/JuliaCI/julia-buildkite/blob/main/utilities/build_envs.sh
 #===========================================
-RUN echo $TARGETARCH
 RUN if ["$TARGETARCH" = "amd64"]; then \
     export JULIA_CPU_TARGET="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)" ; \
 elif [ "$TARGETARCH" = "arm64" ]; then \
