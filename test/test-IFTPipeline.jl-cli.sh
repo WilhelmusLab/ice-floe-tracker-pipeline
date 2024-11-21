@@ -16,14 +16,17 @@
 # - https://stackoverflow.com/a/28085062/24937841 and 
 # - https://unix.stackexchange.com/a/31712
 : "${IFT:=julia --project=`pwd`/../IFTPipeline.jl `pwd`/../IFTPipeline.jl/src/cli.jl}"
-echo "IFT=${IFT}"
 : "${FSDPROC:=pipx run --spec /workspaces/ice-floe-tracker-workspace/ebseg fsdproc --debug}"
-echo "FSDPROC=${FSDPROC}"
 : "${COLORIZE:=pipx run --spec `pwd`/../label-colorizer/ colorize }"
-echo "COLORIZE=${COLORIZE}"
 
 # Set up debug messages
 export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" 
+
+echo_CLI_tools () {
+    echo "IFT=${IFT}"
+    echo "FSDPROC=${FSDPROC}"
+    echo "COLORIZE=${COLORIZE}"
+}
 
 initialize_test_directory () {
     DATA_SOURCE=$1
@@ -43,6 +46,8 @@ initialize_test_directory () {
 }
 
 preprocess_lopez () {
+    echo_CLI_tools
+
     DATA_SOURCE=$1
     DATA_TARGET=$2
     initialize_test_directory $1 $2
@@ -86,6 +91,8 @@ preprocess_lopez () {
 }
 
 preprocess_buckley () {
+    echo_CLI_tools
+
     DATA_SOURCE=$1
     DATA_TARGET=$2
     initialize_test_directory $1 $2
@@ -117,6 +124,8 @@ preprocess_buckley () {
 
 
 track () {
+    echo_CLI_tools
+    
     DATA_SOURCES=$@
 
     TEMPDIR=$(mktemp -d -p .)
