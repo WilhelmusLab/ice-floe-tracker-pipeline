@@ -58,7 +58,7 @@
             {% if FSDPROC_INSTALL == "Local" %}
                 FSDPROC="pipx run --spec /workspaces/ice-floe-tracker-workspace/ebseg fsdproc --debug"
             {% elif FSDPROC_INSTALL == "Source" %}
-                FSDPROC="pipx run --spec https://github.com/WilhelmusLab/ebseg.git fsdproc --debug"
+                FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg fsdproc --debug"
             {% elif FSDPROC_INSTALL == "Docker" %}
                 {{ raise('FSDPROC_INSTALL `Docker` not implemented.') }}
             {% elif FSDPROC_INSTALL == "Apptainer" %}
