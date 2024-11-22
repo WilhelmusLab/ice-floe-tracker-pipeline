@@ -13,7 +13,7 @@ ENV TERM=xterm
 ENV CONDA_PREFIX=/opt/conda
 WORKDIR ${CONDA_PREFIX}
 RUN apt-get update && apt-get install -y wget
-RUN wget --no-verbose -O miniforge.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+RUN wget --no-verbose -O miniforge.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-$(uname -m).sh"
 RUN bash miniforge.sh -b -u -p ${CONDA_PREFIX}
 
 # Python environment build
@@ -24,13 +24,10 @@ ENV JULIA_DEPOT_PATH=/opt/julia
 COPY ./PythonSetupForIFTPipeline.jl /opt/PythonSetupForIFTPipeline.jl
 RUN julia --project="/opt/PythonSetupForIFTPipeline.jl" "/opt/PythonSetupForIFTPipeline.jl/setup.jl"
 
-RUN env > /env.txt
-
-
 # IFT Pipeline package build
 #===========================================
-# COPY ./IFTPipeline.jl /opt/IFTPipeline.jl
-# RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.instantiate(); Pkg.precompile();"
+COPY ./IFTPipeline.jl /opt/IFTPipeline.jl
+RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.instantiate(); Pkg.precompile();"
 
 # Test the package
 # RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.test();"
