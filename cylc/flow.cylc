@@ -109,6 +109,11 @@
         script = """
             ${FSDPROC} --help
         """
+    [[init_colorize]]
+        inherit = INIT
+        script = """
+            ${COLORIZE} --help
+        """
     [[init_iftp]]
         inherit = INIT
         script = """
