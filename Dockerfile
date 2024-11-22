@@ -20,6 +20,7 @@ RUN bash miniforge.sh -b -u -p ${CONDA_PREFIX}
 #===========================================
 ENV CONDA_JL_CONDA_EXE=${CONDA_PREFIX}/bin/conda
 ENV CONDA_JL_HOME=${CONDA_PREFIX}
+ENV JULIA_DEPOT_PATH=/opt/julia
 COPY ./PythonSetupForIFTPipeline.jl /opt/PythonSetupForIFTPipeline.jl
 RUN julia --project="/opt/PythonSetupForIFTPipeline.jl" "/opt/PythonSetupForIFTPipeline.jl/setup.jl"
 
