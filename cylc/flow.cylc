@@ -249,6 +249,8 @@
     [[tracking]]
         execution retry delays = PT10M
         execution time limit = PT120M
+        [[[directives]]]
+            --mem = 64G
         # Pair and track identified floes across days
         script = """
             images=(*/segmented_floes.tiff)
