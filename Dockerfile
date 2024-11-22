@@ -35,4 +35,4 @@ RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.instantiate(); Pkg.
 # CLI setup
 #===========================================
 SHELL ["/bin/bash", "-c"]
-# ENTRYPOINT ["julia", "--project=/opt/IFTPipeline.jl", "/opt/IFTPipeline.jl/src/cli.jl" ]
+ENTRYPOINT ["julia", "--project=/opt/IFTPipeline.jl", "/opt/IFTPipeline.jl/src/cli.jl" ]
