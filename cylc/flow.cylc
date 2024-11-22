@@ -120,6 +120,8 @@
             ${IFT} --help
         """
         execution time limit = PT25M
+        [[[directives]]]
+            --mem = 64G
 
     [[soit]]
         execution retry delays = PT15S, PT10M, PT1H, PT3H
