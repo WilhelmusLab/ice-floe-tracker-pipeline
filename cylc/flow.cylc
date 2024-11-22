@@ -163,7 +163,7 @@
         inherit=LOAD
         execution retry delays = PT15S, PT10M, PT1H, PT3H
         [[[environment]]]
-            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --date ${date} --satellite ${satellite} "
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite} "
 
     [[load_truecolor<satellite>]]
         inherit = LOAD_IMAGE, <satellite>

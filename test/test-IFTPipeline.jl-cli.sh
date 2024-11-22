@@ -125,7 +125,7 @@ preprocess_buckley () {
 
 track () {
     echo_CLI_tools
-    
+
     DATA_SOURCES=$@
 
     TEMPDIR=$(mktemp -d -p .)
