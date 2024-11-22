@@ -39,6 +39,7 @@
 [runtime]
     [[root]]
         work sub-directory = .
+        execution time limit = PT5M
         
         [[[environment]]]
             # Update these variables with your run parameters
