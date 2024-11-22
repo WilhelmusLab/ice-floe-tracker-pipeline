@@ -119,6 +119,7 @@
         script = """
             ${IFT} --help
         """
+        execution time limit = PT25M
 
     [[soit]]
         execution retry delays = PT15S, PT10M, PT1H, PT3H
