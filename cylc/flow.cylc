@@ -40,6 +40,8 @@
     [[root]]
         work sub-directory = .
         execution time limit = PT5M
+        [[[directives]]]
+            --mem = 8G
         
         [[[environment]]]
             # Update these variables with your run parameters
