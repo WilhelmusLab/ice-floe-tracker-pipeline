@@ -1,28 +1,35 @@
-FROM julia:1.11-bookworm
+FROM --platform=$BUILDPLATFORM julia:1.11-bookworm
+ARG TARGETARCH
+ARG JULIA_CPU_TARGET="generic"
+ENV JULIA_CPU_TARGET=${JULIA_CPU_TARGET}
 
-# DEPENDENCIES
+# Dependencies
 #===========================================
 ENV TERM=xterm
 
-# Julia Processor Targets for Precompile
-# From https://github.com/JuliaCI/julia-buildkite/blob/main/utilities/build_envs.sh
+# Miniconda install
 #===========================================
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-    export JULIA_CPU_TARGET="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)" ; \
-elif [ "$TARGETARCH" = "arm64" ]; then \
-    export JULIA_CPU_TARGET="generic;cortex-a57;thunderx2t99;carmel,clone_all;apple-m1,base(3);neoverse-512tvb,base(3)" ; \
-fi ;
+# Shell version – miniforge
+ENV CONDA_PREFIX=/opt/conda
+WORKDIR ${CONDA_PREFIX}
+RUN apt-get update && apt-get install -y wget
+RUN wget -O miniforge.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+RUN bash miniforge.sh -b -u -p ${CONDA_PREFIX}
 
 # Python environment build
 #===========================================
-ENV CONDA_JL_HOME="/opt/conda-env/"
+ENV CONDA_JL_CONDA_EXE=${CONDA_PREFIX}/bin/conda
+ENV CONDA_JL_HOME=${CONDA_PREFIX}
 COPY ./PythonSetupForIFTPipeline.jl /opt/PythonSetupForIFTPipeline.jl
 RUN julia --project="/opt/PythonSetupForIFTPipeline.jl" "/opt/PythonSetupForIFTPipeline.jl/setup.jl"
 
+RUN env > /env.txt
+
+
 # IFT Pipeline package build
 #===========================================
-COPY ./IFTPipeline.jl /opt/IFTPipeline.jl
-RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.instantiate(); Pkg.precompile();"
+# COPY ./IFTPipeline.jl /opt/IFTPipeline.jl
+# RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.instantiate(); Pkg.precompile();"
 
 # Test the package
 # RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.test();"
@@ -30,4 +37,4 @@ RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.instantiate(); Pkg.
 # CLI setup
 #===========================================
 SHELL ["/bin/bash", "-c"]
-ENTRYPOINT ["julia", "--project=/opt/IFTPipeline.jl", "/opt/IFTPipeline.jl/src/cli.jl" ]
+# ENTRYPOINT ["julia", "--project=/opt/IFTPipeline.jl", "/opt/IFTPipeline.jl/src/cli.jl" ]
