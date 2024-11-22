@@ -13,7 +13,7 @@ ENV TERM=xterm
 ENV CONDA_PREFIX=/opt/conda
 WORKDIR ${CONDA_PREFIX}
 RUN apt-get update && apt-get install -y wget
-RUN wget -O miniforge.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+RUN wget --no-verbose -O miniforge.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 RUN bash miniforge.sh -b -u -p ${CONDA_PREFIX}
 
 # Python environment build
