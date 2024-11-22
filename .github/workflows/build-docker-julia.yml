@@ -46,8 +46,6 @@ jobs:
           platforms: linux/amd64
           load: true
           tags: ${{ env.TEST_TAG }}
-          cache-from: type=gha
-          cache-to: type=gha
             
       - name: Test CLI
         working-directory: ./test
@@ -61,5 +59,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha
