@@ -1,4 +1,5 @@
 Manifest.toml
+!IFTPipeline.jl/Manifest.toml
 
 resources/*
 !resources/README.md
