@@ -182,7 +182,7 @@ function convert_uint_from_gray(image)
     image_reinterpreted = rawview(channelview(image))
     img_type = eltype(image)
     target_type = get(fixedpoint_to_int_map, img_type) do
-        throw(TypeError("Missing mapping for $img_type in convert_uint_from_gray"))
+        error("Missing mapping for $img_type in convert_uint_from_gray")
     end
     image_recast = target_type.(image_reinterpreted)
     return image_recast
