@@ -169,7 +169,7 @@ function convert_gray_from_uint(image::AbstractArray{<:Integer})
     return image_reinterpreted
 end
 
-fixedpoint_to_int_map = Dict(value => key for (key, value) in int_to_fixedpoint_map)
+fixedpoint_to_int_map = Dict(Gray{value} => key for (key, value) in int_to_fixedpoint_map)
 
 """
     convert_uint_from_gray(image)
