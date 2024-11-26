@@ -557,8 +557,8 @@ version = "2.11.2+1"
 
 [[deps.IceFloeTracker]]
 deps = ["AxisArrays", "Clustering", "ColorTypes", "CoordinateTransformations", "DSP", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributed", "FFTW", "FileIO", "Git", "HDF5", "ImageAxes", "ImageBinarization", "ImageContrastAdjustment", "ImageCore", "ImageFiltering", "ImageIO", "ImageMorphology", "ImageSegmentation", "ImageTransformations", "Images", "Interpolations", "JLD2", "LinearAlgebra", "LoopVectorization", "MappedArrays", "OffsetArrays", "PaddedViews", "Peaks", "Pkg", "PositiveFactorizations", "Printf", "ProgressMeter", "PyCall", "Random", "Reexport", "Requires", "Rotations", "Serialization", "SharedArrays", "StaticArrays", "Statistics", "StatsBase", "TOML", "TiledIteration", "UpdateJulia"]
-git-tree-sha1 = "ac89246081c7065f5c429c8efbf02a8c18a267cf"
-repo-rev = "main"
+git-tree-sha1 = "76d7a6e42b82e28397fa7d9ce02afbb0198f2453"
+repo-rev = "f6551c7315f114916dbfb34a1a9b343317ca6d17"
 repo-url = "https://github.com/WilhelmusLab/IceFloeTracker.jl"
 uuid = "04643c7a-9ac6-48c5-822f-2704f9e70bd3"
 version = "0.6.0"
