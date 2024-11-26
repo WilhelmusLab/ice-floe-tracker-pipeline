@@ -26,14 +26,16 @@ end
     image_size = (8, 8)
     
     # Can cast and uncast all sizes of integer
-    test_cast_uncast(rand(UInt8, image_size))
-    test_cast_uncast(rand(UInt16, image_size))
-    test_cast_uncast(rand(UInt32, image_size))
-    test_cast_uncast(rand(UInt64, image_size))
+    _test_cast_uncast = test_cast_uncast(rand(t, image_size))
+    _test_cast_uncast(UInt8)
+    _test_cast_uncast(UInt16)
+    _test_cast_uncast(UInt32)
+    _test_cast_uncast(UInt64)
 
     # Can load all sizes of fixed point integer:
-    test_save_load(rand(UInt8, image_size))
-    test_save_load(rand(UInt16, image_size))
-    test_save_load(rand(UInt32, image_size))
-    test_save_load(rand(UInt64, image_size))
+    _test_save_load(t) = test_save_load(rand(t, image_size))
+    _test_save_load(UInt8)
+    _test_save_load(UInt16)
+    _test_save_load(UInt32)
+    _test_save_load(UInt64)
 end
