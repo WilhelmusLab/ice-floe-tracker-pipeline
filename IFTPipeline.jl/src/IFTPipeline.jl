@@ -16,6 +16,8 @@ using Pkg
 using FileIO
 using Images
 using CSV
+using ImageSegmentation
+using FixedPointNumbers
 
 include("cli.jl")
 include("soit-parser.jl")
@@ -37,6 +39,10 @@ export cache_vector, sharpen,
     load_truecolor_imgs,
     load_falsecolor_imgs,
     load_cloudmask,
+    load_labeled_img,
+    save_labeled_img,
+    convert_gray_from_uint,
+    convert_uint_from_gray,
     disc_ice_water,
     landmask,
     landmask_single,

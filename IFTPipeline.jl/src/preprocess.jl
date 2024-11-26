@@ -285,12 +285,16 @@ function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_
     rgb_truecolor_img = RGB.(truecolor_img)
     rgb_falsecolor_img = RGB.(falsecolor_img)
 
-    @info "Segmenting floes started"
+    @info "Segmenting floes"
     segmented_floes = preprocess(rgb_truecolor_img, rgb_falsecolor_img, landmask)
-    @info "Segmenting floes complete"
 
+    @info "Labeling floes"
+    labeled_floes = label_components(segmented_floes)
+    _dtype = choose_dtype(maximum(labeled_floes))
+    labeled_floes_cast = convert(Array{_dtype}, labeled_floes)
+    
     @info "Writing segmented floes to $output"
-    FileIO.save(output, segmented_floes)
+    save_labeled_img(labeled_floes_cast, output)
 
     return nothing
 end
