@@ -26,7 +26,7 @@ end
     image_size = (8, 8)
     
     # Can cast and uncast all sizes of integer
-    _test_cast_uncast = test_cast_uncast(rand(t, image_size))
+    _test_cast_uncast(t) = test_cast_uncast(rand(t, image_size))
     _test_cast_uncast(UInt8)
     _test_cast_uncast(UInt16)
     _test_cast_uncast(UInt32)
