@@ -38,7 +38,7 @@ end
     _test_cast_uncast(Int32)
     _test_cast_uncast(Int64)
 
-    # Can load all sizes of unsigned integer:
+    # Can save and load all sizes of unsigned integer:
     _test_save_load(t) = test_save_load(rand(t, image_size))
     _test_save_load(UInt8)
     _test_save_load(UInt16)
@@ -50,4 +50,5 @@ end
     _test_save_load(Int16)
     _test_save_load(Int32)
     _test_save_load(Int64)
+
 end
