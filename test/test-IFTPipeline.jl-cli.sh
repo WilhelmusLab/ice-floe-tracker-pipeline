@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Use this file by calling like this:
+#   source ./test-IFTPipeline.jl-cli.sh && preprocess_lopez input_data/ne-greenland.20220913.terra.250m/
+#   source ./test-IFTPipeline.jl-cli.sh && preprocess_buckley input_data/ne-greenland.20220913.terra.250m/
+#   source ./test-IFTPipeline.jl-cli.sh && PREPROCESS=preprocess_lopez track input_data/ne-greenland.2022091{3,4}.terra.250m/
+#   source ./test-IFTPipeline.jl-cli.sh && track_original input_data/ne-greenland.2022091{3,4}.terra.250m/
+#   source ./test-IFTPipeline.jl-cli.sh && track_buckley input_data/ne-greenland.2022091{3.terra,4.aqua}.250m/
+
 # Set variables with the script names we're going to use. 
 # If these are set as environment variables outside, then the outside version will be used.
 # This might be useful if you're trying to test a Docker container – 
@@ -10,39 +17,52 @@
 # - https://unix.stackexchange.com/a/31712
 : "${IFT:=julia --project=`pwd`/../IFTPipeline.jl `pwd`/../IFTPipeline.jl/src/cli.jl}"
 echo "IFT=${IFT}"
-
-# Data target
-TEMPDIR=$(mktemp -d -p .)
-: "${DATA_TARGET:=$TEMPDIR}"
-echo "DATA_TARGET=${DATA_TARGET}"
-
-# Initialize data directory
-: "${DATA_SOURCE:=./input_data}"
-echo "DATA_SOURCE=${DATA_SOURCE}"
-
-cp -r ${DATA_SOURCE}/* ${DATA_TARGET}/
-echo "in $(pwd)"
-
-SAMPLEIMG=20220914.terra.truecolor.250m.tiff
+: "${FSDPROC:=pipx run --spec /workspaces/ice-floe-tracker-workspace/ebseg fsdproc --debug}"
+echo "FSDPROC=${FSDPROC}"
+: "${COLORIZE:=pipx run --spec `pwd`/../label-colorizer/ colorize }"
+echo "COLORIZE=${COLORIZE}"
 
 # Set up debug messages
 export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" 
 
-# Run the processing (single files)
-LANDMASK=${DATA_TARGET}/landmask.tiff
-LANDMASK_NON_DILATED=${DATA_TARGET}/landmask.non-dilated.tiff
-LANDMASK_DILATED=${DATA_TARGET}/landmask.dilated.tiff
-
-${IFT} landmask_single -i ${LANDMASK} -o ${LANDMASK_NON_DILATED} -d ${LANDMASK_DILATED}
-
-for satellite in "aqua" "terra"
-do
-    TRUECOLOR=${DATA_TARGET}/20220914.${satellite}.truecolor.250m.tiff
-    FALSECOLOR=${DATA_TARGET}/20220914.${satellite}.falsecolor.250m.tiff
-    LABELED=${DATA_TARGET}/20220914.${satellite}.labeled.250m.tiff
-    FLOEPROPERTIES=${DATA_TARGET}/20220914.${satellite}.labeled.250m.props.csv
-    HDF5FILE=${DATA_TARGET}/20220914.${satellite}.h5
+initialize_test_directory () {
+    DATA_SOURCE=$1
+    DATA_TARGET=$2
     
+    # Initialize data directory
+    : "${DATA_SOURCE:=./input_data}"
+    echo "DATA_SOURCE=${DATA_SOURCE}"
+
+    TEMPDIR=$(mktemp -d -p .)
+    : "${DATA_TARGET:=$TEMPDIR}"
+    echo "DATA_TARGET=${DATA_TARGET}"
+
+    mkdir -p ${DATA_TARGET}/
+
+    cp -r ${DATA_SOURCE}/* ${DATA_TARGET}/
+}
+
+preprocess_lopez () {
+    DATA_SOURCE=$1
+    DATA_TARGET=$2
+    initialize_test_directory $1 $2
+
+    LANDMASK=${DATA_TARGET}/landmask.tiff
+    LANDMASK_NON_DILATED=${DATA_TARGET}/landmask.non-dilated.tiff
+    LANDMASK_DILATED=${DATA_TARGET}/landmask.dilated.tiff
+    TRUECOLOR=${DATA_TARGET}/truecolor.tiff
+    FALSECOLOR=${DATA_TARGET}/falsecolor.tiff
+    LABELED=${DATA_TARGET}/labeled.tiff
+    COLORIZED=${DATA_TARGET}/labeled.colorized.tiff
+    FLOEPROPERTIES=${DATA_TARGET}/labeled.props.csv
+    HDF5FILE=${DATA_TARGET}/results.h5
+    OVERPASS=${DATA_TARGET}/overpass.txt
+
+    ${IFT} landmask_single \
+        -i ${LANDMASK} \
+        -o ${LANDMASK_NON_DILATED} \
+        -d ${LANDMASK_DILATED}
+
     ${IFT} preprocess_single \
         --truecolor ${TRUECOLOR} \
         --falsecolor ${FALSECOLOR} \
@@ -53,27 +73,78 @@ do
     ${IFT} extractfeatures_single \
         --input ${LABELED} \
         --output ${FLOEPROPERTIES}
+
+    ${COLORIZE} ${LABELED} ${COLORIZED}
     
     ${IFT} makeh5files_single \
-        --passtime "2022-09-14T12:00:00" \
+        --passtime `cat ${OVERPASS}` \
         --truecolor ${TRUECOLOR} \
         --falsecolor ${FALSECOLOR} \
         --labeled ${LABELED} \
         --props ${FLOEPROPERTIES} \
         --output ${HDF5FILE}
-done
+}
 
-${IFT} track_single \
-    --imgs ${DATA_TARGET}/20220914.{aqua,terra}.labeled.250m.tiff \
-    --props ${DATA_TARGET}/20220914.{aqua,terra}.labeled.250m.props.csv \
-    --latlon ${TRUECOLOR} \
-    --passtimes "2022-09-14T12:00:00" "2022-09-15T12:00:00" \
-    --output ${DATA_TARGET}/paired-floes.csv
+preprocess_buckley () {
+    DATA_SOURCE=$1
+    DATA_TARGET=$2
+    initialize_test_directory $1 $2
 
-# Run the processing (batch)
-${IFT} landmask . .
-${IFT} preprocess -t . -r . -l . -p . -o .
-${IFT} extractfeatures -i . -o .
-${IFT} track --imgs . --props . --passtimes . --latlon ${SAMPLEIMG} -o .
-${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir .
+    TRUECOLOR=${DATA_TARGET}/truecolor.tiff
+    FALSECOLOR=${DATA_TARGET}/falsecolor.tiff
+    CLOUD=${DATA_TARGET}/cloud.tiff
+    LANDMASK=${DATA_TARGET}/landmask.tiff
+    LABELED=${DATA_TARGET}/labeled.tiff
+    COLORIZED=${DATA_TARGET}/labeled.colorized.tiff
+    LABELEDDIR=${LABELED}.work/
+    FLOEPROPERTIES=${DATA_TARGET}/labeled.props.csv
+    HDF5FILE=${DATA_TARGET}/results.h5
+    OVERPASS=${DATA_TARGET}/overpass.txt
 
+    ${FSDPROC} process ${TRUECOLOR} ${CLOUD} ${LANDMASK} ${LABELEDDIR}
+    cp ${LABELEDDIR}/final.tif ${LABELED}
+    cp ${LABELEDDIR}/props.csv ${FLOEPROPERTIES}
+    ${COLORIZE} ${LABELED} ${COLORIZED}
+        
+    ${IFT} makeh5files_single \
+        --passtime `cat ${OVERPASS}` \
+        --truecolor ${TRUECOLOR} \
+        --falsecolor ${FALSECOLOR} \
+        --labeled ${LABELED} \
+        --props ${FLOEPROPERTIES} \
+        --output ${HDF5FILE}
+}
+
+
+track () {
+    DATA_SOURCES=$@
+
+    TEMPDIR=$(mktemp -d -p .)
+    : "${_DATA_TARGET:=$TEMPDIR}"
+    echo "_DATA_TARGET=${_DATA_TARGET}"
+
+    _DATA_TARGET_SUBDIRS=()
+    
+    for source in ${DATA_SOURCES[@]}
+    do
+        _THIS_SUBDIR=${_DATA_TARGET}/$(basename $source)/
+        _DATA_TARGET_SUBDIRS+=(${_THIS_SUBDIR})
+        ${PREPROCESS} ${source} ${_THIS_SUBDIR}
+    done
+    
+    ${IFT} track_single \
+        --imgs "${_DATA_TARGET_SUBDIRS[@]/%/labeled.tiff}" \
+        --props "${_DATA_TARGET_SUBDIRS[@]/%/labeled.props.csv}" \
+        --latlon "${_DATA_TARGET_SUBDIRS[1]/%/truecolor.tiff}" \
+        --passtimes $(cat ${_DATA_TARGET_SUBDIRS[@]/%/overpass.txt} | tr '\n' ' ') \
+        --output ${_DATA_TARGET}/paired.csv
+}
+
+
+track_original () {
+    PREPROCESS=preprocess_lopez track $@
+}
+
+track_buckley () {
+    PREPROCESS=preprocess_buckley track $@
+}

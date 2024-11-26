@@ -49,7 +49,7 @@ jobs:
             
       - name: Test CLI
         working-directory: ./test
-        run: IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}" ./test-IFTPipeline.jl-cli.sh
+        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez input_data/ne-greenland.20220914.terra.250m
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6

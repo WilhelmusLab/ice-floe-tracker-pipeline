@@ -130,11 +130,22 @@ Save an unsigned integer image to an image file.
 
 See also: load_labeled_img
 """
-function save_labeled_img(image::AbstractArray{T} where {T <: Union{UInt8, UInt16, UInt32, UInt64}}, path::AbstractString)
+function save_labeled_img(image::AbstractArray{<:Integer}, path::AbstractString)
     image_reinterpreted = convert_gray_from_uint(image)
     FileIO.save(path, image_reinterpreted)
     return path
 end
+
+int_to_fixedpoint_map = Dict(
+    UInt8 => N0f8,
+    Int8 => Q0f7,
+    UInt16 => N0f16,
+    Int16 => Q0f15,
+    UInt32 => N0f32,
+    Int32 => Q0f31,
+    UInt64 => N0f64,
+    Int64 => Q0f63
+)
 
 """
     convert_gray_from_uint(image)
@@ -144,39 +155,31 @@ Convert an image from an unsigned integer format into a fixed-point Gray format.
 See also: convert_uint_from_gray
 """
 
-function convert_gray_from_uint(image::AbstractArray{T} where {T <: Union{UInt8, UInt16, UInt32, UInt64}})
-    if eltype(image) === UInt8
-        target_type = N0f8
-    elseif eltype(image) === UInt16
-        target_type = N0f16
-    elseif eltype(image) === UInt32
-        target_type = N0f32
-    elseif eltype(image) === UInt64
-        target_type = N0f64
+function convert_gray_from_uint(image::AbstractArray{<:Integer})
+    img_type = eltype(image)
+    
+    # Lookup the target type in the dictionary. If not found call the do block to throw the warning
+    target_type = get(int_to_fixedpoint_map, img_type) do
+        error("Missing mapping for $img_type in convert_gray_from_uint")
     end
     image_reinterpreted  = Gray.(reinterpret.(target_type, image))
     return image_reinterpreted
 end
 
+fixedpoint_to_int_map = Dict(Gray{value} => key for (key, value) in int_to_fixedpoint_map)
+
 """
     convert_uint_from_gray(image)
 
-Convert an image from a fixed-point Gray format into unsigned integers.
+Convert an image from a fixed-point Gray format into integers.
 
 See also: convert_gray_from_uint
 """
 function convert_uint_from_gray(image)
     image_reinterpreted = rawview(channelview(image))
-    element_type = eltype(image)
-    @info "$element_type"
-    if eltype(image) === Gray{N0f8}
-        target_type = UInt8
-    elseif eltype(image) === Gray{N0f16}
-        target_type = UInt16
-    elseif eltype(image) === Gray{N0f32}
-        target_type = UInt32
-    elseif eltype(image) === Gray{N0f64}
-        target_type = UInt64
+    img_type = eltype(image)
+    target_type = get(fixedpoint_to_int_map, img_type) do
+        error("Missing mapping for $img_type in convert_uint_from_gray")
     end
     image_recast = target_type.(image_reinterpreted)
     return image_recast
