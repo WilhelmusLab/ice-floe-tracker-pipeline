@@ -48,3 +48,4 @@ Update your `~/.cylc/flow/global.cylc` file to include the following lines:
 
 This will ensure that jobs from `cylc` are scheduled using `Slurm`.
 
+Oscar uses Apptainer rather than Docker, so include the line `IFT_INSTALL="Apptainer"` or `IFT_INSTALL="ApptainerLocal"` in your configuration file.
