@@ -3,6 +3,7 @@ using Pkg
 Pkg.instantiate()
 
 # Initialize the Conda environment
+Pkg.build("Conda")
 using Conda
 
 # Add the dependencies to the Conda environment
