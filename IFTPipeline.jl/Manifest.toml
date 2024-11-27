@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.6"
+julia_version = "1.10.7"
 manifest_format = "2.0"
 project_hash = "ac968179f8dedb48fdd068dce54f394cecaece52"
 
@@ -557,8 +557,8 @@ version = "2.11.2+1"
 
 [[deps.IceFloeTracker]]
 deps = ["AxisArrays", "Clustering", "ColorTypes", "CoordinateTransformations", "DSP", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributed", "FFTW", "FileIO", "Git", "HDF5", "ImageAxes", "ImageBinarization", "ImageContrastAdjustment", "ImageCore", "ImageFiltering", "ImageIO", "ImageMorphology", "ImageSegmentation", "ImageTransformations", "Images", "Interpolations", "JLD2", "LinearAlgebra", "LoopVectorization", "MappedArrays", "OffsetArrays", "PaddedViews", "Peaks", "Pkg", "PositiveFactorizations", "Printf", "ProgressMeter", "PyCall", "Random", "Reexport", "Requires", "Rotations", "Serialization", "SharedArrays", "StaticArrays", "Statistics", "StatsBase", "TOML", "TiledIteration", "UpdateJulia"]
-git-tree-sha1 = "76d7a6e42b82e28397fa7d9ce02afbb0198f2453"
-repo-rev = "f6551c7315f114916dbfb34a1a9b343317ca6d17"
+git-tree-sha1 = "ec0d100e3b10bd6009963544f8166f1ce903120d"
+repo-rev = "main"
 repo-url = "https://github.com/WilhelmusLab/IceFloeTracker.jl"
 uuid = "04643c7a-9ac6-48c5-822f-2704f9e70bd3"
 version = "0.6.0"
