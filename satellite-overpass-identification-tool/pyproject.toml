@@ -1,0 +1,20 @@
+[project]
+name="satellite-overpass-identification-tool"
+version = "2024.11.4"
+authors = [
+    {name="Simon Hatcher"},
+    {name="Timothy Divoll", email = "timothy_divoll@brown.edu"}
+]
+requires-python = ">= 3.10"
+dependencies = [
+  "requests==2.31.0",
+  "skyfield==1.45.0",
+  "numpy==1.26",
+]
+
+[project.scripts]
+soit="satellite_overpass_identification_tool:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

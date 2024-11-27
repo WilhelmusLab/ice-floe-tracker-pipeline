@@ -5,11 +5,13 @@ This repository contains the processing pipeline for IceFloeTracker.jl and ancil
 
 ## SOIT Integration
 
-The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.ZBhat-zMJUe) is called to generate a list of satellite times for both Aqua and Terra in the area of interest. This program is written in Python and its dependencies are pulled from a Docker container at `docker://brownccv/icefloetracker-fetchdata:main`. 
+The [Satellite Overpass Identification Tool](https://zenodo.org/record/6475619#.ZBhat-zMJUe) is called to generate a list of satellite times for both Aqua and Terra in the area of interest. This program is written in Python and its dependencies are pulled from a Docker container at `docker://brownccv/icefloetracker-soit:main`. 
 
 Register an account with [space-track.org](https://www.space-track.org/) to use SOIT. 
 
-To run SOIT manually :
+### Running using Docker
+
+To run SOIT using Docker:
 1. Make sure Docker Desktop is running on your local machine.
 2. Export SOIT username/password to environment variable.
    - [ ] From your home directory `nano .bash_profile`
@@ -20,14 +22,21 @@ To run SOIT manually :
    - [ ] ` export SPACEPSWD=<password>`
 3. Update inputs and run the following: 
 ```bash
-docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-fetchdata:main \
-python3 /usr/local/bin/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath /tmp --centroid_lat <input_centroid_lat> --centroid_lon <input_centroid_lon> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
+docker run --env SPACEUSER --env SPACEPSWD --mount type=bind,source=<your_desired_output_dir>,target=/tmp brownccv/icefloetracker-soit:main \
+--startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath /tmp --centroid_lat <input_centroid_lat> --centroid_lon <input_centroid_lon> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD
 ```
    * be sure to replace `source`, `startdate`, `enddate`, `centroid_lat`, and `centroid_lon` with your desired inputs
    * csvoutpath must remain as `/tmp` to bind the Docker container output path with your desired local path
 
-**Note:** The `pass_time_cylc.py` script in this project can be adapted to include additional satellites available in the [space-track.org](https://www.space-track.org/) repository. If you have `numpy` and `skyfield` installed in a local `conda` environment, you can run `pass_time_cylc.py` from the directory where you installed the Ice Floe Tracker Pipeline:
-```python3 workflow/scripts/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath <save_directory> --centroid_x <input_centroid_x> --centroid_y <input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD```
+**Note:** The `pass_time_cylc.py` script in this project can be adapted to include additional satellites available in the [space-track.org](https://www.space-track.org/) repository. 
+
+### Running using pipx
+
+To run SOIT, you can run `pass_time_cylc.py` from the directory where you installed the Ice Floe Tracker Pipeline using pipx.
+
+1. [Install pipx](https://pipx.pypa.io/stable/)
+2. Export SOIT username/password to environment variables as described above.
+3. Call `pipx run satellite-overpass-idenfitication-tool/pass_time_cylc.py --startdate <YYYY-MM-DD> --enddate <YYYY-MM-DD> --csvoutpath <save_directory> --centroid_x <input_centroid_x> --centroid_y <input_centroid_y> --SPACEUSER $SPACEUSER --SPACEPSWD $SPACEPSWD`
 
 ## Fetching data from NASA Worldview
 
