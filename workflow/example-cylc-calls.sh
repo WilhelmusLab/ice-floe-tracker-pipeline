@@ -1,4 +1,5 @@
-mkdir -p ~/.cylc/flow && cp global.cylc ~/.cylc/flow/.
+# Copy oscar configuration to your home directory
+mkdir -p ~/.cylc/flow && cp oscar.global.cylc ~/.cylc/flow/global.cylc
 
 cylc vip . --set-file example/iftpipeline-test-case.conf -n iftpipeline-test-case-lopez -s 'PREPROCESSING="Lopez"'
 cylc vip . --set-file example/iftpipeline-test-case.conf -n iftpipeline-test-case-buckley -s 'PREPROCESSING="Buckley"'
