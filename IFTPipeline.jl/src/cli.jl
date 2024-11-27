@@ -32,25 +32,25 @@ end
 
 function mkclipreprocess_single!(settings)
     @add_arg_table! settings["preprocess_single"] begin
-            "--truecolor", "-t"
-            help = "Truecolor image file (.tiff)"
-            required = true
-    
-            "--falsecolor", "-r"
-            help = "Falsecolor image file (.tiff)"
-            required = true
-    
-            "--landmask", "-l"
-            help = "Landmask image file (.tiff)"
-            required = true
-    
-            "--landmask-dilated", "-d"
-            help = "Landmask image file (dilated, .tiff)"
-            required = true
-    
-            "--output", "-o"
-            help = "Path to output segmented image file (.tiff)"
-            required = true
+        "--truecolor", "-t"
+        help = "Truecolor image file (.tiff)"
+        required = true
+
+        "--falsecolor", "-r"
+        help = "Falsecolor image file (.tiff)"
+        required = true
+
+        "--landmask", "-l"
+        help = "Landmask image file (.tiff)"
+        required = true
+
+        "--landmask-dilated", "-d"
+        help = "Landmask image file (dilated, .tiff)"
+        required = true
+
+        "--output", "-o"
+        help = "Path to output segmented image file (.tiff)"
+        required = true
     end
     return nothing
 end
@@ -473,7 +473,7 @@ end
 
 
 function main()
-    
+
     settings = ArgParseSettings(; autofix_names=true)
 
     @add_arg_table! settings begin
@@ -496,7 +496,7 @@ function main()
         "extractfeatures"
         help = "Extract ice floe features from segmented floe image"
         action = :command
-        
+
         "extractfeatures_single"
         help = "Extract ice floe features from a single segmented floe image"
         action = :command
@@ -517,9 +517,9 @@ function main()
         help = "Pair ice floes in day k with ice floes in day k+1"
         action = :command
     end
-    
+
     command_common_args = []
-    
+
 
     mkcli!(settings, command_common_args)
 
@@ -532,7 +532,7 @@ function main()
     @debug "debug message"
     @info "info message"
     @time command_func(; command_args...)
-    
+
     return nothing
 end
 
