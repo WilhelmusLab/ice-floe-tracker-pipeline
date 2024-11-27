@@ -154,7 +154,6 @@ Convert an image from an unsigned integer format into a fixed-point Gray format.
 
 See also: convert_uint_from_gray
 """
-
 function convert_gray_from_uint(image::AbstractArray{<:Integer})
     img_type = eltype(image)
     target_type = get(int_to_fixedpoint_map, img_type) do
