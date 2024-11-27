@@ -39,6 +39,9 @@
 [runtime]
     [[root]]
         work sub-directory = .
+        execution time limit = PT5M
+        [[[directives]]]
+            --mem = 8G
         
         [[[environment]]]
             # Update these variables with your run parameters
@@ -50,7 +53,9 @@
             {% elif IFT_INSTALL == "Docker" %}
                 IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
             {% elif IFT_INSTALL == "Apptainer" %}
-                IFT="apptainer run docker://brownccv/icefloetracker-julia"
+                IFT="apptainer run docker://brownccv/icefloetracker-julia:pr-196"
+            {% elif IFT_INSTALL == "ApptainerLocal" %}
+                IFT="apptainer run /oscar/data/mmart119/jholla10/ice-floe-tracker-pipeline/runtime/image/iftp-pr-196.simg"
             {% else %}
                  {{ raise('IFT_INSTALL not recognized.') }}
             {% endif %}
@@ -58,7 +63,7 @@
             {% if FSDPROC_INSTALL == "Local" %}
                 FSDPROC="pipx run --spec /workspaces/ice-floe-tracker-workspace/ebseg fsdproc --debug"
             {% elif FSDPROC_INSTALL == "Source" %}
-                FSDPROC="pipx run --spec https://github.com/WilhelmusLab/ebseg.git fsdproc --debug"
+                FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg fsdproc --debug"
             {% elif FSDPROC_INSTALL == "Docker" %}
                 {{ raise('FSDPROC_INSTALL `Docker` not implemented.') }}
             {% elif FSDPROC_INSTALL == "Apptainer" %}
@@ -104,11 +109,19 @@
         script = """
             ${FSDPROC} --help
         """
+    [[init_colorize]]
+        inherit = INIT
+        script = """
+            ${COLORIZE} --help
+        """
     [[init_iftp]]
         inherit = INIT
         script = """
             ${IFT} --help
         """
+        execution time limit = PT25M
+        [[[directives]]]
+            --mem = 64G
 
     [[soit]]
         execution retry delays = PT15S, PT10M, PT1H, PT3H
@@ -150,7 +163,7 @@
         inherit=LOAD
         execution retry delays = PT15S, PT10M, PT1H, PT3H
         [[[environment]]]
-            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --date ${date} --satellite ${satellite} "
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite} "
 
     [[load_truecolor<satellite>]]
         inherit = LOAD_IMAGE, <satellite>
@@ -177,6 +190,7 @@
         """
 
     [[PREPROCESS]]
+        execution time limit = PT120M
         execution retry delays = PT10M
 
     [[preprocess<satellite>]]
@@ -234,6 +248,9 @@
 
     [[tracking]]
         execution retry delays = PT10M
+        execution time limit = PT120M
+        [[[directives]]]
+            --mem = 64G
         # Pair and track identified floes across days
         script = """
             images=(*/segmented_floes.tiff)

@@ -1,19 +1,15 @@
+# Instantiate all the dependencies
+using Pkg
+Pkg.instantiate()
 
-if abspath(PROGRAM_FILE) == @__FILE__
+# Initialize the Conda environment
+using Conda
 
-    # Instantiate all the dependencies
-    using Pkg
-    Pkg.instantiate()
+# Add the dependencies to the Conda environment
+Conda.runconda(Conda.Cmd(["env", "update", "-n", "base", "--file", joinpath(@__DIR__, "environment.yaml")]))
 
-    # Initialize the Conda environment
-    ENV["PYTHON"]=""
-    Pkg.build("PyCall")
+# Force PyCall to use the Conda version on Linux.
+ENV["PYTHON"]=""  
 
-    # Add the dependencies to the Conda environment
-    using Conda
-    Conda.runconda(Conda.Cmd(["env", "update", "-n", "base", "--file", joinpath(@__DIR__, "environment.yaml")]))
-
-    # Rebuild PyCall with the new conda environment
-    Pkg.build("PyCall")
-
-end
+# Build PyCall with the new conda environment
+Pkg.build("PyCall")

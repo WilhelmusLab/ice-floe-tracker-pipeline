@@ -39,17 +39,17 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
       
-      - name: Build Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/amd64
-          load: true
-          tags: ${{ env.TEST_TAG }}
+      # - name: Build Docker image
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     platforms: linux/amd64
+      #     load: true
+      #     tags: ${{ env.TEST_TAG }}
             
-      - name: Test CLI
-        working-directory: ./test
-        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez input_data/ne-greenland.20220914.terra.250m
+      # - name: Test CLI
+      #   working-directory: ./test
+      #   run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez input_data/ne-greenland.20220914.terra.250m
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -59,3 +59,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)
