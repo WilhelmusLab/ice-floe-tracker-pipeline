@@ -145,9 +145,9 @@
             truecolor_file = ${img_prefix}truecolor.tiff
             falsecolor_file = ${img_prefix}falsecolor.tiff
             cloud_file = ${img_prefix}cloud.tiff
-            segmented_floes_file = ${img_prefix}segmented_floes.tiff
-            colorized_segmented_floes_file = ${img_prefix}segmented_floes.colorized.tiff
-            segmented_floes_props_file = ${img_prefix}segmented_floes.props.csv
+            labeled_file = ${img_prefix}labeled.tiff
+            colorized_labeled_file = ${img_prefix}labeled.colorized.tiff
+            labeled_props_file = ${img_prefix}labeled.props.csv
             overpass_time_file = ${img_prefix}overpass.txt
             hdf5_archive_file = ${img_prefix}results.h5
     
@@ -208,21 +208,21 @@
                 -r ${falsecolor_file} \
                 -l ${landmask_binarized_file} \
                 -d ${landmask_binarized_dilated_file} \
-                -o ${segmented_floes_file}
+                -o ${labeled_file}
             
             ${IFT} extractfeatures_single \
-                --input ${segmented_floes_file} \
-                --output ${segmented_floes_props_file} \
+                --input ${labeled_file} \
+                --output ${labeled_props_file} \
                 --minarea {{ MINFLOEAREA }} \
                 --maxarea {{ MAXFLOEAREA }}
             
             {% elif PREPROCESSING == "Buckley" %}
 
-            workdir="${segmented_floes_file}.work"
+            workdir="${labeled_file}.work"
             mkdir -p "${workdir}"
             ${FSDPROC} process ${truecolor_file} ${cloud_file} ${landmask_file} ${workdir}
-            cp ${workdir}/final.tif ${segmented_floes_file}
-            cp ${workdir}/props.csv ${segmented_floes_props_file}
+            cp ${workdir}/final.tif ${labeled_file}
+            cp ${workdir}/props.csv ${labeled_props_file}
             
             {% else %}
                  
@@ -230,7 +230,7 @@
             
             {% endif %}
 
-            ${COLORIZE} ${segmented_floes_file} ${colorized_segmented_floes_file}
+            ${COLORIZE} ${labeled_file} ${colorized_labeled_file}
         """
     
     [[exportH5<satellite>]]
@@ -241,8 +241,8 @@
             --passtime `cat ${overpass_time_file}` \
             --truecolor ${truecolor_file} \
             --falsecolor ${falsecolor_file} \
-            --labeled ${segmented_floes_file} \
-            --props ${segmented_floes_props_file} \
+            --labeled ${labeled_file} \
+            --props ${labeled_props_file} \
             --output ${hdf5_archive_file}
         """
 
@@ -253,10 +253,10 @@
             --mem = 64G
         # Pair and track identified floes across days
         script = """
-            images=(*/segmented_floes.tiff)
+            images=(*/labeled.tiff)
             props=${images[@]/.tiff/.props.csv}
             landmasks=(*/landmask.tiff)
-            passtimes=${images[@]/segmented_floes.tiff/overpass.txt}
+            passtimes=${images[@]/labeled.tiff/overpass.txt}
 
             ${IFT} track_single \
                 --imgs ${images[@]} \
