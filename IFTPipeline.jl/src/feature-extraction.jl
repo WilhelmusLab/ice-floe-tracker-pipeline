@@ -157,12 +157,10 @@ See also: convert_uint_from_gray
 
 function convert_gray_from_uint(image::AbstractArray{<:Integer})
     img_type = eltype(image)
-    
-    # Lookup the target type in the dictionary. If not found call the do block to throw the warning
     target_type = get(int_to_fixedpoint_map, img_type) do
         error("Missing mapping for $img_type in convert_gray_from_uint")
     end
-    image_reinterpreted  = Gray.(reinterpret.(target_type, image))
+    image_reinterpreted = Gray.(reinterpret.(target_type, image))
     return image_reinterpreted
 end
 
