@@ -20,7 +20,7 @@ def main(
     randomize: bool = True,
 ):
     with rasterio.open(input_path) as in_dataset:
-        assert in_dataset.count == 1  # one band
+        assert in_dataset.count == 1, "There should be only one band in the dataset"
         band1 = in_dataset.read(1)
 
         max_value = int(band1.max())
