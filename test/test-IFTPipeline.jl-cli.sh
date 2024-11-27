@@ -26,9 +26,19 @@ SAMPLEIMG=${DATA_TARGET}/20220914.terra.truecolor.250m.tiff
 # Set up debug messages
 export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" 
 
-# Run the processing
+# Run the processing (single files)
+LANDMASK=${DATA_TARGET}/landmask.tiff
+LANDMASK_NON_DILATED=${DATA_TARGET}/landmask.non-dilated.tiff
+LANDMASK_DILATED={DATA_TARGET}/landmask.dilated.tiff 
+
+${IFT} landmask_single -i ${LANDMASK} -o ${LANDMASK_NON_DILATED} -d ${LANDMASK_DILATED}
+
+
+
+# Run the processing (batch)
 ${IFT} landmask ${DATA_TARGET} ${DATA_TARGET}
 ${IFT} preprocess -t ${DATA_TARGET} -r ${DATA_TARGET} -l ${DATA_TARGET} -p ${DATA_TARGET} -o ${DATA_TARGET}
 ${IFT} extractfeatures -i ${DATA_TARGET} -o ${DATA_TARGET}
 ${IFT} track --imgs ${DATA_TARGET} --props ${DATA_TARGET} --passtimes ${DATA_TARGET} --latlon ${SAMPLEIMG} -o ${DATA_TARGET}
 ${IFT} makeh5files --pathtosampleimg ${SAMPLEIMG} --resdir ${DATA_TARGET}
+
