@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-# Use this file by calling like this:
-#   source ./test-IFTPipeline.jl-cli.sh && preprocess_lopez input_data/ne-greenland.20220913.terra.250m/
-#   source ./test-IFTPipeline.jl-cli.sh && preprocess_buckley input_data/ne-greenland.20220913.terra.250m/
-#   source ./test-IFTPipeline.jl-cli.sh && PREPROCESS=preprocess_lopez track input_data/ne-greenland.2022091{3,4}.terra.250m/
-#   source ./test-IFTPipeline.jl-cli.sh && track_original input_data/ne-greenland.2022091{3,4}.terra.250m/
-#   source ./test-IFTPipeline.jl-cli.sh && track_buckley input_data/ne-greenland.2022091{3.terra,4.aqua}.250m/
-
 # Set variables with the script names we're going to use. 
 # If these are set as environment variables outside, then the outside version will be used.
 # This might be useful if you're trying to test a Docker container – 
