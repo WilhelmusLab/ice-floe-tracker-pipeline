@@ -38,7 +38,6 @@ end
 """
 function landmask_single(; input::String, output_non_dilated::String, output_dilated::String)
     @info "Using $input as landmask"
-    check_landmask_path(input)
     img = load(input)
     @info "Landmask found at $input."
 
