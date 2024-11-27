@@ -51,11 +51,19 @@ module load python/3.11.0s-ixrhc3q
 . ../runtime/venv/bin/activate
 ```
 
-Update your `~/.cylc/flow/global.cylc` file to include the following lines:
+Update your `~/.cylc/flow/global.cylc` file to include the following lines to use the SLURM scheduler:
 ```
 [platforms]
     [[localhost]]
         job runner = slurm
+```
+
+... and the following lines to store the data outside of your home directory: 
+```
+[install]
+    [[symlink dirs]]
+        [[[localhost]]]
+            run = /oscar/data/mmart119/jholla10/ice-floe-tracker-pipeline/workflow/run/
 ```
 
 This will ensure that jobs from `cylc` are scheduled using `Slurm`.
