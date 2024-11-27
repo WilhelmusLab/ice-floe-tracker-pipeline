@@ -28,12 +28,13 @@ testnames = [n[6:(end-3)] for n in alltests]
 ## Put the filenames to test below
 
 to_test = alltests # uncomment this line to run all tests or add individual files below
-[
-    "test-h5.jl"
-]
+# to_test = [
+#     "test-h5.jl",
+#     "test-pipeline.jl"
+# ]
 
 # Run the tests
-@testset verbose = true "IceFloeTracker.jl" begin
+@testset verbose = true "IFTPipeline.jl" begin
     for test in to_test
         include(test)
     end

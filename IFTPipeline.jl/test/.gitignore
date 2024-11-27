@@ -1,0 +1,3 @@
+__temp__
+test_inputs/input_pipeline/*.jls
+!test_inputs/input_pipeline/{filenames,generated_landmask,passtimes}.jls
