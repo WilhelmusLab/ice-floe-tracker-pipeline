@@ -5,4 +5,4 @@
 [install]
     [[symlink dirs]]
         [[[localhost]]]
-            run = /oscar/data/mmart119/jholla10/cylc-run
+            run = /oscar/data/mmart119/jholla10/
