@@ -13,9 +13,21 @@ You will need the following installed on your computer:
   - [`global.cylc`](https://cylc.github.io/cylc-doc/stable/html/reference/config/global.html#global.cylc) file, making any modifications you might want.
 - [`docker`](https://docs.docker.com/)
 
+You will also need a username and account on [space-track.org](https://space-track.org)
+
 ### Running the pipeline
 
 Make a new configuration file with the region and time period you want to analyse. All the possible parameters are listed in [rose-suite.conf](./rose-suite.conf). You can see examples in [example](./example/). 
+
+Add the following lines to the rose-suite.conf file with your space-track.org username and password:
+```
+SPACEUSER="your_email_address@example.com"
+SPACEPSWD="yourpassword"
+```
+
+Don't commit these changes to the repo.
+<!-- TODO: Insecure. Make this import from an environment file or the keychain. -->
+
 
 Run the pipeline by calling:
 ```bash
