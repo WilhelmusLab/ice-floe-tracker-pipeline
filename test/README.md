@@ -34,3 +34,12 @@ For example:
 IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia" track_buckley input_data/ne-greenland.2022091{3,4}.terra.250m/
 ```
 
+Or with Apptainer:
+```bash
+IFT="apptainer run brownccv/icefloetracker-julia:pr-198" preprocess_lopez input_data/ne-greenland.20220913.terra.250m/
+```
+
+or 
+```bash
+IFT="apptainer run `pwd`/../runtime/image/iftp-pr-198.simg" preprocess_lopez input_data/ne-greenland.20220913.terra.250m/
+```
