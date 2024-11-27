@@ -159,13 +159,13 @@ function convert_gray_from_uint(image::AbstractArray{<:Integer})
         UInt64 => N0f64,
         Int64 => Q0f63
     )
-    
+
     # Lookup the target type in the dictionary. If not found call the do block to throw the warning
     target_type = get(type_map, img_type) do
         @warn "Missing mapping for $img_type"
         return img_type # Fallback to the original type if not found
     end
-    image_reinterpreted  = Gray.(reinterpret.(target_type, image))
+    image_reinterpreted = Gray.(reinterpret.(target_type, image))
     return image_reinterpreted
 end
 
