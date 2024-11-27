@@ -1,0 +1,38 @@
+{
+	"name": "Ice Floe Tracker Pipeline",
+	
+	"build": {
+        "dockerfile": "Dockerfile"
+    },
+	
+	"features": {
+		"ghcr.io/julialang/devcontainer-features/julia:1": {
+			"channel": "lts"
+		},
+		"ghcr.io/devcontainers/features/python:1": {
+			"installTools": true,
+			"version": "3.11"
+		},
+		"ghcr.io/devcontainers-contrib/features/pipx-package:1": {
+			"includeDeps": true,
+			"package": "cylc-rose",
+			"interpreter": "python3.11"
+		},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"github.vscode-github-actions",
+				"mechatroner.rainbow-csv",
+				"analytic-signal.preview-tiff",
+				"cylc.vscode-cylc"
+			]
+		}
+	},
+
+	"postCreateCommand": ""
+}
