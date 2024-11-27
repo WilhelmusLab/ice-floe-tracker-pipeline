@@ -1,9 +1,8 @@
-[install]
-    [[symlink dirs]]
-        [[[localhost]]]
-            run = /oscar/data/mmart119/jholla10/ice-floe-tracker-pipeline/workflow/run/
-
 [platforms]
     [[localhost]]
         job runner = slurm
         
+[install]
+    [[symlink dirs]]
+        [[[localhost]]]
+            run = /oscar/data/mmart119/jholla10/cylc-run
