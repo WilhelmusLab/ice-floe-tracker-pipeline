@@ -136,7 +136,7 @@ function save_labeled_img(image::AbstractArray{<:Integer}, path::AbstractString)
     return path
 end
 
-int_to_fixedpoint_map = Dict(
+INT_TO_FIXEDPOINT_MAP = Dict(
     UInt8 => N0f8,
     Int8 => Q0f7,
     UInt16 => N0f16,
@@ -154,17 +154,16 @@ Convert an image from an unsigned integer format into a fixed-point Gray format.
 
 See also: convert_uint_from_gray
 """
-
 function convert_gray_from_uint(image::AbstractArray{<:Integer})
     img_type = eltype(image)
-    target_type = get(int_to_fixedpoint_map, img_type) do
+    target_type = get(INT_TO_FIXEDPOINT_MAP, img_type) do
         error("Missing mapping for $img_type in convert_gray_from_uint")
     end
     image_reinterpreted = Gray.(reinterpret.(target_type, image))
     return image_reinterpreted
 end
 
-fixedpoint_to_int_map = Dict(Gray{value} => key for (key, value) in int_to_fixedpoint_map)
+FIXEDPOINT_TO_INT_MAP = Dict(Gray{value} => key for (key, value) in INT_TO_FIXEDPOINT_MAP)
 
 """
     convert_uint_from_gray(image)
@@ -176,7 +175,7 @@ See also: convert_gray_from_uint
 function convert_uint_from_gray(image)
     image_reinterpreted = rawview(channelview(image))
     img_type = eltype(image)
-    target_type = get(fixedpoint_to_int_map, img_type) do
+    target_type = get(FIXEDPOINT_TO_INT_MAP, img_type) do
         error("Missing mapping for $img_type in convert_uint_from_gray")
     end
     image_recast = target_type.(image_reinterpreted)
