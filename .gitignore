@@ -19,5 +19,4 @@ trackplayground.jl
 
 *.simg
 
-.JuliaFormatter.toml
 runtime/
