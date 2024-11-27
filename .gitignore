@@ -1,5 +1,3 @@
-Manifest.toml
-
 resources/*
 !resources/README.md
 
