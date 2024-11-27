@@ -26,3 +26,14 @@ julia --project="PythonSetupForIFTPipeline.jl" PythonSetupForIFTPipeline.jl/setu
 > rm -r ~/.julia/conda/
 > ```
 > ... and then retry.
+
+If you're working on a system where the home directory might not be reliable, 
+e.g. you're building a Docker container but you want to use it with Apptainer 
+which mounts things in different ways, you may want to change 
+the default location for the Conda installation.
+
+Export a different path in `CONDA_JL_HOME` before running setup:
+```bash
+export CONDA_JL_HOME="/opt/conda-env/"
+julia --project="PythonSetupForIFTPipeline.jl" PythonSetupForIFTPipeline.jl/setup.jl
+```

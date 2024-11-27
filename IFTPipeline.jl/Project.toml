@@ -31,4 +31,4 @@ PyCall = "1.96"
 TOML = "1.0"
 
 [sources]
-IceFloeTracker = {url = "https://github.com/WilhelmusLab/IceFloeTracker.jl", rev = "main"}
+IceFloeTracker = { url = "https://github.com/WilhelmusLab/IceFloeTracker.jl", rev = "f6551c7315f114916dbfb34a1a9b343317ca6d17"}
