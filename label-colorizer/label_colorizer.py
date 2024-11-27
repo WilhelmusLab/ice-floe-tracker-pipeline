@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.11
+"""Utility to assign random colors to values in a grayscale integer array saved as a GeoTIFF."""
 
 import typer
 import pathlib
