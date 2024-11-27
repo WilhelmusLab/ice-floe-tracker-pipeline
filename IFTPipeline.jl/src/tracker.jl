@@ -89,10 +89,17 @@ function track_single(;
 
     # Load the files – can we drop the memory requirements by doing two at once?
     @info "Loading $imgs"
-    imgs_ = [Integer.(rawview(channelview((FileIO.load(img))))) for img in imgs]
-
+    imgs_ = [load_labeled_img(img) for img in imgs]
+    
     @info "Loading $props"
     props_ = [DataFrame(CSV.File(prop)) for prop in props]
+    # go through each of the props_ dataframes and convert each 
+    # into the element type from the corresponding image.
+    for (img_, prop_) in zip(imgs_, props_)
+        label_type = eltype(img_)
+        @debug "converting labels to $label_type"
+        prop_[!,:label] = convert.(label_type, prop_[!,:label])
+    end
     @info "Loaded: $props_"
 
     @info "Using passtimes=$passtimes"

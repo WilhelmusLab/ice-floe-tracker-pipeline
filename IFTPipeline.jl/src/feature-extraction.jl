@@ -48,16 +48,18 @@ julia> IFTPipeline.extractfeatures(bw_img; minarea=minarea, maxarea=maxarea, fea
 ```
 """
 function extractfeatures(
-    bw::T;
+    floes::AbstractArray{<:Union{Integer,Bool}};
     minarea::Int64=350,
     maxarea::Int64=90000,
     features::Union{Vector{Symbol},Vector{<:AbstractString}}
-)::DataFrame where {T<:AbstractArray{Bool}}
+)::DataFrame
     # assert the first area threshold is less than the second
     minarea >= maxarea &&
         throw(ArgumentError("The minimum area must be less than the maximum area."))
 
-    props = regionprops_table(label_components(bw, trues(3, 3)); properties=features)
+    floes = isa(eltype(floes), Bool) ? label_components(floes, trues(3, 3)) : floes
+    props = regionprops_table(floes; properties=features)
+    @debug "loaded $props"
 
     # filter by area using the area thresholds
     return props[minarea.<=props.area.<=maxarea, :]
@@ -94,11 +96,11 @@ end
 function extractfeatures_single(;
     input::String, output::String, minarea::Int64, maxarea::Int64, features::Array{String}
 )
-    @info "Loading segmented floes as a binarized image from $input"
-    segmented_floes = BitMatrix(FileIO.load(input))
+    @info "Loading segmented floes from $input"
+    labeled_floes = Int.(load_labeled_img(input))
 
     @info "Extracting features from each floe: $features"
-    props = IFTPipeline.extractfeatures(segmented_floes; minarea=minarea, maxarea=maxarea, features=features)
+    props = IFTPipeline.extractfeatures(labeled_floes; minarea=minarea, maxarea=maxarea, features=features)
 
     @info "Extracted properties:"
     @info props
@@ -106,4 +108,76 @@ function extractfeatures_single(;
     @info "Writing to $output"
     FileIO.save(output, props)
     return nothing
+end
+
+"""
+    load_labeled_img(path)
+
+Load an unsigned integer image from a file.
+
+See also: save_labeled_img
+"""
+function load_labeled_img(path::AbstractString)
+    image = FileIO.load(path)
+    image_reinterpreted = convert_uint_from_gray(image)
+    return image_reinterpreted
+end
+
+"""
+    save_labeled_img(image, path)
+
+Save an unsigned integer image to an image file.
+
+See also: load_labeled_img
+"""
+function save_labeled_img(image::AbstractArray{T} where {T <: Union{UInt8, UInt16, UInt32, UInt64}}, path::AbstractString)
+    image_reinterpreted = convert_gray_from_uint(image)
+    FileIO.save(path, image_reinterpreted)
+    return path
+end
+
+"""
+    convert_gray_from_uint(image)
+
+Convert an image from an unsigned integer format into a fixed-point Gray format.
+
+See also: convert_uint_from_gray
+"""
+
+function convert_gray_from_uint(image::AbstractArray{T} where {T <: Union{UInt8, UInt16, UInt32, UInt64}})
+    if eltype(image) === UInt8
+        target_type = N0f8
+    elseif eltype(image) === UInt16
+        target_type = N0f16
+    elseif eltype(image) === UInt32
+        target_type = N0f32
+    elseif eltype(image) === UInt64
+        target_type = N0f64
+    end
+    image_reinterpreted  = Gray.(reinterpret.(target_type, image))
+    return image_reinterpreted
+end
+
+"""
+    convert_uint_from_gray(image)
+
+Convert an image from a fixed-point Gray format into unsigned integers.
+
+See also: convert_gray_from_uint
+"""
+function convert_uint_from_gray(image)
+    image_reinterpreted = rawview(channelview(image))
+    element_type = eltype(image)
+    @info "$element_type"
+    if eltype(image) === Gray{N0f8}
+        target_type = UInt8
+    elseif eltype(image) === Gray{N0f16}
+        target_type = UInt16
+    elseif eltype(image) === Gray{N0f32}
+        target_type = UInt32
+    elseif eltype(image) === Gray{N0f64}
+        target_type = UInt64
+    end
+    image_recast = target_type.(image_reinterpreted)
+    return image_recast
 end
