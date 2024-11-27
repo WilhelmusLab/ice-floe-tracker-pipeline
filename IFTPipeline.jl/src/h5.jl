@@ -26,7 +26,7 @@ Choose the appropriate unsigned integer type based on a maximum value.
       * `UInt128` if 0 ≤ `mx` ≤ 2^128 - 1.
 
 """
-function choose_dtype(mx::T) where {T <: Integer}
+function choose_dtype(mx::T) where {T<:Integer}
     types = [UInt8, UInt16, UInt32, UInt64, UInt128]
     for t_ in types
         if typemin(t_) <= mx <= typemax(t_)
@@ -138,7 +138,7 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
 end
 
 
-function makeh5files_single(; passtime::DateTime, iftversion::Union{String, Nothing}=nothing, truecolor::String, falsecolor::String, labeled::String, props::String, output::String)
+function makeh5files_single(; passtime::DateTime, iftversion::Union{String,Nothing}=nothing, truecolor::String, falsecolor::String, labeled::String, props::String, output::String)
     latlondata = getlatlon(truecolor)
     ptsunix = Int64(Dates.datetime2unix(passtime))
     labeled_ = load_labeled_img(labeled)
