@@ -57,7 +57,6 @@ function extractfeatures(
     minarea >= maxarea &&
         throw(ArgumentError("The minimum area must be less than the maximum area."))
 
-    @info "converted floes from: "
     floes = (eltype(floes) <: Bool ? label_components(floes, trues(3, 3)) : floes)
     props = regionprops_table(floes; properties=features)
     @debug "loaded $props"
