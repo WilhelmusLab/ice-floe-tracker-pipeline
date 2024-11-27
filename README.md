@@ -280,3 +280,38 @@ ift_segmented = np.ma.masked_array(ift_segmented, mask=ift_segmented==0)
 fig, ax = plt.subplots()
 ax.imshow(ift_segmented, cmap='prism')
 ```
+
+## Logging
+
+The command line tools all implement logging to `Stderr`.
+
+To redirect Stdout and Stderr  to a file, append `&> outfile.log` to the command, e.g.:
+```bash
+julia --project=IFTPipeline.jl IFTPipeline.jl/src/cli.jl landmask ./input_directory/ ./output_directory/ &> outfile.log
+```
+
+To print the output to the console in addition to writing it to a file, append  `|& tee outfile.log` to the command, e.g.:
+```bash
+julia --project=IFTPipeline.jl IFTPipeline.jl/src/cli.jl landmask ./input_directory/ ./output_directory/ |& tee outfile.log
+```
+
+This works the same way for all the command line tools, including those in Julia, Python, and Bash.
+
+When used within the cylc workflow, the logs are automatically saved to the `cylc-run` directory 
+and can be viewed using the `cylc tui` or `cylc gui` or viewed directly from the terminal, e.g.:
+```bash
+cat ./cylc-run/<workflow-name>/<run#>/log/job/1/<task-name>/01/job.err
+```
+
+Debug messages (from `@debug` macros in the code) can be activated for 
+each command line task by calling Julia with the `JULIA_DEBUG` environment variable set.
+
+To activate debug logging for the Ice Floe Tracker, call:
+```bash
+JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" julia --project=IFTPipeline.jl IFTPipeline.jl/src/cli.jl landmask
+```
+
+To activate debug logging for all the packages used (many more messages), call:
+```bash
+JULIA_DEBUG="all" julia --project=IFTPipeline.jl IFTPipeline.jl/src/cli.jl landmask ...
+```

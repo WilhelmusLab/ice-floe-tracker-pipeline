@@ -1,7 +1,6 @@
 #!/usr/bin/env julia
 
 using ArgParse
-using LoggingExtras
 using IceFloeTracker
 using IFTPipeline
 using Serialization
@@ -228,34 +227,6 @@ function mkcli!(settings, common_args)
 end
 
 
-"""
-    setuplogger(option::Int64, path::String)
-
-Setup logger for the ice floe tracker. If `option` is 0, log to file only. If `option` is 1, log to file and terminal.
-"""
-function setuplogger(option::Int64, command::Symbol)
-    output = joinpath(@__DIR__, "..", "report")
-    cmd = string(command)
-
-    filelogger = FileLogger(joinpath(output, "$cmd-logfile.log")) # add command prefix to logfile name
-
-    # filter out debug messages
-    filtlogger = EarlyFilteredLogger(filelogger) do args
-        r = Logging.Info <= args.level <= Logging.Warn && args._module === IFTPipeline
-        return r
-    end
-
-    if option == 0
-        return TeeLogger(filtlogger,
-        )
-    elseif option == 1
-        return TeeLogger(
-            global_logger(),
-            filtlogger
-        )
-    end
-end
-
 function main()
     
     settings = ArgParseSettings(; autofix_names=true)
@@ -281,12 +252,9 @@ function main()
         help = "Pair ice floes in day k with ice floes in day k+1"
         action = :command
     end
-
-    command_common_args = [
-        "--log",
-        Dict(:help => "Show log on terminal; either 1 or 0", :required => false, :arg_type => Int,
-            :default => 0, :range_tester => (x -> x == 0 || x == 1)
-        )]
+    
+    command_common_args = []
+    
 
     mkcli!(settings, command_common_args)
 
@@ -295,16 +263,11 @@ function main()
     command = parsed_args[:_COMMAND_]
     command_args = parsed_args[command]
     command_func = getfield(IFTPipeline, Symbol(command))
-    logoption = command_args[:log]
 
-    # delete log option from command_args so it doesn't get passed to command_func
-    delete!(command_args, :log)
-
-    logger = setuplogger(logoption, command)
-
-    with_logger(logger) do
-        @time command_func(; command_args...)
-    end
+    @debug "debug message"
+    @info "info message"
+    @time command_func(; command_args...)
+    
     return nothing
 end
 
