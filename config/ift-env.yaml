@@ -1,7 +1,0 @@
-name: ift-env
-
-channels:
-  - conda-forge
-
-dependencies:
-  - cylc-flow=8.2.1

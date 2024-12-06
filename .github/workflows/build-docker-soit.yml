@@ -1,19 +1,20 @@
 # from https://docs.github.com/en/actions/guides/publishing-docker-images
 
-name: Build and PushContainer - Julia
+name: Build and PushContainer - SOIT
 on:
   push:
     branches:
       - 'main'
     tags:
       - 'v*.*.*'
-  pull_request:
-  workflow_dispatch:
+  pull_request:  
+    branches:
+      - 'main'
 
 env:
   REGISTRY: hub.docker.com
-  IMAGE_NAME: brownccv/icefloetracker-julia
-  TEST_TAG: brownccv/icefloetracker-julia:test
+  IMAGE_NAME: brownccv/icefloetracker-soit
+  TEST_TAG: brownccv/icefloetracker-soit:test
 
 jobs:
   build_and_push:
@@ -38,28 +39,30 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE_NAME }}
-      
+
       - name: Build Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./satellite-overpass-identification-tool
           platforms: linux/amd64
           load: true
           tags: ${{ env.TEST_TAG }}
-          build-args: |
-            JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)
-            
-      - name: Test CLI
-        working-directory: ./test
-        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez input_data/ne-greenland.20220914.terra.250m
+          
+      - name: Test SOIT
+        run: |
+          docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }} \
+          -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
+          --startdate 2013-03-31 --enddate 2013-05-01 \
+          --lat 76.0015 --lon -18.4315 \
+          --csvoutpath .
+        
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v5
         with:
-          context: .
-          platforms: linux/amd64
+          context: ./satellite-overpass-identification-tool
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)
+  
