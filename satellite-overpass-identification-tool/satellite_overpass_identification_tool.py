@@ -69,7 +69,7 @@ def get_passtimes(start_date, end_date, csvoutpath, lat, lon, SPACEUSER, SPACEPS
     rows = []
 
     # Loop through each day until the end date of interest is reached.
-    while not np.array_equiv(tomorrow, end_date):
+    while not np.array_equiv(today, end_date):
         # Get UTC time values of the start of today and the start of tomorrow.
         # Passes between these times are considered.
         t0 = to_utc(today)
