@@ -29,5 +29,3 @@ jobs:
                 --startdate 2013-03-31 --enddate 2013-05-01 \
                 --lat 76.0015 --lon -18.4315 \
                 --csvoutpath tracker-results.csv
-
-            
