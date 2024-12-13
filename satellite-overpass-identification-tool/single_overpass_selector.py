@@ -7,26 +7,23 @@ def main():
         description="Aqua and Terra Satellite Overpass time tool"
     )
     parser.add_argument(
+        "path",
         type=pathlib.Path,
-        dest="path",
         help="Path to the CSV file",
     )
     parser.add_argument(
         "--date",
         type=pandas.to_datetime,
-        dest="date",
         help="Date in format YYYY-MM-DD",
     )
     parser.add_argument(
         "--satellite",
         type=str,
-        dest="satellite",
         help="satellite name in lowercase, e.g. 'aqua', 'terra'",
     )
     parser.add_argument(
         "--field",
         type=str,
-        dest="field",
         default="overpass time",
         help="name of the field to report",
     )
