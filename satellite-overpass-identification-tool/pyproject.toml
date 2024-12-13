@@ -10,6 +10,7 @@ dependencies = [
   "requests==2.31.0",
   "skyfield==1.45.0",
   "numpy==1.26",
+  "pandas"
 ]
 
 [project.scripts]
