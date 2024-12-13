@@ -9,7 +9,7 @@ def main():
     parser.add_argument(
         type=pathlib.Path,
         dest="path",
-        help="Date in format YYYY-MM-DD",
+        help="Path to the CSV file",
     )
     parser.add_argument(
         "--date",
@@ -36,7 +36,7 @@ def main():
 
 def get_single_field(path, date, satellite, field):
     df = pandas.read_csv(path, index_col=["date", "satellite"], parse_dates=["date"])
-    print(df.loc[date,satellite]["overpass time"])
+    print(df.loc[date,satellite][field])
 
 
 if __name__ == "__main__":
