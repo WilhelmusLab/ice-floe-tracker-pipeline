@@ -30,9 +30,4 @@ jobs:
                 --lat 76.0015 --lon -18.4315 \
                 --csvoutpath tracker-results.csv
 
-            - name: Run SOIT selector
-              run: |
-                  pipx run --spec ./satellite-overpass-identification-tool soit-select \
-                  --date 2013-03-31 --satellite aqua \
-                  tracker-results.csv
             
