@@ -12,10 +12,11 @@
     runahead limit = P1
     [[graph]]
         R1 = """
-            INIT 
-            init_soit => soit
+            INIT
+            init_soit => get_all_overpass_times
         """
         P1D = """
+            get_all_overpass_times[^] => get_single_overpass_time<satellite>
             INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all => exportH5 => done
             done[-P1D] => done
 
@@ -124,7 +125,7 @@
         [[[directives]]]
             --mem = 64G
 
-    [[soit]]
+    [[get_all_overpass_times]]
         execution retry delays = PT15S, PT10M, PT1H, PT3H
         script = """
             ${PASS_TIME} --csvoutpath ${all_overpass_time_file} \
@@ -154,7 +155,7 @@
     
     [[LOAD]]
         
-    [[load_soit_daily<satellite>]]
+    [[get_single_overpass_time<satellite>]]
         inherit = LOAD, <satellite>
         script = """
             # Get the date of the current task cycle point in YYYY-MM-DD format
