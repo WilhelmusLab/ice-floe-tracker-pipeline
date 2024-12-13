@@ -14,6 +14,7 @@ dependencies = [
 
 [project.scripts]
 soit="satellite_overpass_identification_tool:main"
+soit-select="single_overpass_selector:main"
 
 [build-system]
 requires = ["hatchling"]
