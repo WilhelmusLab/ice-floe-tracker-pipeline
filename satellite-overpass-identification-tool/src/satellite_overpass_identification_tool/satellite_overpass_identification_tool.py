@@ -91,12 +91,56 @@ def get_passtimes(start_date, end_date, csvoutpath, lat, lon, SPACEUSER, SPACEPS
         today = getNextDay(today)
         tomorrow = getNextDay(today)
 
-    csvwrite(start_date, end_date, lat, lon, rows, csvoutpath)
+    fields_, rows_ = convert_fields_mdy_folded_to_iso8601_unfolded(rows)
+    csvwrite(start_date, end_date, lat, lon, fields_, rows_, csvoutpath)
+
+def convert_fields_mdy_folded_to_iso8601_unfolded(rows):
+    """Convert a row from [MM-DD-YYYY, UTC time (aqua), UTC time (terra)] to [YYYY-MM-DD, Satellite, ISO8601 datetime] format.
+    
+    Examples:
+        >>> convert_fields_mdy_folded_to_iso8601_unfolded([("03-31-2013", "11:50:20", "14:45:05"),])
+        ... # doctest: +NORMALIZE_WHITESPACE
+        (['Date', 'Satellite', 'Datetime'], 
+         [['2013-03-31', 'aqua',  '2013-03-31T11:50:20Z'], 
+          ['2013-03-31', 'terra', '2013-03-31T14:45:05Z']])
+
+        >>> convert_fields_mdy_folded_to_iso8601_unfolded([("12-01-2609", "23:59:01", "00:00:00"),])
+        ... # doctest: +NORMALIZE_WHITESPACE
+        (['Date', 'Satellite', 'Datetime'], 
+         [['2609-12-01', 'aqua',  '2609-12-01T23:59:01Z'], 
+          ['2609-12-01', 'terra', '2609-12-01T00:00:00Z']])
+
+        
+        >>> convert_fields_mdy_folded_to_iso8601_unfolded([
+        ...     ("03-31-2013", "11:50:20", "14:45:05"),
+        ...     ("04-01-2013", "11:52:20", "14:43:05"),
+        ... ])
+        ... # doctest: +NORMALIZE_WHITESPACE
+        (['Date', 'Satellite', 'Datetime'], 
+         [['2013-03-31', 'aqua',  '2013-03-31T11:50:20Z'], 
+          ['2013-03-31', 'terra', '2013-03-31T14:45:05Z'], 
+          ['2013-04-01', 'aqua',  '2013-04-01T11:52:20Z'], 
+          ['2013-04-01', 'terra', '2013-04-01T14:43:05Z']])
+        
+
+    """
+    new_fields = ["Date", "Satellite", "Datetime"]
+    new_rows = []
+    for row in rows:
+        date_mm_dd_yyyy, aqua_time, terra_time = row
+        m, d, y = map(int, date_mm_dd_yyyy.split("-"))
+        date_yyyy_mm_dd = datetime.date(y, m, d)
+        
+        new_rows.append([f"{date_yyyy_mm_dd}", "aqua", f"{date_yyyy_mm_dd}T{aqua_time}Z"])
+        new_rows.append([f"{date_yyyy_mm_dd}", "terra", f"{date_yyyy_mm_dd}T{terra_time}Z"])
+    
+    return new_fields, new_rows
+
 
 
 # Write CSV of all pass information.
-def csvwrite(startdate, enddate, lat, lon, rows, outpath):
-    fields = ["Date", "Aqua pass time", "Terra pass time"]
+def csvwrite(startdate, enddate, lat, lon, rows, outpath, fields=["Date", "Aqua pass time", "Terra pass time"]):
+    
     outpath_ = pathlib.Path(outpath)
     
     if outpath_.is_dir():
