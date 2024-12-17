@@ -77,7 +77,7 @@
             {% if PASS_TIME_INSTALL == "Local" %}
                 {{ raise('PASS_TIME_INSTALL `Local` not implemented.') }}
             {% elif PASS_TIME_INSTALL == "Source" %}
-                PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
+                PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline#subdirectory=satellite-overpass-identification-tool soit"
             {% elif PASS_TIME_INSTALL == "Docker" %}
                 {{ raise('PASS_TIME_INSTALL `Docker` not implemented.') }}
             {% elif PASS_TIME_INSTALL == "Apptainer" %}
