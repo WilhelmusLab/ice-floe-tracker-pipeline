@@ -25,6 +25,7 @@ import numpy as np
 import csv
 import math
 import argparse
+import pathlib
 
 # URLs for space track login.
 uriBase = "https://www.space-track.org"
@@ -96,7 +97,17 @@ def get_passtimes(start_date, end_date, csvoutpath, lat, lon, SPACEUSER, SPACEPS
 # Write CSV of all pass information.
 def csvwrite(startdate, enddate, lat, lon, rows, outpath):
     fields = ["Date", "Aqua pass time", "Terra pass time"]
-    filename = f"{outpath}/passtimes_lat{lat}_lon{lon}_{''.join(startdate)}_{''.join(enddate)}.csv"
+    outpath_ = pathlib.Path(outpath)
+    
+    if outpath_.is_dir():
+        csv_name = f"passtimes_lat{lat}_lon{lon}_{''.join(startdate)}_{''.join(enddate)}.csv"
+        filename = outpath_ / pathlib.Path(csv_name)
+    elif outpath_.suffix == ".csv":
+        filename = outpath_
+    else:
+        msg = "Output path neither a directory nor a .csv file: %s" % outpath
+        raise IOError(msg)
+
     with open(filename, "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
@@ -367,7 +378,7 @@ def main():
     parser.add_argument(
         "--csvoutpath",
         type=str,
-        help="Path to output CSV file",
+        help="Path to output CSV file, or a directory, where the output should be written",
     )
 
     args = parser.parse_args()
