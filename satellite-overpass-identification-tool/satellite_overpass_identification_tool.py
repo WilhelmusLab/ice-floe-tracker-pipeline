@@ -100,7 +100,8 @@ def csvwrite(startdate, enddate, lat, lon, rows, outpath):
     outpath_ = pathlib.Path(outpath)
     
     if outpath_.is_dir():
-        filename = outpath_ / pathlib.Path(f"passtimes_lat{lat}_lon{lon}_{''.join(startdate)}_{''.join(enddate)}.csv")
+        csv_name = f"passtimes_lat{lat}_lon{lon}_{''.join(startdate)}_{''.join(enddate)}.csv"
+        filename = outpath_ / pathlib.Path(csv_name)
     elif outpath_.suffix == ".csv":
         filename = outpath_
     else:
