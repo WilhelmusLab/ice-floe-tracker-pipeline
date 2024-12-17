@@ -51,7 +51,7 @@
             all_overpass_time_file="overpass-times.csv"
             
             {% if IFT_INSTALL == "Local" %}
-                IFT="julia --project=/workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl/src/cli.jl"
+                {{ raise('IFT_INSTALL `Local` not implemented.') }}
             {% elif IFT_INSTALL == "Docker" %}
                 IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
             {% elif IFT_INSTALL == "Apptainer" %}
