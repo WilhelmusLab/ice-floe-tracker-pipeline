@@ -56,8 +56,6 @@
                 IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
             {% elif IFT_INSTALL == "Apptainer" %}
                 IFT="apptainer run docker://brownccv/icefloetracker-julia:pr-198"
-            {% elif IFT_INSTALL == "ApptainerLocal" %}
-                IFT="apptainer run /oscar/data/mmart119/jholla10/ice-floe-tracker-pipeline/runtime/image/iftp-pr-198.simg"
             {% else %}
                  {{ raise('IFT_INSTALL not recognized.') }}
             {% endif %}
