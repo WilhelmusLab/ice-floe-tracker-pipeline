@@ -12,10 +12,11 @@
     runahead limit = P10
     [[graph]]
         R1 = """
-            INIT 
-            init_soit => soit
+            INIT
+            init_soit => get_all_overpass_times
         """
         P1D = """
+            get_all_overpass_times[^] => get_single_overpass_time<satellite>
             INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all => exportH5 => done
             done[-P1D] => done
 
@@ -47,6 +48,7 @@
             # Update these variables with your run parameters
             date=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format CCYY-MM-DD)
             date_without_dashes=${date//-/}
+            all_overpass_time_file="overpass-times.csv"
             
             {% if IFT_INSTALL == "Local" %}
                 IFT="julia --project=/workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl/src/cli.jl"
@@ -75,7 +77,7 @@
             {% if PASS_TIME_INSTALL == "Local" %}
                 {{ raise('PASS_TIME_INSTALL `Local` not implemented.') }}
             {% elif PASS_TIME_INSTALL == "Source" %}
-                PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
+                PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C3-update-soit-to-use-ios8601-datetimes#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
             {% elif PASS_TIME_INSTALL == "Docker" %}
                 {{ raise('PASS_TIME_INSTALL `Docker` not implemented.') }}
             {% elif PASS_TIME_INSTALL == "Apptainer" %}
@@ -123,10 +125,10 @@
         [[[directives]]]
             --mem = 64G
 
-    [[soit]]
+    [[get_all_overpass_times]]
         execution retry delays = PT15S, PT10M, PT1H, PT3H
         script = """
-            ${PASS_TIME} --csvoutpath . \
+            ${PASS_TIME} --csvoutpath ${all_overpass_time_file} \
                 --startdate {{ START }} --enddate {{ END }} \
                 --centroid-lat {{ CENTROID_LAT }} --centroid-lon {{ CENTROID_LON }} \
                 --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
@@ -153,10 +155,21 @@
     
     [[LOAD]]
         
-    [[load_soit_daily<satellite>]]
+    [[get_single_overpass_time<satellite>]]
         inherit = LOAD, <satellite>
         script = """
-            isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format "CCYY-MM-DDThh:mm:ss" > ${overpass_time_file}
+            # Get the date of the current task cycle point in YYYY-MM-DD format
+            date_=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format "CCYY-MM-DD")
+            
+            # -F,: Split the lines from the file on commas,
+            # -v search=...: set the value of the `search` variable to the date and satellite
+            # $0 ~ search: match the line in the file containing the search variable
+            # {print $3}: print the third value (from the comma-delimited split)
+            # > ${filename}: write the value out to file
+            awk -F, \
+                -v search="${date_},${satellite}" \
+                '$0 ~ search {print $3}' ${all_overpass_time_file} \
+                > ${overpass_time_file}
         """
     
     [[LOAD_IMAGE]]
