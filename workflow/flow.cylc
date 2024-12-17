@@ -1,0 +1,280 @@
+#!jinja2
+
+[scheduler]
+    allow implicit tasks = True
+
+[task parameters]
+    satellite = {{ SATELLITES | join(", ")}}
+
+[scheduling]
+    initial cycle point = {{ START }}
+    final cycle point = {{ END }}
+    runahead limit = P10
+    [[graph]]
+        R1 = """
+            INIT
+            init_soit => get_all_overpass_times
+        """
+        P1D = """
+            get_all_overpass_times[^] => get_single_overpass_time<satellite>
+            INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all => exportH5 => done
+            done[-P1D] => done
+
+        """
+        R1/P0Y = done => tracking 
+
+    [[queues]]
+        [[[fetchdata]]]
+            limit = 4
+            # Limit to 4 instances hitting the API at once. 
+            # Values higher than this might lead to throttling.
+            members = LOAD_IMAGE
+        
+        [[[preprocess]]]
+            limit = 20
+            # Limit to 2 instances only due to memory constraints. 
+            # Can be removed on a system with more memory or a scheduler.
+            members = PREPROCESS
+
+
+[runtime]
+    [[root]]
+        work sub-directory = .
+        execution time limit = PT5M
+        [[[directives]]]
+            --mem = 8G
+        
+        [[[environment]]]
+            # Update these variables with your run parameters
+            date=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format CCYY-MM-DD)
+            date_without_dashes=${date//-/}
+            all_overpass_time_file="overpass-times.csv"
+            
+            {% if IFT_INSTALL == "Local" %}
+                IFT="julia --project=/workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/IFTPipeline.jl/src/cli.jl"
+            {% elif IFT_INSTALL == "Docker" %}
+                IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
+            {% elif IFT_INSTALL == "Apptainer" %}
+                IFT="apptainer run docker://brownccv/icefloetracker-julia:pr-198"
+            {% elif IFT_INSTALL == "ApptainerLocal" %}
+                IFT="apptainer run /oscar/data/mmart119/jholla10/ice-floe-tracker-pipeline/runtime/image/iftp-pr-198.simg"
+            {% else %}
+                 {{ raise('IFT_INSTALL not recognized.') }}
+            {% endif %}
+
+            {% if FSDPROC_INSTALL == "Local" %}
+                FSDPROC="pipx run --spec /workspaces/ice-floe-tracker-workspace/ebseg fsdproc --debug"
+            {% elif FSDPROC_INSTALL == "Source" %}
+                FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg fsdproc --debug"
+            {% elif FSDPROC_INSTALL == "Docker" %}
+                {{ raise('FSDPROC_INSTALL `Docker` not implemented.') }}
+            {% elif FSDPROC_INSTALL == "Apptainer" %}
+                {{ raise('FSDPROC_INSTALL `Apptainer` not implemented.') }}
+            {% else %}
+                 {{ raise('FSDPROC_INSTALL not recognized.') }}
+            {% endif %}
+
+            {% if PASS_TIME_INSTALL == "Local" %}
+                {{ raise('PASS_TIME_INSTALL `Local` not implemented.') }}
+            {% elif PASS_TIME_INSTALL == "Source" %}
+                PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C3-update-soit-to-use-ios8601-datetimes#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool soit"
+            {% elif PASS_TIME_INSTALL == "Docker" %}
+                {{ raise('PASS_TIME_INSTALL `Docker` not implemented.') }}
+            {% elif PASS_TIME_INSTALL == "Apptainer" %}
+                {{ raise('PASS_TIME_INSTALL `Apptainer` not implemented.') }}
+            {% else %}
+                 {{ raise('PASS_TIME_INSTALL not recognized.') }}
+            {% endif %}
+
+            {% if COLORIZE_INSTALL == "Local" %}
+                COLORIZE = "pipx run --spec /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/label-colorizer colorize"
+            {% elif COLORIZE_INSTALL == "Source" %}
+                COLORIZE = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@merge-attempt-1#egg=label-colorizer&subdirectory=label-colorizer colorize"
+            {% elif COLORIZE_INSTALL == "Docker" %}
+                {{ raise('COLORIZE_INSTALL `Docker` not implemented.') }}
+            {% elif COLORIZE_INSTALL == "Apptainer" %}
+                {{ raise('COLORIZE_INSTALL `Apptainer` not implemented.') }}
+            {% else %}
+                 {{ raise('COLORIZE_INSTALL not recognized.') }}
+            {% endif %}
+
+            JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker"
+
+    [[INIT]]
+    [[init_soit]]
+        inherit = INIT
+        script = """
+            ${PASS_TIME} --help
+        """
+    [[init_fsdproc]]
+        inherit = INIT
+        script = """
+            ${FSDPROC} --help
+        """
+    [[init_colorize]]
+        inherit = INIT
+        script = """
+            ${COLORIZE} --help
+        """
+    [[init_iftp]]
+        inherit = INIT
+        script = """
+            ${IFT} --help
+        """
+        execution time limit = PT25M
+        [[[directives]]]
+            --mem = 64G
+
+    [[get_all_overpass_times]]
+        execution retry delays = PT15S, PT10M, PT1H, PT3H
+        script = """
+            ${PASS_TIME} --csvoutpath ${all_overpass_time_file} \
+                --startdate {{ START }} --enddate {{ END }} \
+                --centroid-lat {{ CENTROID_LAT }} --centroid-lon {{ CENTROID_LON }} \
+                --SPACEUSER {{ SPACEUSER }} --SPACEPSWD {{ SPACEPSWD }}
+        """
+
+    [[<satellite>]]
+        pre-script = """
+            mkdir -p ${img_prefix}
+        """
+        [[[environment]]]
+            satellite=${CYLC_TASK_PARAM_satellite}
+            img_prefix = "${date_without_dashes}.{{ SCALE }}m.${satellite}/"
+            landmask_file = "${img_prefix}landmask.tiff"
+            landmask_binarized_file = "${img_prefix}landmask.binarized.tiff"
+            landmask_binarized_dilated_file = "${img_prefix}landmask.binarized.dilated.tiff"
+            truecolor_file = ${img_prefix}truecolor.tiff
+            falsecolor_file = ${img_prefix}falsecolor.tiff
+            cloud_file = ${img_prefix}cloud.tiff
+            labeled_file = ${img_prefix}labeled.tiff
+            colorized_labeled_file = ${img_prefix}labeled.colorized.tiff
+            labeled_props_file = ${img_prefix}labeled.props.csv
+            overpass_time_file = ${img_prefix}overpass.txt
+            hdf5_archive_file = ${img_prefix}results.h5
+    
+    [[LOAD]]
+        
+    [[get_single_overpass_time<satellite>]]
+        inherit = LOAD, <satellite>
+        script = """
+            # Get the date of the current task cycle point in YYYY-MM-DD format
+            date_=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format "CCYY-MM-DD")
+            
+            # -F,: Split the lines from the file on commas,
+            # -v search=...: set the value of the `search` variable to the date and satellite
+            # $0 ~ search: match the line in the file containing the search variable
+            # {print $3}: print the third value (from the comma-delimited split)
+            # > ${filename}: write the value out to file
+            awk -F, \
+                -v search="${date_},${satellite}" \
+                '$0 ~ search {print $3}' ${all_overpass_time_file} \
+                > ${overpass_time_file}
+        """
+    
+    [[LOAD_IMAGE]]
+        inherit=LOAD
+        execution retry delays = PT15S, PT10M, PT1H, PT3H
+        [[[environment]]]
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite} "
+
+    [[load_truecolor<satellite>]]
+        inherit = LOAD_IMAGE, <satellite>
+        script = """
+            ${FSDPROC} load ${truecolor_file} --kind truecolor ${fsdprocargs}
+        """
+
+    [[load_falsecolor<satellite>]]
+        inherit = LOAD_IMAGE, <satellite>
+        script = """
+            ${FSDPROC} load ${falsecolor_file} --kind bands721 ${fsdprocargs}
+        """
+
+    [[load_cloud<satellite>]]
+        inherit = LOAD_IMAGE, <satellite>
+        script = """
+            ${FSDPROC} load ${cloud_file} --kind cloud ${fsdprocargs}
+        """
+    
+    [[load_landmask<satellite>]]
+        inherit = LOAD_IMAGE, <satellite>
+        script="""
+            ${FSDPROC} load ${landmask_file} --kind landmask ${fsdprocargs}
+        """
+
+    [[PREPROCESS]]
+        execution time limit = PT120M
+        execution retry delays = PT10M
+
+    [[preprocess<satellite>]]
+        inherit = PREPROCESS, <satellite>
+        script = """
+            {% if PREPROCESSING == "Lopez" %}
+
+            ${IFT} landmask_single \
+                -i ${landmask_file} \
+                -o ${landmask_binarized_file} \
+                -d ${landmask_binarized_dilated_file}
+            
+            ${IFT} preprocess_single \
+                -t ${truecolor_file} \
+                -r ${falsecolor_file} \
+                -l ${landmask_binarized_file} \
+                -d ${landmask_binarized_dilated_file} \
+                -o ${labeled_file}
+            
+            ${IFT} extractfeatures_single \
+                --input ${labeled_file} \
+                --output ${labeled_props_file} \
+                --minarea {{ MINFLOEAREA }} \
+                --maxarea {{ MAXFLOEAREA }}
+            
+            {% elif PREPROCESSING == "Buckley" %}
+
+            workdir="${labeled_file}.work"
+            mkdir -p "${workdir}"
+            ${FSDPROC} process ${truecolor_file} ${cloud_file} ${landmask_file} ${workdir}
+            cp ${workdir}/final.tif ${labeled_file}
+            cp ${workdir}/props.csv ${labeled_props_file}
+            
+            {% else %}
+                 
+                 {{ raise('PREPROCESSING type not recognized.') }}
+            
+            {% endif %}
+
+            ${COLORIZE} ${labeled_file} ${colorized_labeled_file}
+        """
+    
+    [[exportH5<satellite>]]
+        inherit = None, <satellite>
+        # Package intermediate and final outputs into HDF5 files
+        script = """
+        ${IFT} makeh5files_single \
+            --passtime `cat ${overpass_time_file}` \
+            --truecolor ${truecolor_file} \
+            --falsecolor ${falsecolor_file} \
+            --labeled ${labeled_file} \
+            --props ${labeled_props_file} \
+            --output ${hdf5_archive_file}
+        """
+
+    [[tracking]]
+        execution retry delays = PT10M
+        execution time limit = PT120M
+        [[[directives]]]
+            --mem = 64G
+        # Pair and track identified floes across days
+        script = """
+            images=(*/labeled.tiff)
+            props=${images[@]/.tiff/.props.csv}
+            landmasks=(*/landmask.tiff)
+            passtimes=${images[@]/labeled.tiff/overpass.txt}
+
+            ${IFT} track_single \
+                --imgs ${images[@]} \
+                --props ${props[@]} \
+                --latlon ${landmasks[0]} \
+                --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') \
+                --output floes.tracked.csv
+        """

@@ -1,0 +1,3 @@
+[platforms]
+    [[localhost]]
+        job runner = slurm
