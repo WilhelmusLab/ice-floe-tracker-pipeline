@@ -89,7 +89,7 @@
             {% if COLORIZE_INSTALL == "Local" %}
                 COLORIZE = "pipx run --spec /workspaces/ice-floe-tracker-workspace/ice-floe-tracker-pipeline/label-colorizer colorize"
             {% elif COLORIZE_INSTALL == "Source" %}
-                COLORIZE = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline#egg=label-colorizer&subdirectory=label-colorizer colorize"
+                COLORIZE = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline#subdirectory=label-colorizer colorize"
             {% elif COLORIZE_INSTALL == "Docker" %}
                 {{ raise('COLORIZE_INSTALL `Docker` not implemented.') }}
             {% elif COLORIZE_INSTALL == "Apptainer" %}
