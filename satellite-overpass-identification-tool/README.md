@@ -11,8 +11,7 @@ pipx run . soit
 
 You can run the code anywhere by calling:
 ```bash
-# TODO: Remove branch specifier once merged
-pipx run --spec "git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@jghrefactor/C-update-soit-to-use-pipx#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool" soit
+pipx run --spec "git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline#egg=satellite-overpass-identification-tool&subdirectory=satellite-overpass-identification-tool" soit
 ```
 
 You can run the Docker image by calling:
