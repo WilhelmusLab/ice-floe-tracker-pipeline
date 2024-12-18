@@ -88,4 +88,4 @@ IFT_INSTALL="Inject"
 IFT_COMMAND="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia:v3.0.0-dev"
 ```
 
-The fragment ``-v `pwd`:/app` `` mounts the current working directory to the `/app` directory of the container, and `-w /app` sets the working directory within the container to `/app`. This allows the command line tool within the container to interact with the data to be processed, which must also be in the current working directory.
+> The fragment ``-v `pwd`:/app`` mounts the current working directory to the `/app` directory of the container, and `-w /app` sets the working directory within the container to `/app`. Together, these allow the command line tool within the container to interact with the data to be processed, which must also be in the current working directory.
