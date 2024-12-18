@@ -82,6 +82,12 @@ PASS_TIME_INSTALL="Inject"
 PASS_TIME_COMMAND="/path/to/venv/bin/soit"
 ```
 
+To use a local version of `satellite-overpass-identification-tool` without a pre-existing virtual environment, you would use the following settings:
+```
+PASS_TIME_INSTALL="Inject"
+PASS_TIME_COMMAND="pipx run --editable --spec /path/to/satellite-overpass-identification-tool/ soit"
+```
+
 To use a specific Dockerized version of the Ice Floe Tracker Pipeline CLI tagged `brownccv/icefloetracker-julia:v3.0.0-dev`, you would use the following settings:
 ```
 IFT_INSTALL="Inject"
