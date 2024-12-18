@@ -53,9 +53,9 @@
             {% if IFT_INSTALL == "Inject" %}
                 IFT={{ IFT_COMMAND }}
             {% elif IFT_INSTALL == "Docker" %}
-                IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia"
+                IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia:{{ IFT_VERSION }}"
             {% elif IFT_INSTALL == "Apptainer" %}
-                IFT="apptainer run docker://brownccv/icefloetracker-julia"
+                IFT="apptainer run docker://brownccv/icefloetracker-julia:{{ IFT_VERSION }}"
             {% else %}
                 {{ raise('IFT_INSTALL not recognized.') }}
             {% endif %}
@@ -63,7 +63,7 @@
             {% if FSDPROC_INSTALL == "Inject" %}
                 FSDPROC={{ FSDPROC_COMMAND }}
             {% elif FSDPROC_INSTALL == "Source" %}
-                FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg fsdproc --debug"
+                FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg@{{ FSDPROC_VERSION }} fsdproc --debug"
             {% else %}
                 {{ raise('FSDPROC_INSTALL not recognized.') }}
             {% endif %}
@@ -71,7 +71,7 @@
             {% if PASS_TIME_INSTALL == "Inject" %}
                 PASS_TIME = {{ PASS_TIME_COMMAND }}
             {% elif PASS_TIME_INSTALL == "Source" %}
-                PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline#subdirectory=satellite-overpass-identification-tool soit"
+                PASS_TIME = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@{{ PASS_TIME_VERSION }}#subdirectory=satellite-overpass-identification-tool soit"
             {% else %}
                 {{ raise('PASS_TIME_INSTALL not recognized.') }}
             {% endif %}
@@ -79,7 +79,7 @@
             {% if COLORIZE_INSTALL == "Inject" %}
                 COLORIZE = {{ COLORIZE_COMMAND }}
             {% elif COLORIZE_INSTALL == "Source" %}
-                COLORIZE = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline#subdirectory=label-colorizer colorize"
+                COLORIZE = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@{{ COLORIZE_VERSION }}#subdirectory=label-colorizer colorize"
             {% else %}
                 {{ raise('COLORIZE_INSTALL not recognized.') }}
             {% endif %}
