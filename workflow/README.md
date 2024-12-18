@@ -76,10 +76,10 @@ IFT_INSTALL="Inject"
 IFT_COMMAND="julia --project=/path/to/IceFloeTracker.jl /path/to/IceFloeTracker.jl/src/cli.jl"
 ```
 
-To use a local version of `satellite-overpass-identification-tool` in the directory `/path/to/satellite-overpass-identification-tool` , you would use the following settings:
+To use a local version of `satellite-overpass-identification-tool` installed into the virtual environment `/path/to/venv/` , you would use the following settings:
 ```
 PASS_TIME_INSTALL="Inject"
-PASS_TIME_COMMAND="pipx run --editable --spec '/path/to/venv/bin/satellite-overpass-identification-tool' soit"
+PASS_TIME_COMMAND="/path/to/venv/bin/soit"
 ```
 
 To use a specific Dockerized version of the Ice Floe Tracker Pipeline CLI tagged `brownccv/icefloetracker-julia:v3.0.0-dev`, you would use the following settings:
