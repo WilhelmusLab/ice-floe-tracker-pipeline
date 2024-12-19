@@ -389,6 +389,7 @@ function preprocess_tiling_single(
         rblocks=tile_rblocks, 
         cblocks=tile_cblocks
     )
+    @debug tiles
 
     @info "Set ice labels thresholds"
     ice_labels_thresholds = (
@@ -399,6 +400,7 @@ function preprocess_tiling_single(
         ratio_upper=ice_labels_ratio_upper,
         use_uint8=true,
     )
+    @debug ice_labels_thresholds
 
     @info "Set adaptive histogram parameters"
     adapthisteq_params = (
@@ -406,6 +408,7 @@ function preprocess_tiling_single(
         entropy_threshold=adapthisteq_entropy_threshold,
         white_fraction_threshold=adapthisteq_white_fraction_threshold,
     )
+    @debug adapthisteq_params
 
     @info "Set gamma parameters"
     adjust_gamma_params = (
@@ -413,11 +416,13 @@ function preprocess_tiling_single(
         gamma_factor=gamma_factor,
         gamma_threshold=gamma_threshold,
     )
+    @debug adjust_gamma_params
 
     @info "Set structuring elements"
     # This isn't tunable in the underlying code right now, 
     # so just use the defaults
     structuring_elements = IceFloeTracker.structuring_elements
+    @debug structuring_elements
 
     @info "Set unsharp mask params"
     unsharp_mask_params = (
@@ -425,9 +430,11 @@ function preprocess_tiling_single(
         amount=unsharp_mask_amount,
         factor=unsharp_mask_factor
     )
+    @debug unsharp_mask_params
 
     @info "Set brighten factor"
     brighten_factor = brighten_factor
+    @debug brighten_factor
     
     @info "Set preliminary ice masks params"
     prelim_icemask_params = (
@@ -435,6 +442,7 @@ function preprocess_tiling_single(
         amount=prelim_icemask_amount,
         factor=prelim_icemask_factor,
     )
+    @debug prelim_icemask_params
     
     @info "Set ice masks params"
     ice_masks_params = (
@@ -447,6 +455,7 @@ function preprocess_tiling_single(
         k=icemask_n_clusters, # number of clusters for kmeans segmentation
         factor=255, # normalization factor to convert images to uint8
     )
+    @debug ice_masks_params
 
     
     @info "Segment floes"
