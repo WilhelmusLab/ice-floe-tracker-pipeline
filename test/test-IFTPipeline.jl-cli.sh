@@ -10,7 +10,7 @@
 # - https://unix.stackexchange.com/a/31712
 : "${IFT:=julia --project=`pwd`/../IFTPipeline.jl `pwd`/../IFTPipeline.jl/src/cli.jl}"
 : "${FSDPROC:=pipx run --spec git+https://github.com/wilhelmuslab/ebseg fsdproc --debug}"
-: "${COLORIZE:=pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@merge-attempt-1#egg=label-colorizer&subdirectory=label-colorizer colorize }"
+: "${COLORIZE:=pipx run --spec `pwd`/../label-colorizer colorize }"
 
 # Set up debug messages
 export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" 
