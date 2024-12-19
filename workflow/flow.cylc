@@ -248,8 +248,6 @@
     [[tracking]]
         execution retry delays = PT10M
         execution time limit = PT120M
-        [[[directives]]]
-            --mem = 64G
         # Pair and track identified floes across days
         script = """
             images=(*/labeled.tiff)
@@ -264,3 +262,5 @@
                 --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') \
                 --output floes.tracked.csv
         """
+        [[[directives]]]
+            --mem = 64G
