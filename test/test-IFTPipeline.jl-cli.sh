@@ -120,25 +120,25 @@ track () {
 
     DATA_SOURCES=$@
 
-    local _DATA_TARGET
-    : "${_DATA_TARGET:=$(mktemp -d -p .)}"
-    echo "_DATA_TARGET=${_DATA_TARGET}"
+    local DATA_ROOT
+    : "${DATA_ROOT:=$(mktemp -d -p .)}"
+    echo "DATA_ROOT=${DATA_ROOT}"
 
-    _DATA_TARGET_SUBDIRS=()
+    DATA_ROOT_SUBDIRS=()
     
     for source in ${DATA_SOURCES[@]}
     do
-        _THIS_SUBDIR=${_DATA_TARGET}/$(basename $source)/
-        _DATA_TARGET_SUBDIRS+=(${_THIS_SUBDIR})
+        _THIS_SUBDIR=${DATA_ROOT}/$(basename $source)/
+        DATA_ROOT_SUBDIRS+=(${_THIS_SUBDIR})
         ${PREPROCESS} ${source} ${_THIS_SUBDIR}
     done
     
     ${IFT} track_single \
-        --imgs "${_DATA_TARGET_SUBDIRS[@]/%/labeled.tiff}" \
-        --props "${_DATA_TARGET_SUBDIRS[@]/%/labeled.props.csv}" \
-        --latlon "${_DATA_TARGET_SUBDIRS[1]/%/truecolor.tiff}" \
-        --passtimes $(cat ${_DATA_TARGET_SUBDIRS[@]/%/overpass.txt} | tr '\n' ' ') \
-        --output ${_DATA_TARGET}/paired.csv
+        --imgs "${DATA_ROOT_SUBDIRS[@]/%/labeled.tiff}" \
+        --props "${DATA_ROOT_SUBDIRS[@]/%/labeled.props.csv}" \
+        --latlon "${DATA_ROOT_SUBDIRS[1]/%/truecolor.tiff}" \
+        --passtimes $(cat ${DATA_ROOT_SUBDIRS[@]/%/overpass.txt} | tr '\n' ' ') \
+        --output ${DATA_ROOT}/paired.csv
 }
 
 
