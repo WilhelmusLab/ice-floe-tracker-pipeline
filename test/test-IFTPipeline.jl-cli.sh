@@ -13,7 +13,7 @@
 : "${COLORIZE:=pipx run --spec `pwd`/../label-colorizer colorize}"
 
 # Set up debug messages
-export JULIA_DEBUG="IFTPipeline" 
+export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" 
 
 echo_CLI_tools () {
     echo "IFT=${IFT}"
