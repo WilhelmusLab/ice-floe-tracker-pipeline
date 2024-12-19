@@ -83,12 +83,12 @@ function mkcli_preprocess_tiling_single!(settings)
         
         "--tile_rblocks"
         default = 8
-        arg_type = Integer
+        arg_type = Int
         required = false
 
         "--tile_cblocks"
         default = 8
-        arg_type = Integer
+        arg_type = Int
         required = false
 
 
@@ -96,22 +96,27 @@ function mkcli_preprocess_tiling_single!(settings)
         
         "--ice_labels_prelim_threshold"
         default = 110.0
+        arg_type = Float64
         required = false
 
         "--ice_labels_band_7_threshold"
         default = 200.0
+        arg_type = Float64
         required = false
 
         "--ice_labels_band_2_threshold"
         default = 190.0
+        arg_type = Float64
         required = false
 
         "--ice_labels_ratio_lower"
         default = 0.0
+        arg_type = Float64
         required = false
 
         "--ice_labels_ratio_upper"
         default = 0.75
+        arg_type = Float64
         required = false
 
 
@@ -119,14 +124,17 @@ function mkcli_preprocess_tiling_single!(settings)
         
         "--adapthisteq_white_threshold"
         default = 25.5
+        arg_type = Float64
         required = false
 
         "--adapthisteq_entropy_threshold"
         default = 4
+        arg_type = Float64
         required = false
 
         "--adapthisteq_white_fraction_threshold"
         default = 0.4
+        arg_type = Float64
         required = false
 
 
@@ -134,14 +142,17 @@ function mkcli_preprocess_tiling_single!(settings)
         
         "--gamma"
         default = 1
+        arg_type = Float64
         required = false
 
         "--gamma_factor"
         default = 1
+        arg_type = Float64
         required = false
 
         "--gamma_threshold"
         default = 220
+        arg_type = Float64
         required = false
 
 
@@ -149,14 +160,17 @@ function mkcli_preprocess_tiling_single!(settings)
         
         "--unsharp_mask_radius"
         default = 10
+        arg_type = Int
         required = false
 
         "--unsharp_mask_amount"
         default = 2.0
+        arg_type = Float64
         required = false
 
         "--unsharp_mask_factor"
         default = 255.0
+        arg_type = Float64
         required = false
 
 
@@ -164,6 +178,7 @@ function mkcli_preprocess_tiling_single!(settings)
         
         "--brighten_factor"
         default  = 0.1
+        arg_type = Float64
         required = false
 
 
@@ -171,14 +186,17 @@ function mkcli_preprocess_tiling_single!(settings)
         
         "--prelim_icemask_radius"
         default = 10
+        arg_type = Int
         required = false
 
         "--prelim_icemask_amount"
         default = 2
+        arg_type = Int
         required = false
 
         "--prelim_icemask_factor"
         default = 0.5
+        arg_type = Float64
         required = false
 
 
@@ -186,30 +204,37 @@ function mkcli_preprocess_tiling_single!(settings)
         
         "--icemask_band_7_threshold"
         default = 5
+        arg_type = Int
         required = false
 
         "--icemask_band_2_threshold"
         default = 230
+        arg_type = Int
         required = false
 
         "--icemask_band_1_threshold"
         default = 240
+        arg_type = Int
         required = false
 
         "--icemask_band_7_threshold_relaxed"
         default = 10
+        arg_type = Int
         required = false
 
         "--icemask_band_1_threshold_relaxed"
         default = 190
+        arg_type = Int
         required = false
 
         "--icemask_possible_ice_threshold"
         default = 75
+        arg_type = Int
         required = false
 
         "--icemask_n_clusters"
         default = 3
+        arg_type = Int
         required = false
 
     end
