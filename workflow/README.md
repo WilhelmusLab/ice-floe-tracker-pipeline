@@ -17,8 +17,6 @@ You will also need a username and account on [space-track.org](https://space-tra
 
 ### Running the pipeline
 
-Make a new configuration file with the region and time period you want to analyse. All the possible parameters are listed in [rose-suite.conf](./rose-suite.conf). You can see examples in [example](./example/). 
-
 Add the following lines to the rose-suite.conf file with your space-track.org username and password:
 ```
 SPACEUSER="your_email_address@example.com"
@@ -28,15 +26,61 @@ SPACEPSWD="yourpassword"
 Don't commit these changes to the repo.
 <!-- TODO: Insecure. Make this import from an environment file or the keychain. -->
 
+#### Simple case: single target
 
-Run the pipeline by calling:
+Make a new configuration file with the region and time period you want to analyse. All the possible parameters are listed in [rose-suite.conf](./rose-suite.conf). You can see examples in [example](./example/). Command line usage examples are shown in [example-cylc-calls.sh](./example-cylc-calls.sh).
+
+Run the pipeline by calling `cylc vip`, like this:
 ```bash
 cylc vip . --set-file /path/to/your/configuration/file.conf -n your-analysis-run-name
 ```
 
-Command line usage examples are shown in [example-cylc-calls.sh](./example-cylc-calls.sh).
+View progress of the pipeline by calling:
+```bash
+cylc tui
+```
+In the TUI you can view logs, and "trigger" (i.e., rerun) tasks which failed.
+
+#### Advanced case: non-contiguous dates, multiple locations
+
+The simplest way to generate runs of non-contiguous dates is to call `cylc vip` several times, e.g.:
+```bash
+cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=may-2006 --initial-cycle-point=2006-05-04 --final-cycle-point=2006-05-06
+cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=july-2008 --initial-cycle-point=2008-07-13 --final-cycle-point=2008-07-15
+```
+
+The simplest way to process many different locations would be to make a location configuration file for each target location, and then to run a series of `cylc vip` commands as above.
+
+You can also use this kind of approach to run the pipeline with different sets of parameters, e.g.:
+```bash
+for nclusters in 3 5 7; do 
+  cylc vip . --set-file example/beaufort-sea-buckley-paper.conf -n beaufort-sea-cluster-test --run-name="${nclusters}-clusters" -s "ICEMASK_N_CLUSTERS=${nclusters}"
+done
+```
 
 View the running commands by calling `cylc tui`.
+
+#### Advanced use: case list
+
+To loop through a list of cases, you might use a script like this:
+
+```bash
+name=sampled-examples
+
+cylc stop ${name}/*;
+cylc clean ${name} -y
+
+datafile="example/all-cases.csv"
+index_col="fullname"
+for fullname in $(pipx run example/util/get_fullnames.py "${datafile}" "${index_col}" --start 1 --stop 10);
+do   
+  cylc vip . -n ${name} --run-name=${fullname} $(pipx run example/util/template.py ${datafile} ${index_col} ${fullname}); 
+done
+
+cylc tui
+```
+
+The `template.py` script provided doesn't currently have support for setting any other parameters, but could be extended if needed.
 
 ## Oscar
 
