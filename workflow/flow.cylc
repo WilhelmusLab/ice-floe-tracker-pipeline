@@ -254,7 +254,7 @@
             props=${images[@]/.tiff/.props.csv}
             landmasks=(*/landmask.tiff)
             passtimes=${images[@]/labeled.tiff/overpass.txt}
-            
+
             ${IFT} track_single \
                 --imgs ${images[@]} \
                 --props ${props[@]} \
@@ -264,6 +264,3 @@
         """
         [[[directives]]]
             --mem = 64G
-
-
-            #--passtimes "$(cat ${passtimes[@]} | tr -d 'Z' | tr '\n' ' ')" \
