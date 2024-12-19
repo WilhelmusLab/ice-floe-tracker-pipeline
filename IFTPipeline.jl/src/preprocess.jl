@@ -319,8 +319,50 @@ function preprocess_tiling_single(
     landmask_dilated::T, 
     segmented::T,
     labeled::T,
-    rblocks=8,
-    cblocks=8
+
+    # Tiling parameters
+    tile_rblocks=8,
+    tile_cblocks=8,
+
+    # Ice labels thresholds
+    ice_labels_prelim_threshold=110.0,
+    ice_labels_band_7_threshold=200.0,
+    ice_labels_band_2_threshold=190.0,
+    ice_labels_ratio_lower=0.0,
+    ice_labels_ratio_upper=0.75,
+
+    # Adaptive histogram equalization parameters
+    adapthisteq_white_threshold=25.5, 
+    adapthisteq_entropy_threshold=4, 
+    adapthisteq_white_fraction_threshold=0.4,
+
+    # Gamma parameters
+    gamma=1,
+    gamma_factor=1,
+    gamma_threshold=220,
+
+    # Unsharp mask parameters
+    unsharp_mask_radius=10, 
+    unsharp_mask_amount=2.0, 
+    unsharp_mask_factor=255.0,
+
+    # Brighten parameters
+    brighten_factor = 0.1,
+
+    # Preliminary ice mask parameters
+    prelim_icemask_radius=10, 
+    prelim_icemask_amount=2, 
+    prelim_icemask_factor=0.5,
+
+    # Main ice mask parameters
+    icemask_band_7_threshold=5,
+    icemask_band_2_threshold=230,
+    icemask_band_1_threshold=240,
+    icemask_band_7_threshold_relaxed=10,
+    icemask_band_1_threshold_relaxed=190,
+    icemask_possible_ice_threshold=75,
+    icemask_n_clusters=3,
+
     ) where {T<:AbstractString}
 
     @info "Processing images: $truecolor, $falsecolor, $landmask_dilated"
@@ -337,38 +379,101 @@ function preprocess_tiling_single(
         dilated=map(!, landmask_dilated),
     )
 
-    @info "Removing alpha channel if it exists"
+    @info "Remove alpha channel if it exists"
     rgb_truecolor_img = RGB.(truecolor_img)
     rgb_falsecolor_img = RGB.(falsecolor_img)
 
-    @info "Getting tile coordinates"
-    tiles = IceFloeTracker.get_tiles(rgb_truecolor_img; rblocks=rblocks, cblocks=cblocks)
+    @info "Get tile coordinates"
+    tiles = IceFloeTracker.get_tiles(
+        rgb_truecolor_img; 
+        rblocks=tile_rblocks, 
+        cblocks=tile_cblocks
+    )
+
+    @info "Set ice labels thresholds"
+    ice_labels_thresholds = (
+        prelim_threshold=ice_labels_prelim_threshold,
+        band_7_threshold=ice_labels_band_7_threshold,
+        band_2_threshold=ice_labels_band_2_threshold,
+        ratio_lower=ice_labels_ratio_lower,
+        ratio_upper=ice_labels_ratio_upper,
+        use_uint8=true,
+    )
+
+    @info "Set adaptive histogram parameters"
+    adapthisteq_params = (
+        white_threshold=adapthisteq_white_threshold,
+        entropy_threshold=adapthisteq_entropy_threshold,
+        white_fraction_threshold=adapthisteq_white_fraction_threshold,
+    )
+
+    @info "Set gamma parameters"
+    adjust_gamma_params = (
+        gamma=gamma,
+        gamma_factor=gamma_factor,
+        gamma_threshold=gamma_threshold,
+    )
+
+    @info "Set structuring elements"
+    # This isn't tunable in the underlying code right now, 
+    # so just use the defaults
+    structuring_elements = IceFloeTracker.structuring_elements
+
+    @info "Set unsharp mask params"
+    unsharp_mask_params = (
+        radius=unsharp_mask_radius,
+        amount=unsharp_mask_amount,
+        factor=unsharp_mask_factor
+    )
+
+    @info "Set brighten factor"
+    brighten_factor = brighten_factor
     
-    @info "Segmenting floes"
+    @info "Set preliminary ice masks params"
+    prelim_icemask_params = (
+        radius=prelim_icemask_radius,
+        amount=prelim_icemask_amount,
+        factor=prelim_icemask_factor,
+    )
+    
+    @info "Set ice masks params"
+    ice_masks_params = (
+        band_7_threshold=icemask_band_7_threshold,
+        band_2_threshold=icemask_band_2_threshold,
+        band_1_threshold=icemask_band_1_threshold,
+        band_7_threshold_relaxed=icemask_band_7_threshold_relaxed,
+        band_1_threshold_relaxed=icemask_band_1_threshold_relaxed,
+        possible_ice_threshold=icemask_possible_ice_threshold,
+        k=icemask_n_clusters, # number of clusters for kmeans segmentation
+        factor=255, # normalization factor to convert images to uint8
+    )
+
+    
+    @info "Segment floes"
     segmented_floes = IceFloeTracker.preprocess_tiling(
         n0f8.(rgb_falsecolor_img), 
         n0f8.(rgb_truecolor_img), 
         landmask,
         tiles,
-        IceFloeTracker.ice_labels_thresholds,
-        IceFloeTracker.adapthisteq_params,
-        IceFloeTracker.adjust_gamma_params,
-        IceFloeTracker.structuring_elements,
-        IceFloeTracker.unsharp_mask_params,
-        IceFloeTracker.ice_masks_params,
-        IceFloeTracker.prelim_icemask_params,
-        IceFloeTracker.brighten_factor,
+        ice_labels_thresholds,
+        adapthisteq_params,
+        adjust_gamma_params,
+        structuring_elements,
+        unsharp_mask_params,
+        ice_masks_params,
+        prelim_icemask_params,
+        brighten_factor,
     )
 
-    @info "Writing segmented floes to $segmented"
+    @info "Write segmented floes to $segmented"
     FileIO.save(segmented, segmented_floes)
 
-    @info "Labeling floes"
+    @info "Label floes"
     labeled_floes = label_components(segmented_floes)
     _dtype = choose_dtype(maximum(labeled_floes))
     labeled_floes_cast = convert(Array{_dtype}, labeled_floes)
     
-    @info "Writing labeled floes to $labeled"
+    @info "Write labeled floes to $labeled"
     save_labeled_img(labeled_floes_cast, labeled)
 
     return nothing

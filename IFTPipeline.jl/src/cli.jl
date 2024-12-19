@@ -77,6 +77,141 @@ function mkcli_preprocess_tiling_single!(settings)
         "--labeled", "-l"
         help = "Path to output labeled image file (.tiff)"
         required = true
+
+
+        # Tiling parameters
+        
+        "--tile_rblocks"
+        default = 8
+        arg_type = Integer
+        required = false
+
+        "--tile_cblocks"
+        default = 8
+        arg_type = Integer
+        required = false
+
+
+        # Ice labels thresholds
+        
+        "--ice_labels_prelim_threshold"
+        default = 110.0
+        required = false
+
+        "--ice_labels_band_7_threshold"
+        default = 200.0
+        required = false
+
+        "--ice_labels_band_2_threshold"
+        default = 190.0
+        required = false
+
+        "--ice_labels_ratio_lower"
+        default = 0.0
+        required = false
+
+        "--ice_labels_ratio_upper"
+        default = 0.75
+        required = false
+
+
+        # Adaptive histogram equalization parameters
+        
+        "--adapthisteq_white_threshold"
+        default = 25.5
+        required = false
+
+        "--adapthisteq_entropy_threshold"
+        default = 4
+        required = false
+
+        "--adapthisteq_white_fraction_threshold"
+        default = 0.4
+        required = false
+
+
+        # Gamma parameters
+        
+        "--gamma"
+        default = 1
+        required = false
+
+        "--gamma_factor"
+        default = 1
+        required = false
+
+        "--gamma_threshold"
+        default = 220
+        required = false
+
+
+        # Unsharp mask parameters
+        
+        "--unsharp_mask_radius"
+        default = 10
+        required = false
+
+        "--unsharp_mask_amount"
+        default = 2.0
+        required = false
+
+        "--unsharp_mask_factor"
+        default = 255.0
+        required = false
+
+
+        # Brighten parameters
+        
+        "--brighten_factor"
+        default  = 0.1
+        required = false
+
+
+        # Preliminary ice mask parameters
+        
+        "--prelim_icemask_radius"
+        default = 10
+        required = false
+
+        "--prelim_icemask_amount"
+        default = 2
+        required = false
+
+        "--prelim_icemask_factor"
+        default = 0.5
+        required = false
+
+
+        # Main ice mask parameters
+        
+        "--icemask_band_7_threshold"
+        default = 5
+        required = false
+
+        "--icemask_band_2_threshold"
+        default = 230
+        required = false
+
+        "--icemask_band_1_threshold"
+        default = 240
+        required = false
+
+        "--icemask_band_7_threshold_relaxed"
+        default = 10
+        required = false
+
+        "--icemask_band_1_threshold_relaxed"
+        default = 190
+        required = false
+
+        "--icemask_possible_ice_threshold"
+        default = 75
+        required = false
+
+        "--icemask_n_clusters"
+        default = 3
+        required = false
+
     end
     return nothing
 end
