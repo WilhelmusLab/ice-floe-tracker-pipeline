@@ -51,6 +51,32 @@ function mkclipreprocess_single!(settings)
         "--output", "-o"
         help = "Path to output segmented image file (.tiff)"
         required = true
+        
+    end
+    return nothing
+end
+
+function mkcli_preprocess_tiling_single!(settings)
+    @add_arg_table! settings["preprocess_tiling_single"] begin
+        "--truecolor", "-t"
+        help = "Truecolor image file (.tiff)"
+        required = true
+
+        "--falsecolor", "-r"
+        help = "Falsecolor image file (.tiff)"
+        required = true
+
+        "--landmask-dilated", "-d"
+        help = "Landmask image file (dilated, .tiff)"
+        required = true
+
+        "--segmented", "-s"
+        help = "Path to output segmented image file (.tiff)"
+        required = true
+        
+        "--labeled", "-l"
+        help = "Path to output labeled image file (.tiff)"
+        required = true
     end
     return nothing
 end
@@ -456,6 +482,7 @@ function mkcli!(settings, common_args)
         "landmask_single" => mkclilandmask_single!,
         "preprocess" => mkclipreprocess!,
         "preprocess_single" => mkclipreprocess_single!,
+        "preprocess_tiling_single" => mkcli_preprocess_tiling_single!,
         "extractfeatures" => mkcliextract!,
         "extractfeatures_single" => mkcliextract_single!,
         "makeh5files" => mkclimakeh5!,
@@ -491,6 +518,10 @@ function main()
 
         "preprocess_single"
         help = "Preprocess truecolor/falsecolor images"
+        action = :command
+
+        "preprocess_tiling_single"
+        help = "Preprocess truecolor/falsecolor images with tile-based histogram equalization"
         action = :command
 
         "extractfeatures"
