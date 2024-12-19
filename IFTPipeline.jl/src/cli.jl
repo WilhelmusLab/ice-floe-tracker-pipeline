@@ -560,8 +560,6 @@ function main()
     command_args = parsed_args[command]
     command_func = getfield(IFTPipeline, Symbol(command))
 
-    @debug "debug message"
-    @info "info message"
     @time command_func(; command_args...)
 
     return nothing
