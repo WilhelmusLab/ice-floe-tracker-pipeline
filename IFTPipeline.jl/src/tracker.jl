@@ -140,8 +140,13 @@ function track_single(;
         ),
     )
 
-    labeled_floes = IceFloeTracker.pairfloes(imgs_, props_, passtimes, latlon, condition_thresholds, mc_thresholds)
-    FileIO.save(output, labeled_floes)
+    add_passtimes!(props_, passtimes)
+    addfloemasks!(props_, imgs_)
+    addψs!(props_)
+    adduuid!(props_)
+
+    tracked_floes = long_tracker(props_, condition_thresholds, mc_thresholds)
+    FileIO.save(output, tracked_floes)
     return nothing
 end
 
