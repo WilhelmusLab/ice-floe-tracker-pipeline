@@ -9,11 +9,11 @@
 # - https://stackoverflow.com/a/28085062/24937841 and 
 # - https://unix.stackexchange.com/a/31712
 : "${IFT:=julia --project=`pwd`/../IFTPipeline.jl `pwd`/../IFTPipeline.jl/src/cli.jl}"
-: "${FSDPROC:=pipx run --spec git+https://github.com/wilhelmuslab/ebseg fsdproc --debug}"
+: "${FSDPROC:=fsdproc}"
 : "${COLORIZE:=pipx run --spec `pwd`/../label-colorizer colorize }"
 
 # Set up debug messages
-export JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" 
+export JULIA_DEBUG="IFTPipeline" 
 
 echo_CLI_tools () {
     echo "IFT=${IFT}"
