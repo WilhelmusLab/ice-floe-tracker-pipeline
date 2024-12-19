@@ -196,33 +196,74 @@
     [[preprocess<satellite>]]
         inherit = PREPROCESS, <satellite>
         script = """
-            {% if PREPROCESSING == "Lopez" %}
+            {% if PREPROCESSING == "Lopez" or PREPROCESSING == "LopezTiling" %}
 
-            ${IFT} landmask_single \
-                -i ${landmask_file} \
-                -o ${landmask_binarized_file} \
-                -d ${landmask_binarized_dilated_file}
+                ${IFT} landmask_single \
+                    -i ${landmask_file} \
+                    -o ${landmask_binarized_file} \
+                    -d ${landmask_binarized_dilated_file}
             
-            ${IFT} preprocess_single \
-                -t ${truecolor_file} \
-                -r ${falsecolor_file} \
-                -l ${landmask_binarized_file} \
-                -d ${landmask_binarized_dilated_file} \
-                -o ${labeled_file}
+                {% if PREPROCESSING == "Lopez" %}
+
+                    ${IFT} preprocess_single \
+                        -t ${truecolor_file} \
+                        -r ${falsecolor_file} \
+                        -l ${landmask_binarized_file} \
+                        -d ${landmask_binarized_dilated_file} \
+                        -o ${labeled_file}
+
+                {% elif PREPROCESSING == "LopezTiling" %}
+
+                    ${IFT} preprocess_tiling_single \
+                        -t ${truecolor_file} \
+                        -r ${falsecolor_file} \
+                        -d ${landmask_binarized_dilated_file} \
+                        -l ${labeled_file} \
+                        -s ${segmented_file} \
+                        --tile-rblocks {{ TILE_RBLOCKS }} \
+                        --tile-cblocks {{ TILE_CBLOCKS }} \
+                        --ice-labels-prelim-threshold {{ ICE_LABELS_PRELIM_THRESHOLD }} \
+                        --ice-labels-band-7-threshold {{ ICE_LABELS_BAND_7_THRESHOLD }} \
+                        --ice-labels-band-2-threshold {{ ICE_LABELS_BAND_2_THRESHOLD }} \
+                        --ice-labels-ratio-lower {{ ICE_LABELS_RATIO_LOWER }} \
+                        --ice-labels-ratio-upper {{ ICE_LABELS_RATIO_UPPER }} \
+                        --adapthisteq-white-threshold {{ ADAPTHISTEQ_WHITE_THRESHOLD }} \
+                        --adapthisteq-entropy-threshold {{ ADAPTHISTEQ_ENTROPY_THRESHOLD }} \
+                        --adapthisteq-white-fraction-threshold {{ ADAPTHISTEQ_WHITE_FRACTION_THRESHOLD }} \
+                        --gamma {{ GAMMA }} \
+                        --gamma-factor {{ GAMMA_FACTOR }} \
+                        --gamma-threshold {{ GAMMA_THRESHOLD }} \
+                        --unsharp-mask-radius {{ UNSHARP_MASK_RADIUS }} \
+                        --unsharp-mask-amount {{ UNSHARP_MASK_AMOUNT }} \
+                        --unsharp-mask-factor {{ UNSHARP_MASK_FACTOR }} \
+                        --brighten-factor {{ BRIGHTEN_FACTOR }} \
+                        --prelim-icemask-radius {{ PRELIM_ICEMASK_RADIUS }} \
+                        --prelim-icemask-amount {{ PRELIM_ICEMASK_AMOUNT }} \
+                        --prelim-icemask-factor {{ PRELIM_ICEMASK_FACTOR }} \
+                        --icemask-band-7-threshold {{ ICEMASK_BAND_7_THRESHOLD }} \
+                        --icemask-band-2-threshold {{ ICEMASK_BAND_2_THRESHOLD }} \
+                        --icemask-band-1-threshold {{ ICEMASK_BAND_1_THRESHOLD }} \
+                        --icemask-band-7-threshold-relaxed {{ ICEMASK_BAND_7_THRESHOLD_RELAXED }} \
+                        --icemask-band-1-threshold-relaxed {{ ICEMASK_BAND_1_THRESHOLD_RELAXED }} \
+                        --icemask-possible-ice-threshold {{ ICEMASK_POSSIBLE_ICE_THRESHOLD }} \
+                        --icemask-n-clusters {{ ICEMASK_N_CLUSTERS }} 
+                
+                {% endif %}
+
             
-            ${IFT} extractfeatures_single \
-                --input ${labeled_file} \
-                --output ${labeled_props_file} \
-                --minarea {{ MINFLOEAREA }} \
-                --maxarea {{ MAXFLOEAREA }}
+                ${IFT} extractfeatures_single \
+                    --input ${labeled_file} \
+                    --output ${labeled_props_file} \
+                    --minarea {{ MINFLOEAREA }} \
+                    --maxarea {{ MAXFLOEAREA }}
             
             {% elif PREPROCESSING == "Buckley" %}
 
-            workdir="${labeled_file}.work"
-            mkdir -p "${workdir}"
-            ${FSDPROC} process ${truecolor_file} ${cloud_file} ${landmask_file} ${workdir}
-            cp ${workdir}/final.tif ${labeled_file}
-            cp ${workdir}/props.csv ${labeled_props_file}
+                workdir="${labeled_file}.work"
+                mkdir -p "${workdir}"
+                ${FSDPROC} process ${truecolor_file} ${cloud_file} ${landmask_file} ${workdir}
+                cp ${workdir}/final.tif ${labeled_file}
+                cp ${workdir}/props.csv ${labeled_props_file}
             
             {% else %}
                  
@@ -249,8 +290,6 @@
     [[tracking]]
         execution retry delays = PT10M
         execution time limit = PT120M
-        [[[directives]]]
-            --mem = 64G
         # Pair and track identified floes across days
         script = """
             images=(*/labeled.tiff)
@@ -265,3 +304,5 @@
                 --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') \
                 --output floes.tracked.csv
         """
+        [[[directives]]]
+            --mem = 64G
