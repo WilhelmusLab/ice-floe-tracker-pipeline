@@ -8,7 +8,7 @@ using ArgParse
 using LoggingExtras
 using IceFloeTracker
 using IceFloeTracker: DataFrames, Dates, @dateformat_str, DataFrame, nrow, rename!, Not, select!, Date, Time, DateTime
-using IceFloeTracker: RGB, Gray, load, float64, imsharpen, getlatlon, pairfloes
+using IceFloeTracker: RGB, Gray, load, float64, imsharpen, getlatlon, pairfloes, add_passtimes!, addfloemasks!, addψs!, adduuid!, long_tracker
 using Folds
 using HDF5
 using TOML: parsefile
