@@ -253,13 +253,21 @@
             images=(*/labeled.tiff)
             props=${images[@]/.tiff/.props.csv}
             landmasks=(*/landmask.tiff)
+            
+            # Get the overpass times corresponding to the images
             passtimes=${images[@]/labeled.tiff/overpass.txt}
+            
+            # Reformat the passtimes – 
+            # - Julia can't parse "Z" on the end of CCYY-MM-DDThh:mm:ssZ; `tr 'Z' ''` removes it 
+            # - Put all the passtimes on a single line with `tr '\n' ' '`
+            passtimes_reformatted=$(cat ${passtimes[@]} | tr 'Z' '' | tr '\n' ' ')
+            
 
             ${IFT} track_single \
                 --imgs ${images[@]} \
                 --props ${props[@]} \
                 --latlon ${landmasks[0]} \
-                --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') \
+                --passtimes ${passtimes_reformatted}
                 --output floes.tracked.csv
         """
         [[[directives]]]
