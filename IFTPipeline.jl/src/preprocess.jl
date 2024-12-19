@@ -258,7 +258,7 @@ function preprocess(; truedir::T, fcdir::T, lmdir::T, passtimesdir::T, output::T
 end
 
 """
-    preprocess(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T) where {T<:AbstractString}
+    preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T) where {T<:AbstractString}
 
 Preprocess and segment floes in a single view. Save the segmented floes to `output`.
 
