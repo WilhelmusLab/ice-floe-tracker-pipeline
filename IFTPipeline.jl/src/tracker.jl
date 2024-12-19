@@ -102,8 +102,7 @@ function track_single(;
     end
     @info "Loaded: $props_"
 
-    @info "Using passtimes=$passtimes"
-
+    @info "Set condition thresholds"
     condition_thresholds = (
         t1=(
             dt=dt_thresh, 
@@ -124,7 +123,9 @@ function track_single(;
             minaxisratio=Sminaxisratio,
         ),
     )
+    @debug condition_thresholds
 
+    @info "Set MC thresholds"
     mc_thresholds = (
         comp=(
             mxrot=mxrot, 
@@ -139,7 +140,9 @@ function track_single(;
             area3=area3
         ),
     )
+    @debug mc_thresholds
 
+    @info "Using passtimes=$passtimes"
     add_passtimes!(props_, passtimes)
     addfloemasks!(props_, imgs_)
     addψs!(props_)
