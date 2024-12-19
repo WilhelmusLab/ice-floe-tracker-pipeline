@@ -301,7 +301,7 @@
                 --imgs ${images[@]} \
                 --props ${props[@]} \
                 --latlon ${landmasks[0]} \
-                --passtimes $(cat ${passtimes[@]} | tr '\n' ' ') \
+                --passtimes $(cat ${passtimes[@]} | tr 'Z\n\r' ' ') \
                 --output floes.tracked.csv
         """
         [[[directives]]]
