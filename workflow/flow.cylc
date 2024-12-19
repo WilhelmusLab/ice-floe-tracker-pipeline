@@ -133,6 +133,7 @@
             truecolor_file = ${img_prefix}truecolor.tiff
             falsecolor_file = ${img_prefix}falsecolor.tiff
             cloud_file = ${img_prefix}cloud.tiff
+            segmented_file = ${img_prefix}segmented.tiff
             labeled_file = ${img_prefix}labeled.tiff
             colorized_labeled_file = ${img_prefix}labeled.colorized.tiff
             labeled_props_file = ${img_prefix}labeled.props.csv
