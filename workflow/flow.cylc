@@ -261,7 +261,18 @@
 
                 workdir="${labeled_file}.work"
                 mkdir -p "${workdir}"
-                ${FSDPROC} process ${truecolor_file} ${cloud_file} ${landmask_file} ${workdir}
+                
+                ${FSDPROC} process \
+                    ${truecolor_file} \
+                    ${cloud_file} \
+                    ${landmask_file} \
+                    ${workdir} \
+                    --itmax {{ BUCKLEY_ITMAX }} \
+                    --itmin {{ BUCKLEY_ITMIN }} \
+                    --step {{ BUCKLEY_STEP }} \
+                    --kernel-type {{ BUCKLEY_KERNEL_TYPE }} \
+                    --kernel-size  {{ BUCKLEY_KERNEL_SIZE }}
+                
                 cp ${workdir}/final.tif ${labeled_file}
                 cp ${workdir}/props.csv ${labeled_props_file}
             
