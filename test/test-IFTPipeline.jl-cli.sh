@@ -22,15 +22,14 @@ echo_CLI_tools () {
 }
 
 initialize_test_directory () {
-    DATA_SOURCE=$1
-    DATA_TARGET=$2
+    local DATA_SOURCE=$1
+    local DATA_TARGET=$2
     
     # Initialize data directory
     : "${DATA_SOURCE:=./input_data}"
     echo "DATA_SOURCE=${DATA_SOURCE}"
 
-    TEMPDIR=$(mktemp -d -p .)
-    : "${DATA_TARGET:=$TEMPDIR}"
+    : "${DATA_TARGET:=$(mktemp -d -p .)}"
     echo "DATA_TARGET=${DATA_TARGET}"
 
     mkdir -p ${DATA_TARGET}/
@@ -121,8 +120,8 @@ track () {
 
     DATA_SOURCES=$@
 
-    TEMPDIR=$(mktemp -d -p .)
-    : "${_DATA_TARGET:=$TEMPDIR}"
+    local _DATA_TARGET
+    : "${_DATA_TARGET:=$(mktemp -d -p .)}"
     echo "_DATA_TARGET=${_DATA_TARGET}"
 
     _DATA_TARGET_SUBDIRS=()
