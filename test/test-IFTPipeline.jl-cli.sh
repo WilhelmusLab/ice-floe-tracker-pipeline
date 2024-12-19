@@ -22,8 +22,8 @@ echo_CLI_tools () {
 }
 
 initialize_test_directory () {
-    local DATA_SOURCE=$1
-    local DATA_TARGET=$2
+    DATA_SOURCE=$1
+    DATA_TARGET=$2
     
     # Initialize data directory
     : "${DATA_SOURCE:=./input_data}"
