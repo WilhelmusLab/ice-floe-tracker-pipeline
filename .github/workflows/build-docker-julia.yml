@@ -49,9 +49,17 @@ jobs:
           build-args: |
             JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)
             
-      - name: Test CLI
+      - name: Test Preprocessing (Lopez CLI)
         working-directory: ./test
         run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez input_data/ne-greenland.20220914.terra.250m
+
+      - name: Test Preprocessing CLI (Lopez with Tiling)
+        working-directory: ./test
+        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez_tiling input_data/ne-greenland.20220914.terra.250m
+
+      - name: Test Tracker CLI
+        working-directory: ./test
+        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  track_lopez input_data/ne-greenland.2022091{3,4}.terra.250m/
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6

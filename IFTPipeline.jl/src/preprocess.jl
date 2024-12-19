@@ -298,3 +298,78 @@ function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_
 
     return nothing
 end
+
+"""
+    preprocess_tiling_single(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T) where {T<:AbstractString}
+
+Preprocess and segment floes in a single view. Save the segmented floes to `segmented` and the labeled floes to `labeled`.
+
+# Arguments
+- `truecolor`: path to truecolor image
+- `falsecolor`: path to falsecolor image
+- `landmask`: path to landmask image
+- `landmask_dilated`: path to dilated landmask image
+- `segmented`: path to segmented output file 
+- `labeled`: path to labeled output file 
+"""
+function preprocess_tiling_single(
+    ; 
+    truecolor::T, 
+    falsecolor::T, 
+    landmask_dilated::T, 
+    segmented::T,
+    labeled::T,
+    rblocks=8,
+    cblocks=8
+    ) where {T<:AbstractString}
+
+    @info "Processing images: $truecolor, $falsecolor, $landmask_dilated"
+    truecolor_img = loadimg(; dir=dirname(truecolor), fname=basename(truecolor))
+    falsecolor_img = loadimg(; dir=dirname(falsecolor), fname=basename(falsecolor))
+
+    # TODO: make symmetric landmask saving/loading functions
+    landmask_dilated=BitMatrix(FileIO.load(landmask_dilated))
+    
+    # Invert the landmasks – in the tiling version of the code, 
+    # the landmask is expected to be the other polarity compared with
+    # the non-tiling version.
+    landmask = (
+        dilated=map(!, landmask_dilated),
+    )
+
+    @info "Removing alpha channel if it exists"
+    rgb_truecolor_img = RGB.(truecolor_img)
+    rgb_falsecolor_img = RGB.(falsecolor_img)
+
+    @info "Getting tile coordinates"
+    tiles = IceFloeTracker.get_tiles(rgb_truecolor_img; rblocks=rblocks, cblocks=cblocks)
+    
+    @info "Segmenting floes"
+    segmented_floes = IceFloeTracker.preprocess_tiling(
+        n0f8.(rgb_falsecolor_img), 
+        n0f8.(rgb_truecolor_img), 
+        landmask,
+        tiles,
+        IceFloeTracker.ice_labels_thresholds,
+        IceFloeTracker.adapthisteq_params,
+        IceFloeTracker.adjust_gamma_params,
+        IceFloeTracker.structuring_elements,
+        IceFloeTracker.unsharp_mask_params,
+        IceFloeTracker.ice_masks_params,
+        IceFloeTracker.prelim_icemask_params,
+        IceFloeTracker.brighten_factor,
+    )
+
+    @info "Writing segmented floes to $segmented"
+    FileIO.save(segmented, segmented_floes)
+
+    @info "Labeling floes"
+    labeled_floes = label_components(segmented_floes)
+    _dtype = choose_dtype(maximum(labeled_floes))
+    labeled_floes_cast = convert(Array{_dtype}, labeled_floes)
+    
+    @info "Writing labeled floes to $labeled"
+    save_labeled_img(labeled_floes_cast, labeled)
+
+    return nothing
+end
