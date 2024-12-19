@@ -2,6 +2,7 @@
 mkdir -p ~/.cylc/flow && cp oscar.global.cylc ~/.cylc/flow/global.cylc
 
 cylc vip . --set-file example/iftpipeline-test-case.conf -n iftpipeline-test-case-lopez -s 'PREPROCESSING="Lopez"'
+cylc vip . --set-file example/iftpipeline-test-case.conf -n iftpipeline-test-case-lopez-tiling -s 'PREPROCESSING="LopezTiling"'
 cylc vip . --set-file example/iftpipeline-test-case.conf -n iftpipeline-test-case-buckley -s 'PREPROCESSING="Buckley"'
 
 cylc vip . --set-file example/beaufort-sea-july.conf -n beaufort-sea-july-lopez -s 'PREPROCESSING="Lopez"'

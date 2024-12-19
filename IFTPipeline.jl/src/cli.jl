@@ -51,6 +51,192 @@ function mkclipreprocess_single!(settings)
         "--output", "-o"
         help = "Path to output segmented image file (.tiff)"
         required = true
+        
+    end
+    return nothing
+end
+
+function mkcli_preprocess_tiling_single!(settings)
+    @add_arg_table! settings["preprocess_tiling_single"] begin
+        "--truecolor", "-t"
+        help = "Truecolor image file (.tiff)"
+        required = true
+
+        "--falsecolor", "-r"
+        help = "Falsecolor image file (.tiff)"
+        required = true
+
+        "--landmask-dilated", "-d"
+        help = "Landmask image file (dilated, .tiff)"
+        required = true
+
+        "--segmented", "-s"
+        help = "Path to output segmented image file (.tiff)"
+        required = true
+        
+        "--labeled", "-l"
+        help = "Path to output labeled image file (.tiff)"
+        required = true
+
+
+        # Tiling parameters
+        
+        "--tile_rblocks"
+        default = 8
+        arg_type = Int
+        required = false
+
+        "--tile_cblocks"
+        default = 8
+        arg_type = Int
+        required = false
+
+
+        # Ice labels thresholds
+        
+        "--ice_labels_prelim_threshold"
+        default = 110.0
+        arg_type = Float64
+        required = false
+
+        "--ice_labels_band_7_threshold"
+        default = 200.0
+        arg_type = Float64
+        required = false
+
+        "--ice_labels_band_2_threshold"
+        default = 190.0
+        arg_type = Float64
+        required = false
+
+        "--ice_labels_ratio_lower"
+        default = 0.0
+        arg_type = Float64
+        required = false
+
+        "--ice_labels_ratio_upper"
+        default = 0.75
+        arg_type = Float64
+        required = false
+
+
+        # Adaptive histogram equalization parameters
+        
+        "--adapthisteq_white_threshold"
+        default = 25.5
+        arg_type = Float64
+        required = false
+
+        "--adapthisteq_entropy_threshold"
+        default = 4
+        arg_type = Float64
+        required = false
+
+        "--adapthisteq_white_fraction_threshold"
+        default = 0.4
+        arg_type = Float64
+        required = false
+
+
+        # Gamma parameters
+        
+        "--gamma"
+        default = 1
+        arg_type = Float64
+        required = false
+
+        "--gamma_factor"
+        default = 1
+        arg_type = Float64
+        required = false
+
+        "--gamma_threshold"
+        default = 220
+        arg_type = Float64
+        required = false
+
+
+        # Unsharp mask parameters
+        
+        "--unsharp_mask_radius"
+        default = 10
+        arg_type = Int
+        required = false
+
+        "--unsharp_mask_amount"
+        default = 2.0
+        arg_type = Float64
+        required = false
+
+        "--unsharp_mask_factor"
+        default = 255.0
+        arg_type = Float64
+        required = false
+
+
+        # Brighten parameters
+        
+        "--brighten_factor"
+        default  = 0.1
+        arg_type = Float64
+        required = false
+
+
+        # Preliminary ice mask parameters
+        
+        "--prelim_icemask_radius"
+        default = 10
+        arg_type = Int
+        required = false
+
+        "--prelim_icemask_amount"
+        default = 2
+        arg_type = Int
+        required = false
+
+        "--prelim_icemask_factor"
+        default = 0.5
+        arg_type = Float64
+        required = false
+
+
+        # Main ice mask parameters
+        
+        "--icemask_band_7_threshold"
+        default = 5
+        arg_type = Int
+        required = false
+
+        "--icemask_band_2_threshold"
+        default = 230
+        arg_type = Int
+        required = false
+
+        "--icemask_band_1_threshold"
+        default = 240
+        arg_type = Int
+        required = false
+
+        "--icemask_band_7_threshold_relaxed"
+        default = 10
+        arg_type = Int
+        required = false
+
+        "--icemask_band_1_threshold_relaxed"
+        default = 190
+        arg_type = Int
+        required = false
+
+        "--icemask_possible_ice_threshold"
+        default = 75
+        arg_type = Int
+        required = false
+
+        "--icemask_n_clusters"
+        default = 3
+        arg_type = Int
+        required = false
+
     end
     return nothing
 end
@@ -456,6 +642,7 @@ function mkcli!(settings, common_args)
         "landmask_single" => mkclilandmask_single!,
         "preprocess" => mkclipreprocess!,
         "preprocess_single" => mkclipreprocess_single!,
+        "preprocess_tiling_single" => mkcli_preprocess_tiling_single!,
         "extractfeatures" => mkcliextract!,
         "extractfeatures_single" => mkcliextract_single!,
         "makeh5files" => mkclimakeh5!,
@@ -491,6 +678,10 @@ function main()
 
         "preprocess_single"
         help = "Preprocess truecolor/falsecolor images"
+        action = :command
+
+        "preprocess_tiling_single"
+        help = "Preprocess truecolor/falsecolor images with tile-based histogram equalization"
         action = :command
 
         "extractfeatures"
