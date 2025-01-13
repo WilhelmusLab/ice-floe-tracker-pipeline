@@ -375,7 +375,7 @@ function preprocess_tiling_single(
     unsharp_mask_factor=255.0,
 
     # Brighten parameters
-    brighten_factor = 0.1,
+    brighten_factor=0.1,
 
     # Preliminary ice mask parameters
     prelim_icemask_radius=10, 
