@@ -433,7 +433,6 @@ function preprocess_tiling_single(
     @debug unsharp_mask_params
 
     @info "Set brighten factor"
-    brighten_factor = brighten_factor
     @debug brighten_factor
     
     @info "Set preliminary ice masks params"
