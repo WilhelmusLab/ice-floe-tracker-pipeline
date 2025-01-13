@@ -84,7 +84,7 @@ The [`template.py`](./example/util/template.py) script provided doesn't currentl
 
 ## Oscar
 
-Contact the Wilhelmus Lab members for access to the pipeline environment on Oscar, Brown University's High Performance Computing cluster.
+Contact the Wilhelmus Lab members for access to the pipeline environment on Brown University's High Performance Computing cluster "Oscar".
 
 ## Prerequisites
 
