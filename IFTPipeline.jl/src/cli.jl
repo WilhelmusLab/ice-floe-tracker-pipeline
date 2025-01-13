@@ -86,7 +86,7 @@ function mkcli_preprocess_tiling_single!(settings)
         arg_type = Int
         required = false
 
-        "--tile_cblocks"
+        "--tile-cblocks"
         default = 8
         arg_type = Int
         required = false
@@ -94,27 +94,27 @@ function mkcli_preprocess_tiling_single!(settings)
 
         # Ice labels thresholds
         
-        "--ice_labels_prelim_threshold"
+        "--ice-labels-prelim-threshold"
         default = 110.0
         arg_type = Float64
         required = false
 
-        "--ice_labels_band_7_threshold"
+        "--ice-labels-band-7-threshold"
         default = 200.0
         arg_type = Float64
         required = false
 
-        "--ice_labels_band_2_threshold"
+        "--ice-labels-band-2-threshold"
         default = 190.0
         arg_type = Float64
         required = false
 
-        "--ice_labels_ratio_lower"
+        "--ice-labels-ratio-lower"
         default = 0.0
         arg_type = Float64
         required = false
 
-        "--ice_labels_ratio_upper"
+        "--ice-labels-ratio-upper"
         default = 0.75
         arg_type = Float64
         required = false
@@ -122,17 +122,17 @@ function mkcli_preprocess_tiling_single!(settings)
 
         # Adaptive histogram equalization parameters
         
-        "--adapthisteq_white_threshold"
+        "--adapthisteq-white-threshold"
         default = 25.5
         arg_type = Float64
         required = false
 
-        "--adapthisteq_entropy_threshold"
+        "--adapthisteq-entropy-threshold"
         default = 4
         arg_type = Float64
         required = false
 
-        "--adapthisteq_white_fraction_threshold"
+        "--adapthisteq-white-fraction-threshold"
         default = 0.4
         arg_type = Float64
         required = false
@@ -145,12 +145,12 @@ function mkcli_preprocess_tiling_single!(settings)
         arg_type = Float64
         required = false
 
-        "--gamma_factor"
+        "--gamma-factor"
         default = 1
         arg_type = Float64
         required = false
 
-        "--gamma_threshold"
+        "--gamma-threshold"
         default = 220
         arg_type = Float64
         required = false
@@ -158,17 +158,17 @@ function mkcli_preprocess_tiling_single!(settings)
 
         # Unsharp mask parameters
         
-        "--unsharp_mask_radius"
+        "--unsharp-mask-radius"
         default = 10
         arg_type = Int
         required = false
 
-        "--unsharp_mask_amount"
+        "--unsharp-mask-amount"
         default = 2.0
         arg_type = Float64
         required = false
 
-        "--unsharp_mask_factor"
+        "--unsharp-mask-factor"
         default = 255.0
         arg_type = Float64
         required = false
@@ -176,7 +176,7 @@ function mkcli_preprocess_tiling_single!(settings)
 
         # Brighten parameters
         
-        "--brighten_factor"
+        "--brighten-factor"
         default  = 0.1
         arg_type = Float64
         required = false
@@ -184,17 +184,17 @@ function mkcli_preprocess_tiling_single!(settings)
 
         # Preliminary ice mask parameters
         
-        "--prelim_icemask_radius"
+        "--prelim-icemask-radius"
         default = 10
         arg_type = Int
         required = false
 
-        "--prelim_icemask_amount"
+        "--prelim-icemask-amount"
         default = 2
         arg_type = Int
         required = false
 
-        "--prelim_icemask_factor"
+        "--prelim-icemask-factor"
         default = 0.5
         arg_type = Float64
         required = false
@@ -202,37 +202,37 @@ function mkcli_preprocess_tiling_single!(settings)
 
         # Main ice mask parameters
         
-        "--icemask_band_7_threshold"
+        "--icemask-band-7-threshold"
         default = 5
         arg_type = Int
         required = false
 
-        "--icemask_band_2_threshold"
+        "--icemask-band-2-threshold"
         default = 230
         arg_type = Int
         required = false
 
-        "--icemask_band_1_threshold"
+        "--icemask-band-1-threshold"
         default = 240
         arg_type = Int
         required = false
 
-        "--icemask_band_7_threshold_relaxed"
+        "--icemask-band-7-threshold-relaxed"
         default = 10
         arg_type = Int
         required = false
 
-        "--icemask_band_1_threshold_relaxed"
+        "--icemask-band-1-threshold-relaxed"
         default = 190
         arg_type = Int
         required = false
 
-        "--icemask_possible_ice_threshold"
+        "--icemask-possible-ice-threshold"
         default = 75
         arg_type = Int
         required = false
 
-        "--icemask_n_clusters"
+        "--icemask-n-clusters"
         default = 3
         arg_type = Int
         required = false
