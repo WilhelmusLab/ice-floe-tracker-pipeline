@@ -36,14 +36,14 @@ def _template(df, row_index):
 
         >>> print(_template(df, row_index="hudson-bay-0"))
         --set START="2020-09-06" --set END="2020-09-09" --set BBOX="-2795941,-3368686,-1295941,-1868686" --set LOCATION="hudson-bay"
-        
+
     """
     r = df.loc[row_index]
     s = (
         f'--set START="{r.startdate}" '
         f'--set END="{r.enddate}" '
-        f'--set CENTROID_LAT="{r.center_lat}" '  
-        f'--set CENTROID_LON="{r.center_lon}" '  
+        f'--set CENTROID_LAT="{r.center_lat}" '
+        f'--set CENTROID_LON="{r.center_lon}" '
         f'--set BBOX="{r.left_x},{r.lower_y},{r.right_x},{r.top_y}" '
         f'--set LOCATION="{r.location}"'
     )
