@@ -310,7 +310,51 @@ Preprocess and segment floes in a single view. Save the segmented floes to `segm
 - `landmask`: path to landmask image
 - `landmask_dilated`: path to dilated landmask image
 - `segmented`: path to segmented output file 
-- `labeled`: path to labeled output file 
+- `labeled`: path to labeled output file
+
+- Tiling
+    - `tile_rblocks`: 
+    - `tile_cblocks`: 
+
+- Ice labels thresholds
+    - `ice_labels_prelim_threshold`: 
+    - `ice_labels_band_7_threshold`:
+    - `ice_labels_band_2_threshold`:
+    - `ice_labels_ratio_lower`:
+    - `ice_labels_ratio_upper`:
+
+- Adaptive histogram equalization
+    - `adapthisteq_white_threshold`:
+    - `adapthisteq_entropy_threshold`:
+    - `adapthisteq_white_fraction_threshold`:
+
+- Gamma
+    - `gamma`:
+    - `gamma_factor`:
+    - `gamma_threshold`:
+
+- Unsharp mask
+    - `unsharp_mask_radius`:
+    - `unsharp_mask_amount`:
+    - `unsharp_mask_factor`:
+
+- Brighten
+    - `brighten_factor`:
+
+- Preliminary ice mask
+    - `prelim_icemask_radius`:
+    - `prelim_icemask_amount`:
+    - `prelim_icemask_factor`:
+   
+- Main ice mask
+    - `icemask_band_7_threshold`:
+    - `icemask_band_2_threshold`:
+    - `icemask_band_1_threshold`:
+    - `icemask_band_7_threshold_relaxed`:
+    - `icemask_band_1_threshold_relaxed`:
+    - `icemask_possible_ice_threshold`:
+    - `icemask_n_clusters`:
+
 """
 function preprocess_tiling_single(
     ; 
