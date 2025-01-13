@@ -376,7 +376,7 @@ function preprocess_tiling_single(
     # the landmask is expected to be the other polarity compared with
     # the non-tiling version.
     landmask = (
-        dilated=map(!, landmask_dilated),
+        dilated=.!landmask_dilated,
     )
 
     @info "Remove alpha channel if it exists"
