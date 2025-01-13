@@ -80,7 +80,7 @@ done
 cylc tui
 ```
 
-The `template.py` script provided doesn't currently have support for setting any other parameters, but could be extended if needed.
+The [`template.py`](./example/util/template.py) script provided doesn't currently have support for setting any other parameters, but could be extended if needed.
 
 ## Oscar
 
