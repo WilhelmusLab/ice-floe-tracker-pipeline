@@ -81,7 +81,7 @@ function mkcli_preprocess_tiling_single!(settings)
 
         # Tiling parameters
         
-        "--tile_rblocks"
+        "--tile-rblocks"
         default = 8
         arg_type = Int
         required = false
