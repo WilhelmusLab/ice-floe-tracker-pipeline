@@ -39,7 +39,7 @@ View progress of the pipeline by calling:
 ```bash
 cylc tui
 ```
-In the TUI you can view logs, and "trigger" (i.e., rerun) tasks which failed.
+In the TUI you can view logs, and "trigger" (i.e., rerun) failed tasks.
 
 #### Advanced case: non-contiguous dates, multiple locations
 
