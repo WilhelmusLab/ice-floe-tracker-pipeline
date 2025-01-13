@@ -300,7 +300,7 @@ function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_
 end
 
 """
-    preprocess_tiling_single(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T) where {T<:AbstractString}
+    preprocess_tiling_single(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T, <other keyword arguments>) where {T<:AbstractString}
 
 Preprocess and segment floes in a single view. Save the segmented floes to `segmented` and the labeled floes to `labeled`.
 
