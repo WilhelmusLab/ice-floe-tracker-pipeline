@@ -32,7 +32,7 @@ Make a new configuration file with the region and time period you want to analys
 
 Run the pipeline by calling `cylc vip`, like this:
 ```bash
-cylc vip . --set-file /path/to/your/configuration/file.conf -n your-analysis-run-name
+cylc vip . --set-file /path/to/your/configuration/file.conf --set PARAM="value" -n your-analysis-run-name
 ```
 
 View progress of the pipeline by calling:
@@ -40,6 +40,11 @@ View progress of the pipeline by calling:
 cylc tui
 ```
 In the TUI you can view logs, and "trigger" (i.e., rerun) failed tasks.
+
+Note that any parameters not specified in `/path/to/your/configuration/file.conf` 
+nor specified using a `--set PARAM="value` argument
+will default to the values in `rose-suite.conf`.
+
 
 #### Advanced case: non-contiguous dates, multiple locations
 
