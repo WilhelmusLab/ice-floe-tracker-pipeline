@@ -311,33 +311,33 @@ Preprocess and segment floes in a single view. Save the segmented floes to `segm
 - `landmask_dilated`: path to dilated landmask image
 - `segmented`: path to segmented output file 
 - `labeled`: path to labeled output file
-- `tile_rblocks::Int=8`: 
-- `tile_cblocks::Int=8`: 
-- `ice_labels_prelim_threshold::Float64=110.0`: 
-- `ice_labels_band_7_threshold::Float64=200.0`: 
-- `ice_labels_band_2_threshold::Float64=190.0`: 
-- `ice_labels_ratio_lower::Float64=0.0`: 
-- `ice_labels_ratio_upper::Float64=0.75`: 
-- `adapthisteq_white_threshold::Float64=25.5,`: 
-- `adapthisteq_entropy_threshold::Float64=4,`: 
-- `adapthisteq_white_fraction_threshold::Float64=0.4`: 
-- `gamma::Float64=1`: 
-- `gamma_factor::Float64=1`: 
-- `gamma_threshold::Float64=220`: 
-- `unsharp_mask_radius::Int=10,`: 
-- `unsharp_mask_amount::Float64=2.0,`: 
-- `unsharp_mask_factor::Float64=255.0`: 
-- `brighten_factor::Float64=0.1`: 
-- `prelim_icemask_radius::Int=10,`: 
-- `prelim_icemask_amount::Int=2,`: 
-- `prelim_icemask_factor::Float64=0.5`: 
-- `icemask_band_7_threshold::Int=5`: 
-- `icemask_band_2_threshold::Int=230`: 
-- `icemask_band_1_threshold::Int=240`: 
-- `icemask_band_7_threshold_relaxed::Int=10`: 
-- `icemask_band_1_threshold_relaxed::Int=190`: 
-- `icemask_possible_ice_threshold::Int=75`: 
-- `icemask_n_clusters::Int=3`: 
+- `tile_rblocks::Int=8`: see IceFloeTracker.conditional_histeq
+- `tile_cblocks::Int=8`: see IceFloeTracker.conditional_histeq
+- `ice_labels_prelim_threshold::Float64=110.0`: see IceFloeTracker.create_cloudmask
+- `ice_labels_band_7_threshold::Float64=200.0`: see IceFloeTracker.create_cloudmask
+- `ice_labels_band_2_threshold::Float64=190.0`: see IceFloeTracker.create_cloudmask
+- `ice_labels_ratio_lower::Float64=0.0`: see IceFloeTracker.create_cloudmask
+- `ice_labels_ratio_upper::Float64=0.75`: see IceFloeTracker.create_cloudmask
+- `adapthisteq_white_threshold::Float64=25.5,`: see IceFloeTracker.conditional_histeq
+- `adapthisteq_entropy_threshold::Float64=4,`: see IceFloeTracker.conditional_histeq
+- `adapthisteq_white_fraction_threshold::Float64=0.4`: see IceFloeTracker.conditional_histeq
+- `gamma::Float64=1`: see step 8 in IceFloeTracker.preprocess_tiling
+- `gamma_factor::Float64=1`: see step 8 in IceFloeTracker.preprocess_tiling
+- `gamma_threshold::Float64=220`: see step 8 in IceFloeTracker.preprocess_tiling
+- `unsharp_mask_radius::Int=10,`: see step 5 in IceFloeTracker.preprocess_tiling
+- `unsharp_mask_amount::Float64=2.0,`: see step 5 in IceFloeTracker.preprocess_tiling
+- `unsharp_mask_factor::Float64=255.0`: see step 5 in IceFloeTracker.preprocess_tiling
+- `brighten_factor::Float64=0.1`: See step 7 in in IceFloeTracker.preprocess_tiling
+- `prelim_icemask_radius::Int=10,`: See step 12 in in IceFloeTracker.preprocess_tiling
+- `prelim_icemask_amount::Int=2,`: See step 12 in in IceFloeTracker.preprocess_tiling
+- `prelim_icemask_factor::Float64=0.5`: See step 12 in in IceFloeTracker.preprocess_tiling
+- `icemask_band_7_threshold::Int=5`: See step 13 in in IceFloeTracker.preprocess_tiling
+- `icemask_band_2_threshold::Int=230`: See step 13 in in IceFloeTracker.preprocess_tiling
+- `icemask_band_1_threshold::Int=240`: See step 13 in in IceFloeTracker.preprocess_tiling
+- `icemask_band_7_threshold_relaxed::Int=10`: See step 13 in in IceFloeTracker.preprocess_tiling
+- `icemask_band_1_threshold_relaxed::Int=190`: See step 13 in in IceFloeTracker.preprocess_tiling
+- `icemask_possible_ice_threshold::Int=75`: See step 13 in in IceFloeTracker.preprocess_tiling
+- `icemask_n_clusters::Int=3`: See step 13 in in IceFloeTracker.preprocess_tiling
 
 """
 function preprocess_tiling_single(
