@@ -77,7 +77,7 @@ cylc clean ${name} -y
 
 datafile="example/all-cases.csv"
 index_col="fullname"
-for fullname in $(pipx run example/util/get_fullnames.py "${datafile}" "${index_col}" --start 1 --stop 10);
+for fullname in $(pipx run example/util/get_values.py "${datafile}" "${index_col}" --start 1 --stop 10);
 do   
   cylc vip . -n ${name} --run-name=${fullname} $(pipx run example/util/template.py ${datafile} ${index_col} ${fullname}); 
 done
