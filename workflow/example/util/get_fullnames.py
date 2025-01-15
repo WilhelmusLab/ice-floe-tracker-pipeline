@@ -15,7 +15,7 @@ import typer
 
 def main(
     datafile: Annotated[pathlib.Path, typer.Argument(help="path to csv file")],
-    index_col: Annotated[str, typer.Argument(help="name of column to return")],
+    column: Annotated[str, typer.Argument(help="name of column to return")],
     start: Annotated[
         Optional[int], typer.Argument(help="initial row index to return")
     ] = None,
@@ -26,9 +26,9 @@ def main(
         Optional[int], typer.Argument(help="size of steps between returned row indices")
     ] = None,
 ):
-    """Print values from the `index_col` column in a CSV file, from row `start` to `stop` in steps of `step`."""
+    """Print values from the `column` column in a CSV file, from row `start` to `stop` in steps of `step`."""
     f = pandas.read_csv(datafile)
-    print("\n".join(f[index_col].values[start:stop:step]))
+    print("\n".join(f[column].values[start:stop:step]))
 
 
 if __name__ == "__main__":
