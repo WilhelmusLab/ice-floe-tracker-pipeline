@@ -300,7 +300,7 @@ function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_
 end
 
 """
-    preprocess_tiling_single(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T) where {T<:AbstractString}
+    preprocess_tiling_single(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T, <other keyword arguments>) where {T<:AbstractString}
 
 Preprocess and segment floes in a single view. Save the segmented floes to `segmented` and the labeled floes to `labeled`.
 
@@ -310,7 +310,42 @@ Preprocess and segment floes in a single view. Save the segmented floes to `segm
 - `landmask`: path to landmask image
 - `landmask_dilated`: path to dilated landmask image
 - `segmented`: path to segmented output file 
-- `labeled`: path to labeled output file 
+- `labeled`: path to labeled output file
+- Ice label thresholds for IceFloeTracker.create_cloudmask, step 1 & 2 of IceFloeTracker.preprocess_tiling
+    - `ice_labels_prelim_threshold::Float64=110.0`
+    - `ice_labels_band_7_threshold::Float64=200.0`
+    - `ice_labels_band_2_threshold::Float64=190.0`
+    - `ice_labels_ratio_lower::Float64=0.0`
+    - `ice_labels_ratio_upper::Float64=0.75`
+- Tile numbers and threshold values for IceFloeTracker.conditional_histeq, step 3 of IceFloeTracker.preprocess_tiling
+    - `tile_rblocks::Int=8`
+    - `tile_cblocks::Int=8`
+    - `adapthisteq_white_threshold::Float64=25.5`
+    - `adapthisteq_entropy_threshold::Float64=4`
+    - `adapthisteq_white_fraction_threshold::Float64=0.4`````
+- Unsharp mask for step 5 of IceFloeTracker.preprocess_tiling
+    - `unsharp_mask_radius::Int=10`
+    - `unsharp_mask_amount::Float64=2.0`
+    - `unsharp_mask_factor::Float64=255.0`
+- Brightening in step 7 of IceFloeTracker.preprocess_tiling
+    - `brighten_factor::Float64=0.1`: See step 7 in 
+- Gamma correction for step 8 of IceFloeTracker.preprocess_tiling
+    - `gamma::Float64=1`
+    - `gamma_factor::Float64=1`
+    - `gamma_threshold::Float64=220`
+- Preliminary ice masking in step 12 of IceFloeTracker.preprocess_tiling
+    - `prelim_icemask_radius::Int=10`
+    - `prelim_icemask_amount::Int=2`
+    - `prelim_icemask_factor::Float64=0.5`
+- Final ice masking in step 13 of IceFloeTracker.preprocess_tiling
+    - `icemask_band_7_threshold::Int=5`
+    - `icemask_band_2_threshold::Int=230`
+    - `icemask_band_1_threshold::Int=240`
+    - `icemask_band_7_threshold_relaxed::Int=10`
+    - `icemask_band_1_threshold_relaxed::Int=190`
+    - `icemask_possible_ice_threshold::Int=75`
+    - `icemask_n_clusters::Int=3`
+
 """
 function preprocess_tiling_single(
     ; 
@@ -347,7 +382,7 @@ function preprocess_tiling_single(
     unsharp_mask_factor=255.0,
 
     # Brighten parameters
-    brighten_factor = 0.1,
+    brighten_factor=0.1,
 
     # Preliminary ice mask parameters
     prelim_icemask_radius=10, 
@@ -376,7 +411,7 @@ function preprocess_tiling_single(
     # the landmask is expected to be the other polarity compared with
     # the non-tiling version.
     landmask = (
-        dilated=map(!, landmask_dilated),
+        dilated=.!landmask_dilated,
     )
 
     @info "Remove alpha channel if it exists"
@@ -433,7 +468,6 @@ function preprocess_tiling_single(
     @debug unsharp_mask_params
 
     @info "Set brighten factor"
-    brighten_factor = brighten_factor
     @debug brighten_factor
     
     @info "Set preliminary ice masks params"
