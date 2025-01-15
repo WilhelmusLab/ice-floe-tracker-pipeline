@@ -673,15 +673,15 @@ function main()
         action = :command
 
         "preprocess"
-        help = "Preprocess truecolor/falsecolor images"
+        help = "Label ice in a directory of truecolor & falsecolor images using full-image-based processing"
         action = :command
 
         "preprocess_single"
-        help = "Preprocess truecolor/falsecolor images"
+        help = "Label ice in a single set of truecolor & falsecolor images using full-image-based processing"
         action = :command
 
         "preprocess_tiling_single"
-        help = "Preprocess truecolor/falsecolor images with tile-based histogram equalization"
+        help = "Label ice in a single set of truecolor & falsecolor images using tile-based processing"
         action = :command
 
         "extractfeatures"
