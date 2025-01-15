@@ -76,10 +76,10 @@ cylc stop ${name}/*;
 cylc clean ${name} -y
 
 datafile="example/all-cases.csv"
-index_col="fullname"
-for fullname in $(pipx run example/util/get_values.py "${datafile}" "${index_col}" --start 1 --stop 10);
+column="fullname"
+for row_name in $(pipx run example/util/get_values.py "${datafile}" "${column}" --start 1 --stop 10);
 do   
-  cylc vip . -n ${name} --run-name=${fullname} $(pipx run example/util/template.py ${datafile} ${index_col} ${fullname}); 
+  cylc vip . -n ${name} --run-name=${row_name} $(pipx run example/util/template.py ${datafile} ${column} ${row_name}); 
 done
 
 cylc tui
