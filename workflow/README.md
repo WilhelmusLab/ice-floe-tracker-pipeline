@@ -8,9 +8,9 @@ This directory includes tools to run the ice floe tracker analysis on a batch of
 
 You will need the following installed on your computer:
 - [`pipx`](https://pipx.pypa.io/stable/)
-- [`cylc`](https://cylc.github.io/) 
+- [`cylc`](https://cylc.github.io/) [(installation instructions)](https://cylc.github.io/cylc-doc/latest/html/installation.html)
   - the `cylc-rose` plugin
-  - [`global.cylc`](https://cylc.github.io/cylc-doc/stable/html/reference/config/global.html#global.cylc) file, making any modifications you might want.
+  - a [`global.cylc`](https://cylc.github.io/cylc-doc/stable/html/reference/config/global.html#global.cylc) file, making any modifications you might want. An [example file for Oscar](./oscar.global.cylc) with SLURM support is included in this directory.
 - [`docker`](https://docs.docker.com/)
 
 You will also need a username and account on [space-track.org](https://space-track.org)
