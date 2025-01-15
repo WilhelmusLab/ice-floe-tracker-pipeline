@@ -322,7 +322,7 @@ Preprocess and segment floes in a single view. Save the segmented floes to `segm
     - `tile_cblocks::Int=8`
     - `adapthisteq_white_threshold::Float64=25.5`
     - `adapthisteq_entropy_threshold::Float64=4`
-    - `adapthisteq_white_fraction_threshold::Float64=0.4`````
+    - `adapthisteq_white_fraction_threshold::Float64=0.4`
 - Unsharp mask for step 5 of IceFloeTracker.preprocess_tiling
     - `unsharp_mask_radius::Int=10`
     - `unsharp_mask_amount::Float64=2.0`
