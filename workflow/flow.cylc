@@ -290,7 +290,7 @@
         # Package intermediate and final outputs into HDF5 files
         script = """
         ${IFT} makeh5files_single \
-            --passtime `cat ${overpass_time_file}` \
+            --passtime "$(cat ${overpass_time_file} | tr -d 'Z\n\r')" \
             --truecolor ${truecolor_file} \
             --falsecolor ${falsecolor_file} \
             --labeled ${labeled_file} \
