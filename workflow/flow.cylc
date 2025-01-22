@@ -17,7 +17,7 @@
         """
         P1D = """
             get_all_overpass_times[^] => get_single_overpass_time<satellite>
-            INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all => exportH5 => done
+            INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all => exportH5<satellite> => done
             done[-P1D] => done
 
         """
