@@ -28,7 +28,11 @@ Don't commit these changes to the repo.
 
 #### Simple case: single target
 
-Make a new configuration file with the region and time period you want to analyse. All the possible parameters are listed in [rose-suite.conf](./rose-suite.conf). You can see examples in [example](./example/). Command line usage examples are shown in [example-cylc-calls.sh](./example-cylc-calls.sh).
+Make a new configuration file with the region and time period you want to analyse. 
+All the possible parameters are listed in [rose-suite.conf](./rose-suite.conf) 
+and described in [meta/rose-meta.conf](meta/rose-meta.conf). 
+You can see examples in [example](./example/). 
+Command line usage examples are shown in [example-cylc-calls.sh](./example-cylc-calls.sh).
 
 Run the pipeline by calling `cylc vip`, like this:
 ```bash
