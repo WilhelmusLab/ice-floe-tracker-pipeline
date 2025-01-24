@@ -1,8 +1,5 @@
 #!jinja2
 
-[scheduler]
-    allow implicit tasks = True
-
 [task parameters]
     satellite = {{ SATELLITES | join(", ")}}
 
@@ -86,6 +83,9 @@
 
             JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker"
 
+    [[done]]
+        script = """exit 0"""
+    
     [[INIT]]
     [[init_soit]]
         inherit = INIT
