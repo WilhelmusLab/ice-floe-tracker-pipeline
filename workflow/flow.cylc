@@ -84,7 +84,7 @@
                 {{ raise('COLORIZE_INSTALL not recognized.') }}
             {% endif %}
 
-            JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker"
+            JULIA_DEBUG={{ JULIA_DEBUG }}
 
     [[INIT]]
     [[init_soit]]
