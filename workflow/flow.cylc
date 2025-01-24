@@ -63,7 +63,7 @@
             {% if FSDPROC_INSTALL == "Inject" %}
                 FSDPROC={{ FSDPROC_COMMAND }}
             {% elif FSDPROC_INSTALL == "Source" %}
-                FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg@{{ FSDPROC_VERSION }} fsdproc --debug"
+                FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg@{{ FSDPROC_VERSION }} fsdproc"
             {% else %}
                 {{ raise('FSDPROC_INSTALL not recognized.') }}
             {% endif %}
