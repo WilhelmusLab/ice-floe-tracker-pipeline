@@ -340,7 +340,7 @@ function mkclimakeh5_single!(settings)
         required = true
         arg_type = String
 
-        "--output", "-o"
+        "--output"
         help = "Output file"
         required = true
     end
