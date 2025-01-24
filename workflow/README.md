@@ -54,8 +54,8 @@ will default to the values in `rose-suite.conf`.
 
 The simplest way to generate runs of non-contiguous dates is to call `cylc vip` several times, e.g.:
 ```bash
-cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=may-2006 --initial-cycle-point=2006-05-04 --final-cycle-point=2006-05-06
-cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=july-2008 --initial-cycle-point=2008-07-13 --final-cycle-point=2008-07-15
+cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=may-2006 --set 'START="2006-05-04"' --set 'END="2006-05-06"'
+cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=july-2008 --set 'START="2008-07-13"' --set 'END="2008-07-15"'
 ```
 
 The simplest way to process many different locations would be to make a location configuration file for each target location, and then to run a series of `cylc vip` commands as above.
