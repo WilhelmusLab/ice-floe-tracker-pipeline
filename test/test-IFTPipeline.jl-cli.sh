@@ -82,6 +82,52 @@ preprocess_lopez () {
         --output ${HDF5FILE}
 }
 
+preprocess_lopez_tiling () {
+    echo_CLI_tools
+
+    DATA_SOURCE=$1
+    DATA_TARGET=$2
+    initialize_test_directory $1 $2
+
+    LANDMASK=${DATA_TARGET}/landmask.tiff
+    LANDMASK_NON_DILATED=${DATA_TARGET}/landmask.non-dilated.tiff
+    LANDMASK_DILATED=${DATA_TARGET}/landmask.dilated.tiff
+    TRUECOLOR=${DATA_TARGET}/truecolor.tiff
+    FALSECOLOR=${DATA_TARGET}/falsecolor.tiff
+    SEGMENTED=${DATA_TARGET}/segmented.tiff
+    LABELED=${DATA_TARGET}/labeled.tiff
+    COLORIZED=${DATA_TARGET}/labeled.colorized.tiff
+    FLOEPROPERTIES=${DATA_TARGET}/labeled.props.csv
+    HDF5FILE=${DATA_TARGET}/results.h5
+    OVERPASS=${DATA_TARGET}/overpass.txt
+
+    ${IFT} landmask_single \
+        -i ${LANDMASK} \
+        -o ${LANDMASK_NON_DILATED} \
+        -d ${LANDMASK_DILATED}
+
+    ${IFT} preprocess_tiling_single \
+        --truecolor ${TRUECOLOR} \
+        --falsecolor ${FALSECOLOR} \
+        --landmask-dilated ${LANDMASK_DILATED} \
+        --segmented ${SEGMENTED} \
+        --labeled ${LABELED}
+    
+    ${IFT} extractfeatures_single \
+        --input ${LABELED} \
+        --output ${FLOEPROPERTIES}
+
+    ${COLORIZE} ${LABELED} ${COLORIZED}
+    
+    ${IFT} makeh5files_single \
+        --passtime `cat ${OVERPASS}` \
+        --truecolor ${TRUECOLOR} \
+        --falsecolor ${FALSECOLOR} \
+        --labeled ${LABELED} \
+        --props ${FLOEPROPERTIES} \
+        --output ${HDF5FILE}
+}
+
 preprocess_buckley () {
     echo_CLI_tools
 
@@ -144,6 +190,14 @@ track () {
 
 track_original () {
     PREPROCESS=preprocess_lopez track $@
+}
+
+track_lopez () {
+    PREPROCESS=preprocess_lopez track $@
+}
+
+track_lopez_tiling () {
+    PREPROCESS=preprocess_lopez_tiling track $@
 }
 
 track_buckley () {
