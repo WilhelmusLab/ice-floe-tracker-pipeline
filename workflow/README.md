@@ -8,16 +8,14 @@ This directory includes tools to run the ice floe tracker analysis on a batch of
 
 You will need the following installed on your computer:
 - [`pipx`](https://pipx.pypa.io/stable/)
-- [`cylc`](https://cylc.github.io/) 
+- [`cylc ≥ 8.4.0`](https://cylc.github.io/) [(installation instructions)](https://cylc.github.io/cylc-doc/latest/html/installation.html)
   - the `cylc-rose` plugin
-  - [`global.cylc`](https://cylc.github.io/cylc-doc/stable/html/reference/config/global.html#global.cylc) file, making any modifications you might want.
+  - a [`global.cylc`](https://cylc.github.io/cylc-doc/stable/html/reference/config/global.html#global.cylc) file, making any modifications you might want. An [example file for Oscar](./oscar.global.cylc) with SLURM support is included in this directory.
 - [`docker`](https://docs.docker.com/)
 
 You will also need a username and account on [space-track.org](https://space-track.org)
 
 ### Running the pipeline
-
-Make a new configuration file with the region and time period you want to analyse. All the possible parameters are listed in [rose-suite.conf](./rose-suite.conf). You can see examples in [example](./example/). 
 
 Add the following lines to the rose-suite.conf file with your space-track.org username and password:
 ```
@@ -28,19 +26,74 @@ SPACEPSWD="yourpassword"
 Don't commit these changes to the repo.
 <!-- TODO: Insecure. Make this import from an environment file or the keychain. -->
 
+#### Simple case: single target
 
-Run the pipeline by calling:
+Make a new configuration file with the region and time period you want to analyse. 
+All the possible parameters are listed in [rose-suite.conf](./rose-suite.conf) 
+and described in [meta/rose-meta.conf](meta/rose-meta.conf). 
+You can see examples in [example](./example/). 
+Command line usage examples are shown in [example-cylc-calls.sh](./example-cylc-calls.sh).
+
+Run the pipeline by calling `cylc vip`, like this:
 ```bash
-cylc vip . --set-file /path/to/your/configuration/file.conf -n your-analysis-run-name
+cylc vip . --set-file /path/to/your/configuration/file.conf --set PARAM="value" -n your-analysis-run-name
 ```
 
-Command line usage examples are shown in [example-cylc-calls.sh](./example-cylc-calls.sh).
+View progress of the pipeline by calling:
+```bash
+cylc tui
+```
+In the TUI you can view logs, and "trigger" (i.e., rerun) failed tasks.
+
+Note that any parameters not specified in `/path/to/your/configuration/file.conf` 
+nor specified using a `--set PARAM="value` argument
+will default to the values in `rose-suite.conf`.
+
+
+#### Advanced case: non-contiguous dates, multiple locations
+
+The simplest way to generate runs of non-contiguous dates is to call `cylc vip` several times, e.g.:
+```bash
+cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=may-2006 --set 'START="2006-05-04"' --set 'END="2006-05-06"'
+cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=july-2008 --set 'START="2008-07-13"' --set 'END="2008-07-15"'
+```
+
+The simplest way to process many different locations would be to make a location configuration file for each target location, and then to run a series of `cylc vip` commands as above.
+
+You can also use this kind of approach to run the pipeline with different sets of parameters, e.g.:
+```bash
+for nclusters in 3 5 7; do 
+  cylc vip . --set-file example/beaufort-sea-buckley-paper.conf -n beaufort-sea-cluster-test --run-name="${nclusters}-clusters" -s "ICEMASK_N_CLUSTERS=${nclusters}"
+done
+```
 
 View the running commands by calling `cylc tui`.
 
+#### Advanced use: case list
+
+To loop through a list of cases, you might use a script like this:
+
+```bash
+name=sampled-examples
+
+cylc stop ${name}/*;
+cylc clean ${name} -y
+
+datafile="example/all-cases.csv"
+column="fullname"
+for row_name in $(pipx run example/util/get_values.py "${datafile}" "${column}" --start 1 --stop 10);
+do   
+  cylc vip . -n ${name} --run-name=${row_name} $(pipx run example/util/template.py ${datafile} ${column} ${row_name}); 
+done
+
+cylc tui
+```
+
+The [`template.py`](./example/util/template.py) script provided doesn't currently have support for setting any other parameters, but could be extended if needed.
+
 ## Oscar
 
-Contact the Wilhelmus Lab members for access to the pipeline environment on Oscar, Brown University's High Performance Computing cluster.
+Contact the Wilhelmus Lab members for access to the pipeline environment on Brown University's High Performance Computing cluster "Oscar".
 
 ## Prerequisites
 
