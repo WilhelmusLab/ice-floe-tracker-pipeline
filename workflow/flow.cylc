@@ -280,9 +280,9 @@
                     --kernel-size  {{ BUCKLEY_KERNEL_SIZE }}
                 
                 ${FILTER_DF} \
-                    --input ${workdir}/props.csv \
-                    --query "{{ MINFLOEAREA }} <= area <= {{ MAXFLOEAREA }}" \
-                    --output ${labeled_props_file}
+                    ${workdir}/props.csv \
+                    "{{ MINFLOEAREA }} <= area <= {{ MAXFLOEAREA }}" \
+                    ${labeled_props_file}
 
                 cp ${workdir}/final.tif ${labeled_file}
             
