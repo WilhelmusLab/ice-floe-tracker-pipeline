@@ -84,6 +84,12 @@
                 {{ raise('COLORIZE_INSTALL not recognized.') }}
             {% endif %}
 
+            {% if FILTER_DF_INSTALL == "Inject" %}
+                FILTER_DF = {{ FILTER_DF_COMMAND }}
+            {% else %}
+                {{ raise('FILTER_DF_INSTALL not recognized.') }}
+            {% endif %}
+
             JULIA_DEBUG={{ JULIA_DEBUG }}
 
     [[INIT]]
@@ -273,8 +279,12 @@
                     --kernel-type {{ BUCKLEY_KERNEL_TYPE }} \
                     --kernel-size  {{ BUCKLEY_KERNEL_SIZE }}
                 
+                ${FILTER_DF} \
+                    --input ${workdir}/props.csv \
+                    --query "{{ MINFLOEAREA }} <= area <= {{ MAXFLOEAREA }}" \
+                    --output ${labeled_props_file}
+
                 cp ${workdir}/final.tif ${labeled_file}
-                cp ${workdir}/props.csv ${labeled_props_file}
             
             {% else %}
                  
