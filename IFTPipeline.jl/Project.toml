@@ -25,11 +25,8 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 ArgParse = "1.1"
 Folds = "0.2"
 HDF5 = "0.16, 0.17"
+IceFloeTracker = "0.6.3"
 LoggingExtras = "1.0"
 Pkg = "1.9"
 PyCall = "1.96"
 TOML = "1.0"
-
-[sources.IceFloeTracker]
-rev = "main"
-url = "https://github.com/WilhelmusLab/IceFloeTracker.jl"
