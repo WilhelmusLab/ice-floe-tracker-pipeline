@@ -60,7 +60,7 @@
             {% if FSDPROC_INSTALL == "Inject" %}
                 FSDPROC={{ FSDPROC_COMMAND }}
             {% elif FSDPROC_INSTALL == "Source" %}
-                FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg@{{ FSDPROC_VERSION }} fsdproc --debug"
+                FSDPROC="pipx run --spec git+https://github.com/WilhelmusLab/ebseg@{{ FSDPROC_VERSION }} fsdproc"
             {% else %}
                 {{ raise('FSDPROC_INSTALL not recognized.') }}
             {% endif %}
@@ -81,7 +81,7 @@
                 {{ raise('COLORIZE_INSTALL not recognized.') }}
             {% endif %}
 
-            JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker"
+            JULIA_DEBUG={{ JULIA_DEBUG }}
 
     [[done]]
         script = """exit 0"""
