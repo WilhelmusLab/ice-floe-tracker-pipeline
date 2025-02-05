@@ -53,9 +53,17 @@ jobs:
         working-directory: ./test
         run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez input_data/ne-greenland.20220914.terra.250m
 
+      - name: Test Preprocessing (Lopez CLI, cloudy image)
+        working-directory: ./test
+        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez input_data/sea_of_okhostk.100km.20190427.terra.250m
+  
       - name: Test Preprocessing CLI (Lopez with Tiling)
         working-directory: ./test
         run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez_tiling input_data/ne-greenland.20220914.terra.250m
+        
+      - name: Test Preprocessing (Lopez with Tiling, cloudy image)
+        working-directory: ./test
+        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez_tiling input_data/sea_of_okhostk.100km.20190427.terra.250m
 
       - name: Test Tracker CLI
         working-directory: ./test

@@ -22,8 +22,13 @@ cylc vip . --set-file example/fram-strait-april-may-2020.conf -n fram-strait-apr
 cylc vip . --set-file example/fram-strait-april-may-2020.conf -n fram-strait-april-may-2020-buckley -s 'PREPROCESSING="Buckley"'
 
 cylc vip . --set-file example/ne-greenland.conf -n ne-greenland-lopez -s 'PREPROCESSING="Lopez"'
+cylc vip . --set-file example/ne-greenland.conf -n ne-greenland-lopeztiling -s 'PREPROCESSING="LopezTiling"'
 cylc vip . --set-file example/ne-greenland.conf -n ne-greenland-buckley -s 'PREPROCESSING="Buckley"'
 
 # Non-contiguous dates:
 cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=may-2006 --initial-cycle-point=2006-05-04 --final-cycle-point=2006-05-06
 cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=july-2008 --initial-cycle-point=2008-07-13 --final-cycle-point=2008-07-15
+
+# Case from case list
+row_name="435-sea_of_okhostk-100km-20190427-20190428"
+cylc vip . -n case-${row_name} $(pipx run example/util/template.py example/case-list.csv "fullname" ${row_name}); 
