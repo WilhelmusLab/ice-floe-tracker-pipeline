@@ -13,10 +13,11 @@
             init_soit => get_all_overpass_times
         """
         P1D = """
-            get_all_overpass_times[^] => get_single_overpass_time<satellite>
-            INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all => exportH5<satellite> => done
+            get_all_overpass_times[^] => get_single_overpass_time<satellite> => done<satellite>
+            INIT[^]:succeed-all => LOAD:succeed-all => preprocess<satellite>:finish => done<satellite>
+            preprocess<satellite>:succeed? => exportH5<satellite>
+            done<satellite> => done
             done[-P1D] => done
-
         """
         R1/P0Y = done => tracking 
 
@@ -84,6 +85,9 @@
             JULIA_DEBUG={{ JULIA_DEBUG }}
 
     [[done]]
+        script = """exit 0"""
+
+    [[done<satellite>]]
         script = """exit 0"""
     
     [[INIT]]
