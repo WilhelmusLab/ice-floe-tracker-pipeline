@@ -24,6 +24,7 @@ cylc vip . --set-file example/fram-strait-april-may-2020.conf -n fram-strait-apr
 cylc vip . --set-file example/ne-greenland.conf -n ne-greenland-lopez -s 'PREPROCESSING="Lopez"'
 cylc vip . --set-file example/ne-greenland.conf -n ne-greenland-buckley -s 'PREPROCESSING="Buckley"'
 
-# Non-contiguous dates:
-cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=may-2006 --initial-cycle-point=2006-05-04 --final-cycle-point=2006-05-06
-cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=july-2008 --initial-cycle-point=2008-07-13 --final-cycle-point=2008-07-15
+# Non-contiguous dates
+cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=may-2006 -s 'START="2006-05-04"' -s 'END="2006-05-06"'
+cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=july-2008 -s 'START="2008-07-13"' -s 'END="2008-07-15"'
+
