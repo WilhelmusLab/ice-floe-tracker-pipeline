@@ -28,3 +28,8 @@ cylc vip . --set-file example/ne-greenland.conf -n ne-greenland-buckley -s 'PREP
 cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=may-2006 -s 'START="2006-05-04"' -s 'END="2006-05-06"'
 cylc vip . --set-file example/hudson-bay.conf -n hudson-bay --run-name=july-2008 -s 'START="2008-07-13"' -s 'END="2008-07-15"'
 
+# Case from case list
+row_name="435-sea_of_okhostk-100km-20190427-20190428"  # cloudy, no ice
+row_name="002-baffin_bay-100km-20040921-20040922"  # mostly land
+cylc vip . -n case-${row_name} $(pipx run example/util/template.py example/case-list.csv "fullname" ${row_name}); 
+
