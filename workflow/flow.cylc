@@ -195,7 +195,6 @@
 
     [[PREPROCESS]]
         execution time limit = PT120M
-        execution retry delays = PT10M
 
     [[preprocess<satellite>]]
         inherit = PREPROCESS, <satellite>
