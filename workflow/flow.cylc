@@ -17,7 +17,7 @@
             
             INIT[^]:succeed-all => LOAD_IMAGE<satellite>:succeed-all => preprocess<satellite>:finish => done
             
-            get_single_overpass_time<satellite> & preprocess<satellite>:succeed? => exportH5<satellite>?
+            get_single_overpass_time<satellite> & preprocess<satellite>:succeed? => exportH5<satellite>
             preprocess<satellite>:failed? => !exportH5<satellite>
             
             done[-P1D] => done
