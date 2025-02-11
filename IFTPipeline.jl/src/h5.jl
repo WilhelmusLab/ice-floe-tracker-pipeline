@@ -36,7 +36,6 @@ function choose_dtype(mx::T) where {T<:Integer}
     throw("$mx can't be represented by any of $types")
 end
 
-
 """
     makeh5files(pathtosampleimg, resdir)
 
@@ -79,7 +78,9 @@ Each HDF5 file has the following structure:
 The `floe_properties` group contains a floe properties matrix `properties` for `labeled_image` and associated `column_names`.
 The `index` group contains the spatial coordinates in the source image coordinate reference system (default NSIDC polar stereographic, meters) and geographic coordinates (latitude and longitude, decimal degrees). Estimated satellite overpass time `time` is provided in Unix timestamp format (seconds since 1970-01-01 00:00 UTC).
 """
-function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFloeTracker.IFTVERSION)
+function makeh5files(;
+    pathtosampleimg::String, resdir::String, iftversion=IceFloeTracker.IFTVERSION
+)
     latlondata = getlatlon(pathtosampleimg)
 
     ptpath = joinpath(resdir, "passtimes.jls")
@@ -137,8 +138,15 @@ function makeh5files(; pathtosampleimg::String, resdir::String, iftversion=IceFl
     return nothing
 end
 
-
-function makeh5files_single(; passtime::DateTime, iftversion::Union{String,Nothing}=nothing, truecolor::String, falsecolor::String, labeled::String, props::String, output::String)
+function makeh5files_single(;
+    passtime::DateTime,
+    iftversion::Union{String,Nothing}=nothing,
+    truecolor::String,
+    falsecolor::String,
+    labeled::String,
+    props::String,
+    output::String,
+)
     latlondata = getlatlon(truecolor)
     ptsunix = Int64(Dates.datetime2unix(passtime))
     labeled_ = load_labeled_img(labeled)
@@ -167,9 +175,13 @@ function makeh5files_single(; passtime::DateTime, iftversion::Union{String,Nothi
         g["y"] = latlondata["Y"]
 
         g = create_group(file, "floe_properties")
-        write_dataset(g, "properties", [copy(row) for row in eachrow(props_)])  # `copy(row)` converts the DataSetRow to a NamedTuple
-        attrs(g)["Description of properties"] = """ Area units (`area`, `convex_area`) are in sq. kilometers, length units (`minor_axis_length`, `major_axis_length`, and `perimeter`) in kilometers, and `orientation` in radians (see the description of properties attribute.) Latitude and longitude coordinates are in degrees, and the stereographic coordinates`x` and `y` are in meters relative to the NSIDC north polar stereographic projection. Generated using the `regionprops` function from the `skimage` package. See https://scikit-image.org/docs/0.20.x/api/skimage.measure.html#regionprops
-        """
+        @info nrow(props_)
+        if nrow(props_) > 0
+            write_dataset(g, "properties", [copy(row) for row in eachrow(props_)])  # `copy(row)` converts the DataSetRow to a NamedTuple
+            attrs(g)["Description of properties"] = """Area units (`area`, `convex_area`) are in sq. kilometers, length units (`minor_axis_length`, `major_axis_length`, and `perimeter`) in kilometers, and `orientation` in radians (see the description of properties attribute.) Latitude and longitude coordinates are in degrees, and the stereographic coordinates`x` and `y` are in meters relative to the NSIDC north polar stereographic projection. Generated using the `regionprops` function from the `skimage` package. See https://scikit-image.org/docs/0.20.x/api/skimage.measure.html#regionprops"""
+        else
+            attrs(g)["Description of properties"] = """No floes detected"""
+        end
 
         mx = maximum(labeled_)
         T = choose_dtype(mx)
@@ -182,7 +194,6 @@ function makeh5files_single(; passtime::DateTime, iftversion::Union{String,Nothi
 
         attrs(obj)["description"] = "Connected components of the segmented floe image using a 3x3 structuring element. The property matrix consists of the properties of each connected component."
         write_dataset(obj, dtype, imgdata)
-
     end
     return nothing
 end
