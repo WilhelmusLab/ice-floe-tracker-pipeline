@@ -6,17 +6,21 @@
 [scheduling]
     initial cycle point = {{ START }}
     final cycle point = {{ END }}
-    runahead limit = P10
+    runahead limit = P0
     [[graph]]
         R1 = """
             INIT
             init_soit => get_all_overpass_times
         """
         P1D = """
-            get_all_overpass_times[^] => get_single_overpass_time<satellite>
-            INIT[^]:succeed-all => LOAD:succeed-all => PREPROCESS:succeed-all => exportH5<satellite> => done
+            get_all_overpass_times[^] => get_single_overpass_time<satellite> => done
+            
+            INIT[^]:succeed-all => LOAD_IMAGE<satellite>:succeed-all => preprocess<satellite>:finish => done
+            
+            get_single_overpass_time<satellite> & preprocess<satellite>:succeed? => exportH5<satellite>
+            preprocess<satellite>:failed? => !exportH5<satellite>
+            
             done[-P1D] => done
-
         """
         R1/P0Y = done => tracking 
 
@@ -28,7 +32,7 @@
             members = LOAD_IMAGE
         
         [[[preprocess]]]
-            limit = 20
+            limit = 2
             # Limit to 2 instances only due to memory constraints. 
             # Can be removed on a system with more memory or a scheduler.
             members = PREPROCESS
@@ -111,6 +115,7 @@
         [[[directives]]]
             --mem = 64G
 
+    
     [[get_all_overpass_times]]
         execution retry delays = PT15S, PT10M, PT1H, PT3H
         script = """
@@ -139,11 +144,10 @@
             labeled_props_file = ${img_prefix}labeled.props.csv
             overpass_time_file = ${img_prefix}overpass.txt
             hdf5_archive_file = ${img_prefix}results.h5
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite} "
     
-    [[LOAD]]
-        
     [[get_single_overpass_time<satellite>]]
-        inherit = LOAD, <satellite>
+        inherit = <satellite>
         script = """
             # Get the date of the current task cycle point in YYYY-MM-DD format
             date_=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format "CCYY-MM-DD")
@@ -160,41 +164,40 @@
         """
     
     [[LOAD_IMAGE]]
-        inherit=LOAD
         execution retry delays = PT15S, PT10M, PT1H, PT3H
-        [[[environment]]]
-            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite} "
+    
+    [[LOAD_IMAGE<satellite>]]
+        inherit = LOAD_IMAGE
 
     [[load_truecolor<satellite>]]
-        inherit = LOAD_IMAGE, <satellite>
+        inherit = <satellite>, LOAD_IMAGE<satellite>
         script = """
             ${FSDPROC} load ${truecolor_file} --kind truecolor ${fsdprocargs}
         """
 
     [[load_falsecolor<satellite>]]
-        inherit = LOAD_IMAGE, <satellite>
+        inherit = <satellite>, LOAD_IMAGE<satellite>
         script = """
             ${FSDPROC} load ${falsecolor_file} --kind bands721 ${fsdprocargs}
         """
 
     [[load_cloud<satellite>]]
-        inherit = LOAD_IMAGE, <satellite>
+        inherit = <satellite>, LOAD_IMAGE<satellite>
         script = """
             ${FSDPROC} load ${cloud_file} --kind cloud ${fsdprocargs}
         """
     
     [[load_landmask<satellite>]]
-        inherit = LOAD_IMAGE, <satellite>
+        inherit = <satellite>, LOAD_IMAGE<satellite>
         script="""
             ${FSDPROC} load ${landmask_file} --kind landmask ${fsdprocargs}
         """
 
     [[PREPROCESS]]
         execution time limit = PT120M
-        execution retry delays = PT10M
 
     [[preprocess<satellite>]]
-        inherit = PREPROCESS, <satellite>
+        inherit = <satellite>, PREPROCESS
         script = """
             {% if PREPROCESSING == "Lopez" or PREPROCESSING == "LopezTiling" %}
 
@@ -286,7 +289,7 @@
         """
     
     [[exportH5<satellite>]]
-        inherit = None, <satellite>
+        inherit = <satellite>
         # Package intermediate and final outputs into HDF5 files
         script = """
         ${IFT} makeh5files_single \
