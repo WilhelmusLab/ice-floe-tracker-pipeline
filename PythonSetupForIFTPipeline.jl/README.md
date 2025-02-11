@@ -4,9 +4,7 @@ This project is designed to initialize the Python Environment for IFTPipeline.jl
 It should be used once before IFTPipeline.jl is instantiated.
 It will:
 
-- Create a new `base` Conda environment which PyCall will use,
-- Install dependencies to that environment,
-- Rebuild PyCall using the updated environment.
+- Build PyCall using the `Conda.jl` package.
 
 Since the `base` environment is shared between all PyCall instances by default, it only needs to be run if the Conda environment is:
 - missing – as in a new installation, or 
