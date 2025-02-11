@@ -11,12 +11,7 @@
 		},
 		"ghcr.io/devcontainers/features/python:1": {
 			"installTools": true,
-			"version": "3.11"
-		},
-		"ghcr.io/devcontainers-contrib/features/pipx-package:1": {
-			"includeDeps": true,
-			"package": "cylc-rose",
-			"interpreter": "python3.11"
+			"version": "3.12"
 		},
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 
@@ -33,6 +28,5 @@
 			]
 		}
 	},
-
-	"postCreateCommand": ""
+	"postCreateCommand": "pipx install --include-deps cylc-rose"
 }

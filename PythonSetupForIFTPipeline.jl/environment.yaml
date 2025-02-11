@@ -1,9 +1,0 @@
-channels:
-  - conda-forge
-dependencies:
-  - python=3.12
-  - pyproj=3.7.0
-  - rasterio=1.4.3
-  - scikit-image=0.24.0
-  - pandas=2.2.3
-  - jinja2=3.1.0
