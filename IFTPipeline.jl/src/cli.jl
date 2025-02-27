@@ -389,6 +389,11 @@ function mkclitrack!(settings)
         help = "Time thresholds to use for pairing floes"
         default = "30 100 1300"
 
+        "--Sminimumarea"
+        help = "Minimum area for small floes"
+        arg_type = Float64
+        default = 400
+
         "--Sarearatio"
         help = "Area ratio threshold for small floes"
         arg_type = Float64
@@ -408,6 +413,11 @@ function mkclitrack!(settings)
         help = "Convex area ratio threshold for small floes"
         arg_type = Float64
         default = 0.14
+
+        "--Lminimumarea"
+        help = "Minimum area for large floes"
+        arg_type = Float64
+        default = 1200
 
         "--Larearatio"
         help = "Area ratio threshold for large floes"
