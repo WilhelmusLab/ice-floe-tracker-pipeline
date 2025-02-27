@@ -466,12 +466,12 @@ function mkclitrack!(settings)
         arg_type = Float64
         default = 0.68
 
-        "--area2"
+        "--large_floe_area"
         help = "Large floe area mismatch threshold"
         arg_type = Float64
         default = 0.236
 
-        "--area3"
+        "--small_floe_area"
         help = "Small floe area mismatch threshold"
         arg_type = Float64
         default = 0.18
