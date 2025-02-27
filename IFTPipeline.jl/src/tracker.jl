@@ -60,19 +60,20 @@ Following are the default set of thresholds `condition_thresholds` used for floe
 - Condition 2: area of floe i `area`, and the computed ratios for area, major axis,  minor axis, and convex area of floes `i` and `j` in days `k` and `k+1`, respectively: `t2=(area=1200, arearatio=0.28, majaxisratio=0.10, minaxisratio=0.12, convexarearatio=0.14)`
 - Condition 3: as in the previous condition but set as follows: `t3=(area=1200, arearatio=0.18, majaxisratio=0.07, minaxisratio=0.08, convexarearatio=0.09)`
 """
-function track_single(; 
+function track_single(;
     imgs::Array{String},
     props::Array{String},
     passtimes::Array{DateTime},
     latlon::String,
     output::String,
-    area::Int64=1200,
     dist::Array{Int}=[200, 250, 300],
     dt_thresh::Array{Int}=[30, 100, 1300],
+    Sminimumarea::Float64=400.0,
     Sarearatio::Float64=0.18,
     Smajaxisratio::Float64=0.1,
     Sminaxisratio::Float64=0.12,
     Sconvexarearatio::Float64=0.14,
+    Lminimumarea::Float64=1200.0,
     Larearatio::Float64=0.28,
     Lmajaxisratio::Float64=0.1,
     Lminaxisratio::Float64=0.15,
@@ -83,14 +84,14 @@ function track_single(;
     comp::Float64=0.25,
     mm::Float64=0.22,
     corr::Float64=0.68,
-    area2::Float64=0.236,
-    area3::Float64=0.18,
+    small_floe_area::Float64=0.18,
+    large_floe_area::Float64=0.236,
 )
 
     # Load the files – can we drop the memory requirements by doing two at once?
     @info "Loading $imgs"
     imgs_::Vector{Matrix{<:Integer}} = [load_labeled_img(img) for img in imgs]
-    
+
     @info "Loading $props"
     props_ = [DataFrame(CSV.File(prop)) for prop in props]
     # go through each of the props_ dataframes and convert each 
@@ -98,47 +99,34 @@ function track_single(;
     for (img_, prop_) in zip(imgs_, props_)
         label_type = eltype(img_)
         @debug "converting labels to $label_type"
-        prop_[!,:label] = convert.(label_type, prop_[!,:label])
+        prop_[!, :label] = convert.(label_type, prop_[!, :label])
     end
     @info "Loaded: $props_"
 
     @info "Set condition thresholds"
-    condition_thresholds = (
-        t1=(
-            dt=dt_thresh, 
-            dist=dist
-        ),
-        t2=(
-            area=area,
-            arearatio=Larearatio,
-            convexarearatio=Lconvexarearatio,
-            majaxisratio=Lmajaxisratio,
-            minaxisratio=Lminaxisratio,
-        ),
-        t3=(
-            area=area,
-            arearatio=Sarearatio,
-            convexarearatio=Sconvexarearatio,
-            majaxisratio=Smajaxisratio,
-            minaxisratio=Sminaxisratio,
-        ),
+    small_floe_settings = (
+        minimumarea=Sminimumarea,
+        arearatio=Sarearatio,
+        majaxisratio=Smajaxisratio,
+        minaxisratio=Sminaxisratio,
+        convexarearatio=Sconvexarearatio,
     )
+    large_floe_settings = (
+        minimumarea=Lminimumarea,
+        arearatio=Larearatio,
+        majaxisratio=Lmajaxisratio,
+        minaxisratio=Lminaxisratio,
+        convexarearatio=Lconvexarearatio,
+    )
+    search_thresholds = (dt=dt_thresh, dist=dist)
+    condition_thresholds = (; search_thresholds, small_floe_settings, large_floe_settings)
+
     @debug condition_thresholds
 
     @info "Set MC thresholds"
     mc_thresholds = (
-        comp=(
-            mxrot=mxrot, 
-            sz=sz, 
-            comp=comp, 
-            mm=mm, 
-            psi=psi
-        ),
-        goodness=(
-            corr=corr, 
-            area2=area2, 
-            area3=area3
-        ),
+        comp=(; mxrot, sz, comp, mm, psi),
+        goodness=(; corr, small_floe_area, large_floe_area),
     )
     @debug mc_thresholds
 
