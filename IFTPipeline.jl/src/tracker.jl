@@ -67,7 +67,7 @@ function track_single(;
     latlon::String,
     output::String,
     area::Int64=1200,
-    dist::Array{Int}=[15, 30, 120],
+    dist::Array{Int}=[200, 250, 300],
     dt_thresh::Array{Int}=[30, 100, 1300],
     Sarearatio::Float64=0.18,
     Smajaxisratio::Float64=0.1,
