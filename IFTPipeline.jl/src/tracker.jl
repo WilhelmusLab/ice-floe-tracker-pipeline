@@ -156,16 +156,18 @@ end
 function parse_params(; args...)
     d = values(args)
     condition_thresholds = (
-        t1=(dt=parselistas(Int64, d.dt_thresh), dist=parselistas(Int64, d.dist)),
-        t2=(
-            area=d.area,
+        search_thresholds=(
+            dt=parselistas(Int64, d.dt_thresh), dist=parselistas(Int64, d.dist)
+        ),
+        large_floe_settings=(
+            minimumarea=d.Lminimumarea,
             arearatio=d.Larearatio,
             convexarearatio=d.Lconvexarearatio,
             majaxisratio=d.Lmajaxisratio,
             minaxisratio=d.Lminaxisratio,
         ),
-        t3=(
-            area=d.area,
+        small_floe_settings=(
+            minimumarea=d.Sminimumarea,
             arearatio=d.Sarearatio,
             convexarearatio=d.Sconvexarearatio,
             majaxisratio=d.Smajaxisratio,
@@ -179,7 +181,11 @@ end
 function mkmct(d)
     return (
         comp=(mxrot=d.mxrot, sz=d.sz, comp=d.comp, mm=d.mm, psi=d.psi),
-        goodness=(corr=d.corr, area2=d.area2, area3=d.area3),
+        goodness=(
+            corr=d.corr,
+            large_floe_area=d.large_floe_area,
+            small_floe_area=d.small_floe_area,
+        ),
     )
 end
 
