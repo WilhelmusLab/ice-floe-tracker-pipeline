@@ -376,11 +376,6 @@ function mkclitrack!(settings)
         "--params"
         help = "Path to TOML file with algorithm parameters"
 
-        "--area"
-        help = "Area thresholds to use for pairing floes"
-        arg_type = Int64
-        default = 1200
-
         "--dist"
         help = "Distance threholds to use for pairing floes"
         default = "200 250 300"
