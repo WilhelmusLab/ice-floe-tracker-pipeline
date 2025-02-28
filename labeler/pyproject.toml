@@ -16,7 +16,7 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
 ]
 
-dependencies = ["typer", "scikit-image", "numpy", "imageio"]
+dependencies = ["typer", "scikit-image", "numpy", "imageio", "tifffile"]
 
 [project.scripts]
 label = "labeler:app"

@@ -1,12 +1,5 @@
-# /// script
-# requires-python = ">=3.11"
-# dependencies = [
-#   "scikit-image",
-#   "typer",
-#   "numpy",
-#   "imageio",
-# ]
-# ///
+#!/usr/bin/env python3.11
+"""Utility to label segmented binary images."""
 
 import pathlib
 from typing import Annotated
@@ -29,7 +22,7 @@ def main(
         pathlib.Path, typer.Argument(help="path to write labeled integer image file")
     ],
 ):
-    """"""
+    """Give integer labels to disconnected regions in a binary image."""
     segmented = imageio.imread(input)
 
     with tifffile.TiffFile(input) as tif:
