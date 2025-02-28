@@ -31,7 +31,9 @@ function track(; args...)
     props = deserialize(joinpath(vals.props, "floe_props.jls"))
     passtimes = deserialize(joinpath(vals.passtimes, "passtimes.jls"))
     latlon = vals.latlon
-    labeledfloes = IceFloeTracker.pairfloes(imgs, props, passtimes, latlon, condition_thresholds, mc_thresholds)
+    labeledfloes = IceFloeTracker.pairfloes(
+        imgs, props, passtimes, latlon, condition_thresholds, mc_thresholds
+    )
     serialize(joinpath(vals.output, "labeled_floes.jls"), labeledfloes)
     return nothing
 end
