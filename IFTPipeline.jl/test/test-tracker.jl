@@ -4,34 +4,15 @@ using Dates
     data_dir = joinpath(@__DIR__, "test_inputs/tracker-single")
     temp_dir = mkpath(joinpath(@__DIR__, "__temp__/tracker-single"))
 
-    imgs = [
-        joinpath(data_dir, "images/labeled-0.tiff"),
-        joinpath(data_dir, "images/labeled-1.tiff"),
-        joinpath(data_dir, "images/labeled-2.tiff"),
-        joinpath(data_dir, "images/labeled-3.tiff"),
-        joinpath(data_dir, "images/labeled-4.tiff"),
-        joinpath(data_dir, "images/labeled-5.tiff"),
-    ]
-    passtimes = [
-        Dates.DateTime("2000-01-01T00:00:00"),
-        Dates.DateTime("2000-01-02T00:00:00"),
-        Dates.DateTime("2000-01-03T00:00:00"),
-        Dates.DateTime("2000-01-04T00:00:00"),
-        Dates.DateTime("2000-01-05T00:00:00"),
-        Dates.DateTime("2000-01-06T00:00:00"),
-    ]
+    imgs = [joinpath(data_dir, "images/labeled-$(i).tiff") for i in range(0, 5)]
+    passtimes = [Dates.DateTime("2000-01-0$(i)T00:00:00") for i in range(1, 6)]
     latlon = imgs[1]
 
     @testset "normal case" begin
         results = IFTPipeline.track_single(;
             imgs=imgs,
             props=[
-                joinpath(data_dir, "floes-gte-350-px/labeled-0.csv"),
-                joinpath(data_dir, "floes-gte-350-px/labeled-1.csv"),
-                joinpath(data_dir, "floes-gte-350-px/labeled-2.csv"),
-                joinpath(data_dir, "floes-gte-350-px/labeled-3.csv"),
-                joinpath(data_dir, "floes-gte-350-px/labeled-4.csv"),
-                joinpath(data_dir, "floes-gte-350-px/labeled-5.csv"),
+                joinpath(data_dir, "floes-gte-350-px/labeled-$(i).csv") for i in range(0, 5)
             ],
             passtimes=passtimes,
             latlon=latlon,
@@ -49,12 +30,7 @@ using Dates
         results = IFTPipeline.track_single(;
             imgs=imgs,
             props=[
-                joinpath(data_dir, "floes-gte-200-px/labeled-0.csv"),
-                joinpath(data_dir, "floes-gte-200-px/labeled-1.csv"),
-                joinpath(data_dir, "floes-gte-200-px/labeled-2.csv"),
-                joinpath(data_dir, "floes-gte-200-px/labeled-3.csv"),
-                joinpath(data_dir, "floes-gte-200-px/labeled-4.csv"),
-                joinpath(data_dir, "floes-gte-200-px/labeled-5.csv"),
+                joinpath(data_dir, "floes-gte-200-px/labeled-$(i).csv") for i in range(0, 5)
             ],
             passtimes=passtimes,
             latlon=latlon,
@@ -77,12 +53,7 @@ using Dates
         results = IFTPipeline.track_single(;
             imgs=imgs,
             props=[
-                joinpath(data_dir, "floes-gte-50-px/labeled-0.csv"),
-                joinpath(data_dir, "floes-gte-50-px/labeled-1.csv"),
-                joinpath(data_dir, "floes-gte-50-px/labeled-2.csv"),
-                joinpath(data_dir, "floes-gte-50-px/labeled-3.csv"),
-                joinpath(data_dir, "floes-gte-50-px/labeled-4.csv"),
-                joinpath(data_dir, "floes-gte-50-px/labeled-5.csv"),
+                joinpath(data_dir, "floes-gte-50-px/labeled-$(i).csv") for i in range(0, 5)
             ],
             passtimes=passtimes,
             latlon=latlon,
