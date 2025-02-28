@@ -71,4 +71,26 @@ using Dates
         @test maximum(results.ID) <= 40
         @test nrow(results) <= 40 * 6
     end
+
+    @testset "drop some detections" begin
+        results = IFTPipeline.track_single(;
+            imgs=imgs,
+            props=[
+                joinpath(data_dir, "floes-gte-350-px-some-missing/labeled-$(i).csv") for
+                i in range(0, 5)
+            ],
+            passtimes=passtimes,
+            latlon=latlon,
+            output=joinpath(temp_dir, "tracked-floes-gte-350-px-some-missing.csv"),
+
+            # Optional arguments
+            Sminimumarea=0.0,
+        )
+
+        # There should be 8 floes tracked in total
+        @test maximum(results.ID) == 8
+
+        # ... but only 24 matched rows
+        @test nrow(results) == 24
+    end
 end
