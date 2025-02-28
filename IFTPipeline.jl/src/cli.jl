@@ -387,7 +387,7 @@ function mkclitrack!(settings)
         "--Sminimumarea"
         help = "Minimum area for small floes"
         arg_type = Float64
-        default = 400
+        default = 350
 
         "--Sarearatio"
         help = "Area ratio threshold for small floes"
@@ -526,7 +526,7 @@ function mkclitrack_single!(settings)
         "--Sminimumarea"
         help = "Minimum area for small floes"
         arg_type = Float64
-        default = 400
+        default = 350
 
         "--Sarearatio"
         help = "Area ratio threshold for small floes"

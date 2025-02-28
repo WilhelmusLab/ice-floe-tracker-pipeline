@@ -70,7 +70,7 @@ function track_single(;
     output::String,
     dist::Array{Int}=[200, 250, 300],
     dt_thresh::Array{Int}=[30, 100, 1300],
-    Sminimumarea::Float64=400.0,
+    Sminimumarea::Float64=350.0,
     Sarearatio::Float64=0.18,
     Smajaxisratio::Float64=0.1,
     Sminaxisratio::Float64=0.12,
