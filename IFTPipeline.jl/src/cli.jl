@@ -511,12 +511,6 @@ function mkclitrack_single!(settings)
 
     add_arg_group!(settings["track_single"], "optional arguments")
     @add_arg_table! settings["track_single"] begin
-
-        "--area"
-        help = "Area thresholds to use for pairing floes"
-        arg_type = Int64
-        default = 1200
-
         "--dist"
         help = "Distance threholds to use for pairing floes"
         default = [15, 30, 120]
