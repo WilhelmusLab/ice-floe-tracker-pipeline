@@ -3,7 +3,7 @@ dt = [30, 100, 1300]
 dist = [200, 250, 300]
 
 [small_floe_settings]
-minimumarea = 0
+minimumarea = 350
 arearatio = 0.18
 majaxisratio = 0.07
 minaxisratio = 0.08
