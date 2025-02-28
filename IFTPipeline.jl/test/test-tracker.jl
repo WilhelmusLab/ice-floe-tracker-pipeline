@@ -20,6 +20,7 @@ using Dates
         Dates.DateTime("2000-01-05T00:00:00"),
         Dates.DateTime("2000-01-06T00:00:00"),
     ]
+    latlon = imgs[1]
 
     @testset "normal case" begin
         results = IFTPipeline.track_single(;
@@ -33,7 +34,7 @@ using Dates
                 joinpath(data_dir, "floes-gte-350-px/labeled-5.csv"),
             ],
             passtimes=passtimes,
-            latlon=joinpath(data_dir, "labeled-0.tiff"),
+            latlon=latlon,
             output=joinpath(temp_dir, "tracked-floes-gte-350-px.csv"),
 
             # Optional arguments
@@ -56,7 +57,7 @@ using Dates
                 joinpath(data_dir, "floes-gte-200-px/labeled-5.csv"),
             ],
             passtimes=passtimes,
-            latlon=joinpath(data_dir, "labeled-0.tiff"),
+            latlon=latlon,
             output=joinpath(temp_dir, "tracked-floes-gte-200-px.csv"),
 
             # Optional arguments
@@ -84,7 +85,7 @@ using Dates
                 joinpath(data_dir, "floes-gte-50-px/labeled-5.csv"),
             ],
             passtimes=passtimes,
-            latlon=joinpath(data_dir, "labeled-0.tiff"),
+            latlon=latlon,
             output=joinpath(temp_dir, "tracked-floes-gte-50-px.csv"),
 
             # Optional arguments
