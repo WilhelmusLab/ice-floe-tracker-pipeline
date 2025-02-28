@@ -138,7 +138,7 @@ function track_single(;
 
     tracked_floes = long_tracker(props_, condition_thresholds, mc_thresholds)
     FileIO.save(output, select!(tracked_floes, Not(:mask, :psi)))
-    return nothing
+    return tracked_floes
 end
 
 function parse_params(params::AbstractString)
