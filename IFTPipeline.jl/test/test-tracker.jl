@@ -76,12 +76,12 @@ using Dates
         results = IFTPipeline.track_single(;
             imgs=imgs,
             props=[
-                joinpath(data_dir, "floes-gte-350-px-some-missing/labeled-$(i).csv") for
-                i in range(0, 5)
+                joinpath(data_dir, "floes-gte-350-px-some-floes-missing/labeled-$(i).csv")
+                for i in range(0, 5)
             ],
             passtimes=passtimes,
             latlon=latlon,
-            output=joinpath(temp_dir, "tracked-floes-gte-350-px-some-missing.csv"),
+            output=joinpath(temp_dir, "tracked-floes-gte-350-px-some-floes-missing.csv"),
 
             # Optional arguments
             Sminimumarea=0.0,
@@ -92,5 +92,51 @@ using Dates
 
         # ... but only 24 matched rows
         @test nrow(results) == 24
+    end
+
+    @testset "some empty fields" begin
+        results = IFTPipeline.track_single(;
+            imgs=imgs,
+            props=[
+                joinpath(data_dir, "floes-gte-350-px-some-days-missing/labeled-$(i).csv")
+                for i in range(0, 5)
+            ],
+            passtimes=passtimes,
+            latlon=latlon,
+            output=joinpath(temp_dir, "tracked-floes-gte-350-px-some-days-missing.csv"),
+
+            # Optional arguments
+            Sminimumarea=0.0,
+        )
+
+        # There should be 8 floes tracked in total
+        @test maximum(results.ID) == 8
+
+        # ... but only 16 matched rows
+        @test nrow(results) == 16
+    end
+
+    @testset "some orphan floes" begin
+        results = IFTPipeline.track_single(;
+            imgs=imgs,
+            props=[
+                joinpath(data_dir, "floes-gte-350-px-orphan-floes/labeled-$(i).csv") for
+                i in range(0, 5)
+            ],
+            passtimes=passtimes,
+            latlon=latlon,
+            output=joinpath(temp_dir, "tracked-floes-gte-350-px-orphan-floes.csv"),
+
+            # Optional arguments
+            Sminimumarea=0.0,
+        )
+
+        # There should be 6 floes tracked in total
+        @test maximum(results.ID) == 6
+        @test nrow(results) == 6 * 6
+
+        # And the largest floe should be < 2500 pixels in area, 
+        # because the two floes larger than that are only in the first field
+        @test maximum(results.area) < 2500
     end
 end
