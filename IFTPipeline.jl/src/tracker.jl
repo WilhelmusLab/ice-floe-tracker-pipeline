@@ -143,11 +143,11 @@ end
 
 function parse_params(params::AbstractString)
     params = parsefile(params)
-    area = params["area"]
-    t1 = dict2nt(params["t1"])
-    t2 = (area=area, dict2nt(params["t2"])...)
-    t3 = (area=area, dict2nt(params["t3"])...)
-    condition_thresholds = (t1=t1, t2=t2, t3=t3)
+    @info params
+    search_thresholds = dict2nt(params["search_thresholds"])
+    small_floe_settings = dict2nt(params["small_floe_settings"])
+    large_floe_settings = dict2nt(params["large_floe_settings"])
+    condition_thresholds = (; search_thresholds, small_floe_settings, large_floe_settings)
     d = dict2nt(params["mc_thresholds"])
     mc_thresholds = mkmct(d)
     return condition_thresholds, mc_thresholds
