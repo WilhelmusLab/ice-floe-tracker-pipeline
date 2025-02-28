@@ -4,6 +4,14 @@ using Dates
     data_dir = joinpath(@__DIR__, "test_inputs/tracker-single")
     temp_dir = mkpath(joinpath(@__DIR__, "__temp__/tracker-single"))
 
+    imgs = [
+        joinpath(data_dir, "images/labeled-0.tiff"),
+        joinpath(data_dir, "images/labeled-1.tiff"),
+        joinpath(data_dir, "images/labeled-2.tiff"),
+        joinpath(data_dir, "images/labeled-3.tiff"),
+        joinpath(data_dir, "images/labeled-4.tiff"),
+        joinpath(data_dir, "images/labeled-5.tiff"),
+    ]
     passtimes = [
         Dates.DateTime("2000-01-01T00:00:00"),
         Dates.DateTime("2000-01-02T00:00:00"),
@@ -15,14 +23,7 @@ using Dates
 
     @testset "normal case" begin
         results = IFTPipeline.track_single(;
-            imgs=[
-                joinpath(data_dir, "images/labeled-0.tiff"),
-                joinpath(data_dir, "images/labeled-1.tiff"),
-                joinpath(data_dir, "images/labeled-2.tiff"),
-                joinpath(data_dir, "images/labeled-3.tiff"),
-                joinpath(data_dir, "images/labeled-4.tiff"),
-                joinpath(data_dir, "images/labeled-5.tiff"),
-            ],
+            imgs=imgs,
             props=[
                 joinpath(data_dir, "floes-gte-350-px/labeled-0.csv"),
                 joinpath(data_dir, "floes-gte-350-px/labeled-1.csv"),
@@ -45,14 +46,7 @@ using Dates
 
     @testset "no crash with medium floes" begin
         results = IFTPipeline.track_single(;
-            imgs=[
-                joinpath(data_dir, "images/labeled-0.tiff"),
-                joinpath(data_dir, "images/labeled-1.tiff"),
-                joinpath(data_dir, "images/labeled-2.tiff"),
-                joinpath(data_dir, "images/labeled-3.tiff"),
-                joinpath(data_dir, "images/labeled-4.tiff"),
-                joinpath(data_dir, "images/labeled-5.tiff"),
-            ],
+            imgs=imgs,
             props=[
                 joinpath(data_dir, "floes-gte-200-px/labeled-0.csv"),
                 joinpath(data_dir, "floes-gte-200-px/labeled-1.csv"),
@@ -80,14 +74,7 @@ using Dates
 
     @testset "including small floes" begin
         results = IFTPipeline.track_single(;
-            imgs=[
-                joinpath(data_dir, "images/labeled-0.tiff"),
-                joinpath(data_dir, "images/labeled-1.tiff"),
-                joinpath(data_dir, "images/labeled-2.tiff"),
-                joinpath(data_dir, "images/labeled-3.tiff"),
-                joinpath(data_dir, "images/labeled-4.tiff"),
-                joinpath(data_dir, "images/labeled-5.tiff"),
-            ],
+            imgs=imgs,
             props=[
                 joinpath(data_dir, "floes-gte-50-px/labeled-0.csv"),
                 joinpath(data_dir, "floes-gte-50-px/labeled-1.csv"),
