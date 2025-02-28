@@ -513,7 +513,7 @@ function mkclitrack_single!(settings)
     @add_arg_table! settings["track_single"] begin
         "--dist"
         help = "Distance threholds to use for pairing floes"
-        default = [15, 30, 120]
+        default = [200, 250, 300]
         arg_type = Int
         nargs = '+'
 
