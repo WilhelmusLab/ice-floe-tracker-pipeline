@@ -10,45 +10,18 @@
 
 import pathlib
 from typing import Annotated
-import logging
 
 import skimage
 import typer
 import numpy as np
 import imageio
-
-_logger = logging.getLogger(__name__)
+import tifffile
 
 app = typer.Typer()
 
 
-@app.callback()
-def main(
-    quiet: Annotated[
-        bool, typer.Option(help="Make the program less talkative.")
-    ] = False,
-    verbose: Annotated[
-        bool, typer.Option(help="Make the program more talkative.")
-    ] = False,
-    debug: Annotated[
-        bool, typer.Option(help="Make the program much more talkative.")
-    ] = False,
-):
-    if debug:
-        level = logging.DEBUG
-    elif verbose:
-        level = logging.INFO
-    elif quiet:
-        level = logging.ERROR
-    else:
-        level = logging.WARNING
-
-    logging.basicConfig(level=level)
-    return
-
-
 @app.command()
-def label(
+def main(
     input: Annotated[
         pathlib.Path, typer.Argument(help="path to segmented binary image file")
     ],
@@ -57,7 +30,13 @@ def label(
     ],
 ):
     """"""
-    segmented = np.logical_not(imageio.imread(input))
+    segmented = imageio.imread(input)
+
+    with tifffile.TiffFile(input) as tif:
+        photometric_interpretation = tif.pages[0].tags["PhotometricInterpretation"]
+    if photometric_interpretation == tifffile.PHOTOMETRIC.MINISWHITE:
+        segmented = np.logical_not(segmented)
+
     labeled = skimage.measure.label(segmented)
     minimum_scalar_type = smallest_dtype(labeled)
     imageio.imsave(output, labeled.astype(minimum_scalar_type))
@@ -86,6 +65,4 @@ def smallest_dtype(array):
 
 
 if __name__ == "__main__":
-
-    label("labeler/segmented-0.tiff", "labeler/labeled-0.tiff")
-    # app()
+    app()
