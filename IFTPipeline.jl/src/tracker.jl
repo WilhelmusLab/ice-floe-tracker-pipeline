@@ -68,7 +68,7 @@ function track_single(;
     passtimes::Array{DateTime},
     latlon::String,
     output::String,
-    dist::Array{Int}=[200, 250, 300],
+    dist::Array{Int}=[15, 30, 120],
     dt_thresh::Array{Int}=[30, 100, 1300],
     Sminimumarea::Float64=350.0,
     Sarearatio::Float64=0.18,
