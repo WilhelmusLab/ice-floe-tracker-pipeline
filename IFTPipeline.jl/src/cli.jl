@@ -378,7 +378,7 @@ function mkclitrack!(settings)
 
         "--dist"
         help = "Distance threholds to use for pairing floes"
-        default = "200 250 300"
+        default = "15 30 120"
 
         "--dt-thresh"
         help = "Time thresholds to use for pairing floes"
