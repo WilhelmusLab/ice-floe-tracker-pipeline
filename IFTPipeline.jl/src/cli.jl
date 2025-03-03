@@ -536,17 +536,17 @@ function mkclitrack_single!(settings)
         "--Smajaxisratio"
         help = "Major axis ratio threshold for small floes"
         arg_type = Float64
-        default = 0.1
+        default = 0.10
 
         "--Sminaxisratio"
         help = "Minor axis ratio threshold for small floes"
         arg_type = Float64
-        default = 0.12
+        default = 0.15
 
         "--Sconvexarearatio"
         help = "Convex area ratio threshold for small floes"
         arg_type = Float64
-        default = 0.14
+        default = 0.20
 
         "--Lminimumarea"
         help = "Minimum area for large floes"
@@ -561,12 +561,12 @@ function mkclitrack_single!(settings)
         "--Lmajaxisratio"
         help = "Major axis ratio threshold for large floes"
         arg_type = Float64
-        default = 0.1
+        default = 0.10
 
         "--Lminaxisratio"
         help = "Minor axis ratio threshold for large floes"
         arg_type = Float64
-        default = 0.15
+        default = 0.12
 
         "--Lconvexarearatio"
         help = "Convex area ratio threshold for large floes"
