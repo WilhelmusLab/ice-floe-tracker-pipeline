@@ -74,7 +74,7 @@ function track_single(;
     Sarearatio::Float64=0.18,
     Smajaxisratio::Float64=0.10,
     Sminaxisratio::Float64=0.15,
-    Sconvexarearatio::Float64=0.2,
+    Sconvexarearatio::Float64=0.20,
     Lminimumarea::Float64=1200.0,
     Larearatio::Float64=0.28,
     Lmajaxisratio::Float64=0.10,
