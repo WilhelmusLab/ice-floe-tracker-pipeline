@@ -335,8 +335,8 @@
                 --comp {{ TRACK_COMP }} \
                 --mm {{ TRACK_MM }} \
                 --corr {{ TRACK_CORR }} \
-                --large_floe_area {{ TRACK_LARGE_FLOE_AREA_MISMATCH_THRESHOLD }} \
-                --small_floe_area {{ TRACK_SMALL_FLOE_AREA_MISMATCH_THRESHOLD }} \
+                --large-floe-area {{ TRACK_LARGE_FLOE_AREA_MISMATCH_THRESHOLD }} \
+                --small-floe-area {{ TRACK_SMALL_FLOE_AREA_MISMATCH_THRESHOLD }}
                 
         """
         [[[directives]]]
