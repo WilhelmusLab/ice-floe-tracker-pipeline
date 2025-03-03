@@ -5,7 +5,8 @@ using Dates
     temp_dir = mkpath(joinpath(@__DIR__, "__temp__/tracker-single"))
 
     imgs = [joinpath(data_dir, "images", "labeled-$(i).tiff") for i in 0:5]
-    passtimes = [Dates.DateTime("2000-01-0$(i)T00:00:00") for i in range(1, 6)]
+    start_date = Dates.DateTime("2000-01-01T00:00:00")
+    passtimes = [start_date + Dates.Day(i) for i in 1:6]
     latlon = imgs[1]
 
     @testset "normal case" begin
