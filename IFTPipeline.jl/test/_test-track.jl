@@ -45,6 +45,6 @@ tracked = deserialize(joinpath(temp, "labeled_floes.jls"))
 @test isfile(joinpath(temp, "labeled_floes.jls"))
 # these tests worked up to IceFloeTracker.jl 0.6.3, broke from 0.6.4
 # TODO: fix underlying problem, or remove this test set
-@test_skip nrow(tracked) == 18
-@test_skip maximum(tracked.ID) == 6
+@test nrow(tracked) == 18
+@test maximum(tracked.ID) == 6
 @test "passtime" in names(tracked)
