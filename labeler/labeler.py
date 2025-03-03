@@ -50,7 +50,7 @@ def smallest_dtype(array):
             np.uint64,
             np.int64,
         ]:
-            if (arr_min >= np.iinfo(dtype).min) and (arr_max <= np.iinfo(dtype).max):
+            if (np.iinfo(dtype).min <= arr_min) and (arr_max <= np.iinfo(dtype).max):
                 return dtype
 
     else:
