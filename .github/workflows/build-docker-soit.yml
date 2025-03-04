@@ -13,6 +13,11 @@ env:
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -22,17 +27,26 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to the Container registry
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ccvbot
           password: ${{ secrets.CCVBOT_DOCKER_PASSWORD }}
+      
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: |
+            ${{ env.IMAGE_NAME }}
+            ghcr.io/${{ github.repository }}/soit
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -50,8 +64,8 @@ jobs:
           --lat 76.0015 --lon -18.4315 \
           --csvoutpath .
         
-
       - name: Build and push Docker image
+        id: push
         uses: docker/build-push-action@v5
         with:
           context: ./satellite-overpass-identification-tool
@@ -59,4 +73,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ghcr.io/${{ github.repository }}/soit
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
