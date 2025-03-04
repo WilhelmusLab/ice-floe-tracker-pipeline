@@ -1,6 +1,6 @@
 # from https://docs.github.com/en/actions/guides/publishing-docker-images
 
-name: Build and PushContainer - SOIT
+name: Build and Push Container - SOIT
 on:
   release:
     types: [published]
