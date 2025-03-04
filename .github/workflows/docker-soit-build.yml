@@ -20,17 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v4
-        with:
-          daemon-config: |
-            {
-              "debug": true,
-              "features": {
-                "containerd-snapshotter": true
-              }
-            }
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -51,7 +40,6 @@ jobs:
         with:
           context: ./satellite-overpass-identification-tool
           platforms: linux/amd64,linux/arm64
-          load: true
           tags: ${{ env.TEST_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
