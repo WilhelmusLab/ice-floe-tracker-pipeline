@@ -93,7 +93,7 @@ jobs:
       - name: Test SOIT
         run: |
           docker run -v `pwd`:/app -w /app --rm \
-          ${{ env.GCR_IMAGE_NAME }}:${{ needs.build_and_push.outputs.image_digest }} \
+          ${GCR_IMAGE_NAME@L}:${{ needs.build_and_push.outputs.image_digest }} \
           -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
           --startdate 2013-03-31 --enddate 2013-05-01 \
           --lat 76.0015 --lon -18.4315 \
