@@ -64,6 +64,7 @@ jobs:
           path: ${{ runner.temp }}/soit-image.tar
 
   test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact
