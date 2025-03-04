@@ -16,7 +16,7 @@ env:
   TEST_TAG: brownccv/icefloetracker-soit:test
 
 jobs:
-  build_and_push:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +44,22 @@ jobs:
           tags: ${{ env.TEST_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: type=docker,dest=/tmp/soit-image.tar
+          outputs: type=docker,dest=${{ runner.temp }}/soit-image.tar
+          
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: soit-image
+          path: ${{ runner.temp }}/soit-image.tar
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: soit-image
+          path: ${{ runner.temp }}
       
       - name: Test SOIT
         run: |
@@ -53,9 +68,3 @@ jobs:
           --startdate 2013-03-31 --enddate 2013-05-01 \
           --lat 76.0015 --lon -18.4315 \
           --csvoutpath .
-          
-      - name: Upload Docker image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: soit-image
-          path: /tmp/soit-image.tar
