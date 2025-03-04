@@ -13,7 +13,6 @@ on:
 env:
   DOCKER_HUB_IMAGE_NAME: brownccv/icefloetracker-soit
   GCR_IMAGE_NAME: ghcr.io/${{ github.repository }}/soit
-  GCR_IMAGE_NAME_LOWERCASE: ${GCR_IMAGE_NAME@L}
 
 jobs:
   build_and_push:
@@ -93,8 +92,10 @@ jobs:
 
       - name: Test SOIT
         run: |
+          GCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
+          echo ${GCR_IMAGE_NAME_LOWERCASE}
           docker run -v `pwd`:/app -w /app --rm \
-          ${{ env.GCR_IMAGE_NAME_LOWERCASE }}:${{ needs.build_and_push.outputs.image_digest }} \
+          ${GCR_IMAGE_NAME_LOWERCASE}@${{ needs.build_and_push.outputs.image_digest }} \
           -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
           --startdate 2013-03-31 --enddate 2013-05-01 \
           --lat 76.0015 --lon -18.4315 \
