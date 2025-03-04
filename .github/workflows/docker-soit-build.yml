@@ -44,7 +44,7 @@ jobs:
           tags: ${{ env.TEST_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: type=docker,dest=${{ runner.temp }}/soit-image.tar
+          outputs: type=image,dest=${{ runner.temp }}/soit-image.tar
           
       - name: Upload Docker image artifact
         uses: actions/upload-artifact@v4
