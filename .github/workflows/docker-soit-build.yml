@@ -41,7 +41,7 @@ jobs:
           context: ./satellite-overpass-identification-tool
           platforms: linux/amd64,linux/arm64
           tags: ${{ env.TEST_TAG }}
-          outputs: type=docker,dest=${{ runner.temp }}/soit-image.tar
+          outputs: type=tar,dest=${{ runner.temp }}/soit-image.tar
           cache-from: type=gha
           cache-to: type=gha,mode=max
           
