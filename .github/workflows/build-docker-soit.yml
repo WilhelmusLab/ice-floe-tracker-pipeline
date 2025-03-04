@@ -2,14 +2,8 @@
 
 name: Build and PushContainer - SOIT
 on:
-  push:
-    branches:
-      - 'main'
-    tags:
-      - 'v*.*.*'
-  pull_request:  
-    branches:
-      - 'main'
+  release:
+    types: [published]
 
 env:
   REGISTRY: hub.docker.com
