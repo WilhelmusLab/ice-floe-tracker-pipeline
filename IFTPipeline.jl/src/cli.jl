@@ -376,11 +376,6 @@ function mkclitrack!(settings)
         "--params"
         help = "Path to TOML file with algorithm parameters"
 
-        "--area"
-        help = "Area thresholds to use for pairing floes"
-        arg_type = Int64
-        default = 1200
-
         "--dist"
         help = "Distance threholds to use for pairing floes"
         default = "15 30 120"
@@ -388,6 +383,11 @@ function mkclitrack!(settings)
         "--dt-thresh"
         help = "Time thresholds to use for pairing floes"
         default = "30 100 1300"
+
+        "--Sminimumarea"
+        help = "Minimum area for small floes"
+        arg_type = Float64
+        default = 350
 
         "--Sarearatio"
         help = "Area ratio threshold for small floes"
@@ -408,6 +408,11 @@ function mkclitrack!(settings)
         help = "Convex area ratio threshold for small floes"
         arg_type = Float64
         default = 0.14
+
+        "--Lminimumarea"
+        help = "Minimum area for large floes"
+        arg_type = Float64
+        default = 1200
 
         "--Larearatio"
         help = "Area ratio threshold for large floes"
@@ -461,12 +466,12 @@ function mkclitrack!(settings)
         arg_type = Float64
         default = 0.68
 
-        "--area2"
+        "--large_floe_area"
         help = "Large floe area mismatch threshold"
         arg_type = Float64
         default = 0.236
 
-        "--area3"
+        "--small_floe_area"
         help = "Small floe area mismatch threshold"
         arg_type = Float64
         default = 0.18
@@ -506,12 +511,6 @@ function mkclitrack_single!(settings)
 
     add_arg_group!(settings["track_single"], "optional arguments")
     @add_arg_table! settings["track_single"] begin
-
-        "--area"
-        help = "Area thresholds to use for pairing floes"
-        arg_type = Int64
-        default = 1200
-
         "--dist"
         help = "Distance threholds to use for pairing floes"
         default = [15, 30, 120]
@@ -524,6 +523,11 @@ function mkclitrack_single!(settings)
         arg_type = Int
         nargs = '+'
 
+        "--Sminimumarea"
+        help = "Minimum area for small floes"
+        arg_type = Float64
+        default = 350
+
         "--Sarearatio"
         help = "Area ratio threshold for small floes"
         arg_type = Float64
@@ -532,17 +536,22 @@ function mkclitrack_single!(settings)
         "--Smajaxisratio"
         help = "Major axis ratio threshold for small floes"
         arg_type = Float64
-        default = 0.1
+        default = 0.10
 
         "--Sminaxisratio"
         help = "Minor axis ratio threshold for small floes"
         arg_type = Float64
-        default = 0.12
+        default = 0.15
 
         "--Sconvexarearatio"
         help = "Convex area ratio threshold for small floes"
         arg_type = Float64
-        default = 0.14
+        default = 0.20
+
+        "--Lminimumarea"
+        help = "Minimum area for large floes"
+        arg_type = Float64
+        default = 1200
 
         "--Larearatio"
         help = "Area ratio threshold for large floes"
@@ -552,12 +561,12 @@ function mkclitrack_single!(settings)
         "--Lmajaxisratio"
         help = "Major axis ratio threshold for large floes"
         arg_type = Float64
-        default = 0.1
+        default = 0.10
 
         "--Lminaxisratio"
         help = "Minor axis ratio threshold for large floes"
         arg_type = Float64
-        default = 0.15
+        default = 0.12
 
         "--Lconvexarearatio"
         help = "Convex area ratio threshold for large floes"
@@ -596,12 +605,12 @@ function mkclitrack_single!(settings)
         arg_type = Float64
         default = 0.68
 
-        "--area2"
+        "--large_floe_area"
         help = "Large floe area mismatch threshold"
         arg_type = Float64
         default = 0.236
 
-        "--area3"
+        "--small_floe_area"
         help = "Small floe area mismatch threshold"
         arg_type = Float64
         default = 0.18

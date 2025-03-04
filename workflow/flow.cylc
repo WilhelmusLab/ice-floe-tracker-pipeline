@@ -317,13 +317,14 @@
                 --latlon ${landmasks[0]} \
                 --passtimes $(cat ${passtimes[@]} | tr 'Z\n\r' ' ') \
                 --output floes.tracked.csv \
-                --area {{ TRACK_AREA }} \
                 --dist {{ TRACK_DIST | join(" ") }} \
                 --dt-thresh {{ TRACK_DT_THRESH | join(" ") }} \
+                --Sminimumarea {{ TRACK_SMINIMUMAREA }} \
                 --Sarearatio {{ TRACK_SAREARATIO }} \
                 --Smajaxisratio {{ TRACK_SMAJAXISRATIO }} \
                 --Sminaxisratio {{ TRACK_SMINAXISRATIO }} \
                 --Sconvexarearatio {{ TRACK_SCONVEXAREARATIO }} \
+                --Lminimumarea {{ TRACK_LMINIMUMAREA }} \
                 --Larearatio {{ TRACK_LAREARATIO }} \
                 --Lmajaxisratio {{ TRACK_LMAJAXISRATIO }} \
                 --Lminaxisratio {{ TRACK_LMINAXISRATIO }} \
@@ -334,8 +335,8 @@
                 --comp {{ TRACK_COMP }} \
                 --mm {{ TRACK_MM }} \
                 --corr {{ TRACK_CORR }} \
-                --area2 {{ TRACK_AREA2 }} \
-                --area3 {{ TRACK_AREA3 }} \
+                --large-floe-area {{ TRACK_LARGE_FLOE_AREA_MISMATCH_THRESHOLD }} \
+                --small-floe-area {{ TRACK_SMALL_FLOE_AREA_MISMATCH_THRESHOLD }}
                 
         """
         [[[directives]]]

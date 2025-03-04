@@ -31,7 +31,9 @@ function track(; args...)
     props = deserialize(joinpath(vals.props, "floe_props.jls"))
     passtimes = deserialize(joinpath(vals.passtimes, "passtimes.jls"))
     latlon = vals.latlon
-    labeledfloes = IceFloeTracker.pairfloes(imgs, props, passtimes, latlon, condition_thresholds, mc_thresholds)
+    labeledfloes = IceFloeTracker.pairfloes(
+        imgs, props, passtimes, latlon, condition_thresholds, mc_thresholds
+    )
     serialize(joinpath(vals.output, "labeled_floes.jls"), labeledfloes)
     return nothing
 end
@@ -60,22 +62,23 @@ Following are the default set of thresholds `condition_thresholds` used for floe
 - Condition 2: area of floe i `area`, and the computed ratios for area, major axis,  minor axis, and convex area of floes `i` and `j` in days `k` and `k+1`, respectively: `t2=(area=1200, arearatio=0.28, majaxisratio=0.10, minaxisratio=0.12, convexarearatio=0.14)`
 - Condition 3: as in the previous condition but set as follows: `t3=(area=1200, arearatio=0.18, majaxisratio=0.07, minaxisratio=0.08, convexarearatio=0.09)`
 """
-function track_single(; 
+function track_single(;
     imgs::Array{String},
     props::Array{String},
     passtimes::Array{DateTime},
     latlon::String,
     output::String,
-    area::Int64=1200,
     dist::Array{Int}=[15, 30, 120],
     dt_thresh::Array{Int}=[30, 100, 1300],
+    Sminimumarea::Float64=350.0,
     Sarearatio::Float64=0.18,
-    Smajaxisratio::Float64=0.1,
-    Sminaxisratio::Float64=0.12,
-    Sconvexarearatio::Float64=0.14,
+    Smajaxisratio::Float64=0.10,
+    Sminaxisratio::Float64=0.15,
+    Sconvexarearatio::Float64=0.20,
+    Lminimumarea::Float64=1200.0,
     Larearatio::Float64=0.28,
-    Lmajaxisratio::Float64=0.1,
-    Lminaxisratio::Float64=0.15,
+    Lmajaxisratio::Float64=0.10,
+    Lminaxisratio::Float64=0.12,
     Lconvexarearatio::Float64=0.14,
     mxrot::Int64=10,
     psi::Float64=0.95,
@@ -83,14 +86,14 @@ function track_single(;
     comp::Float64=0.25,
     mm::Float64=0.22,
     corr::Float64=0.68,
-    area2::Float64=0.236,
-    area3::Float64=0.18,
+    small_floe_area::Float64=0.18,
+    large_floe_area::Float64=0.236,
 )
 
     # Load the files – can we drop the memory requirements by doing two at once?
     @info "Loading $imgs"
     imgs_::Vector{Matrix{<:Integer}} = [load_labeled_img(img) for img in imgs]
-    
+
     @info "Loading $props"
     props_ = [DataFrame(CSV.File(prop)) for prop in props]
     # go through each of the props_ dataframes and convert each 
@@ -98,47 +101,34 @@ function track_single(;
     for (img_, prop_) in zip(imgs_, props_)
         label_type = eltype(img_)
         @debug "converting labels to $label_type"
-        prop_[!,:label] = convert.(label_type, prop_[!,:label])
+        prop_[!, :label] = convert.(label_type, prop_[!, :label])
     end
     @info "Loaded: $props_"
 
     @info "Set condition thresholds"
-    condition_thresholds = (
-        t1=(
-            dt=dt_thresh, 
-            dist=dist
-        ),
-        t2=(
-            area=area,
-            arearatio=Larearatio,
-            convexarearatio=Lconvexarearatio,
-            majaxisratio=Lmajaxisratio,
-            minaxisratio=Lminaxisratio,
-        ),
-        t3=(
-            area=area,
-            arearatio=Sarearatio,
-            convexarearatio=Sconvexarearatio,
-            majaxisratio=Smajaxisratio,
-            minaxisratio=Sminaxisratio,
-        ),
+    small_floe_settings = (
+        minimumarea=Sminimumarea,
+        arearatio=Sarearatio,
+        majaxisratio=Smajaxisratio,
+        minaxisratio=Sminaxisratio,
+        convexarearatio=Sconvexarearatio,
     )
+    large_floe_settings = (
+        minimumarea=Lminimumarea,
+        arearatio=Larearatio,
+        majaxisratio=Lmajaxisratio,
+        minaxisratio=Lminaxisratio,
+        convexarearatio=Lconvexarearatio,
+    )
+    search_thresholds = (dt=dt_thresh, dist=dist)
+    condition_thresholds = (; search_thresholds, small_floe_settings, large_floe_settings)
+
     @debug condition_thresholds
 
     @info "Set MC thresholds"
     mc_thresholds = (
-        comp=(
-            mxrot=mxrot, 
-            sz=sz, 
-            comp=comp, 
-            mm=mm, 
-            psi=psi
-        ),
-        goodness=(
-            corr=corr, 
-            area2=area2, 
-            area3=area3
-        ),
+        comp=(; mxrot, sz, comp, mm, psi),
+        goodness=(; corr, small_floe_area, large_floe_area),
     )
     @debug mc_thresholds
 
@@ -149,17 +139,17 @@ function track_single(;
     adduuid!(props_)
 
     tracked_floes = long_tracker(props_, condition_thresholds, mc_thresholds)
-    FileIO.save(output, tracked_floes)
-    return nothing
+    FileIO.save(output, select!(tracked_floes, Not(:mask, :psi)))
+    return tracked_floes
 end
 
 function parse_params(params::AbstractString)
     params = parsefile(params)
-    area = params["area"]
-    t1 = dict2nt(params["t1"])
-    t2 = (area=area, dict2nt(params["t2"])...)
-    t3 = (area=area, dict2nt(params["t3"])...)
-    condition_thresholds = (t1=t1, t2=t2, t3=t3)
+    @info params
+    search_thresholds = dict2nt(params["search_thresholds"])
+    small_floe_settings = dict2nt(params["small_floe_settings"])
+    large_floe_settings = dict2nt(params["large_floe_settings"])
+    condition_thresholds = (; search_thresholds, small_floe_settings, large_floe_settings)
     d = dict2nt(params["mc_thresholds"])
     mc_thresholds = mkmct(d)
     return condition_thresholds, mc_thresholds
@@ -168,16 +158,18 @@ end
 function parse_params(; args...)
     d = values(args)
     condition_thresholds = (
-        t1=(dt=parselistas(Int64, d.dt_thresh), dist=parselistas(Int64, d.dist)),
-        t2=(
-            area=d.area,
+        search_thresholds=(
+            dt=parselistas(Int64, d.dt_thresh), dist=parselistas(Int64, d.dist)
+        ),
+        large_floe_settings=(
+            minimumarea=d.Lminimumarea,
             arearatio=d.Larearatio,
             convexarearatio=d.Lconvexarearatio,
             majaxisratio=d.Lmajaxisratio,
             minaxisratio=d.Lminaxisratio,
         ),
-        t3=(
-            area=d.area,
+        small_floe_settings=(
+            minimumarea=d.Sminimumarea,
             arearatio=d.Sarearatio,
             convexarearatio=d.Sconvexarearatio,
             majaxisratio=d.Smajaxisratio,
@@ -191,7 +183,11 @@ end
 function mkmct(d)
     return (
         comp=(mxrot=d.mxrot, sz=d.sz, comp=d.comp, mm=d.mm, psi=d.psi),
-        goodness=(corr=d.corr, area2=d.area2, area3=d.area3),
+        goodness=(
+            corr=d.corr,
+            large_floe_area=d.large_floe_area,
+            small_floe_area=d.small_floe_area,
+        ),
     )
 end
 
