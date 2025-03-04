@@ -55,7 +55,7 @@ jobs:
           --csvoutpath .
           
       - name: Upload Docker image artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: soit-image
           path: /tmp/soit-image.tar
