@@ -92,7 +92,7 @@ jobs:
 
       - name: Test SOIT
         run: |
-          GCR_IMAGE_NAME_LOWERCASE=`echo ${{github.repository}} | tr '[:upper:]' '[:lower:]'`"
+          GCR_IMAGE_NAME_LOWERCASE="`echo ${{github.repository}} | tr '[:upper:]' '[:lower:]'`"
           docker run -v `pwd`:/app -w /app --rm \
           ${GCR_IMAGE_NAME_LOWERCASE}:${{ needs.build_and_push.outputs.image_digest }} \
           -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
