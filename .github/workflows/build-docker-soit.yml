@@ -78,9 +78,7 @@ jobs:
     needs: build_and_push
     permissions:
       packages: read
-      contents: read
-      attestations: read
-      id-token: write
+      
     steps:
       
       - name: Log in to the GitHub Container registry
