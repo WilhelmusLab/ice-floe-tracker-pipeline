@@ -54,9 +54,9 @@
             {% if IFT_INSTALL == "Inject" %}
                 IFT={{ IFT_COMMAND }}
             {% elif IFT_INSTALL == "Docker" %}
-                IFT="docker run -v `pwd`:/app -w /app brownccv/icefloetracker-julia:{{ IFT_VERSION }}"
+                IFT="docker run -v `pwd`:/app -w /app ghcr.io/wilhelmuslab/ice-floe-tracker-pipeline/cli:{{ IFT_VERSION }}"
             {% elif IFT_INSTALL == "Apptainer" %}
-                IFT="apptainer run docker://brownccv/icefloetracker-julia:{{ IFT_VERSION }}"
+                IFT="apptainer run docker://ghcr.io/wilhelmuslab/ice-floe-tracker-pipeline/cli:{{ IFT_VERSION }}"
             {% else %}
                 {{ raise('IFT_INSTALL not recognized.') }}
             {% endif %}
