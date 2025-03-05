@@ -2,7 +2,7 @@ name: Build and PushContainer - Julia
 on:
   push:
     branches:
-      - 'main'
+      - main
     tags:
       - 'v*.*.*'
   pull_request:
