@@ -134,6 +134,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}    
       - name: Test CLI
         run: |
-          docker run --rm ${{ needs.build_and_push.outputs.tagged_image_name }} \ 
-            --entrypoint "/bin/sh" \
-            -c "julia --project=/opt/IFTPipeline.jl /opt/IFTPipeline.jl/test/runtests.jl"
+          docker run --rm --entrypoint "/bin/sh" \
+            ${{ needs.build_and_push.outputs.tagged_image_name }} \
+            -c "julia --project=/opt/IFTPipeline.jl -e 'using Pkg; Pkg.test()'"
