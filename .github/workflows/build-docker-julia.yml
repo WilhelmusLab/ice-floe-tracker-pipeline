@@ -11,9 +11,9 @@ on:
   workflow_dispatch:
   
 env:
-  REGISTRY: hub.docker.com
-  IMAGE_NAME: brownccv/icefloetracker-julia
-  TEST_TAG: brownccv/icefloetracker-julia:test
+  DOCKER_HUB_IMAGE_NAME: brownccv/icefloetracker-julia
+  GCR_IMAGE_NAME: ghcr.io/${{ github.repository }}/cli
+  TAGGED_IMAGE_NAME: 
 
 jobs:
   build_and_push:
