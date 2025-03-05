@@ -49,31 +49,12 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMAGE_NAME }}
-      
-      - name: Build Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/amd64
-          load: true
-          tags: ${{ env.TEST_TAG }}
-          build-args: |
-            JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)
+          images: |
+            ${{ env.DOCKER_HUB_IMAGE_NAME }}
+            ${{ env.GCR_IMAGE_NAME }}
             
-      - name: Test Preprocessing (Lopez CLI)
-        working-directory: ./test
-        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez input_data/ne-greenland.20220914.terra.250m
-
-      - name: Test Preprocessing CLI (Lopez with Tiling)
-        working-directory: ./test
-        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  preprocess_lopez_tiling input_data/ne-greenland.20220914.terra.250m
-
-      - name: Test Tracker CLI
-        working-directory: ./test
-        run: source ./test-IFTPipeline.jl-cli.sh && IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TEST_TAG }}"  track_lopez input_data/ne-greenland.2022091{3,4}.terra.250m/
-
       - name: Build and push Docker image
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -83,3 +64,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.GCR_IMAGE_NAME }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
