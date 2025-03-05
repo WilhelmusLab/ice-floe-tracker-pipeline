@@ -19,9 +19,6 @@ RUN julia --project="/opt/PythonSetupForIFTPipeline.jl" "/opt/PythonSetupForIFTP
 COPY ./IFTPipeline.jl /opt/IFTPipeline.jl
 RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.instantiate(); Pkg.precompile();"
 
-# Test the package
-# RUN julia --project="/opt/IFTPipeline.jl" -e "using Pkg; Pkg.test();"
-
 # CLI setup
 #===========================================
 SHELL ["/bin/bash", "-c"]
