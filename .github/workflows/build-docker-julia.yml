@@ -23,6 +23,8 @@ jobs:
       contents: read
       attestations: write
       id-token: write
+    outputs:
+      image_digest: ${{ steps.push.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
 
