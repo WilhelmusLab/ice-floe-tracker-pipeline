@@ -13,7 +13,6 @@ on:
 env:
   DOCKER_HUB_IMAGE_NAME: brownccv/icefloetracker-julia
   GCR_IMAGE_NAME: ghcr.io/${{ github.repository }}/cli
-  TAGGED_IMAGE_NAME: 
 
 jobs:
   build_and_push:
@@ -24,7 +23,7 @@ jobs:
       attestations: write
       id-token: write
     outputs:
-      image_digest: ${{ steps.push.outputs.digest }}
+      tagged_image_name: ${{ steps.tagged_image_name.outputs.tagged_image_name }}
     steps:
       - uses: actions/checkout@v4
 
@@ -76,7 +75,14 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
-  test:
+      - name: Get tagged image name
+        id: tagged_image_name
+        run: |
+          GCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
+          echo "tagged_image_name=${GCR_IMAGE_NAME_LOWERCASE}@${{ steps.push.outputs.digest }}" >> ${GITHUB_OUTPUT}
+
+
+  test-pipeline:
     runs-on: ubuntu-latest
     needs: build_and_push
     permissions:
@@ -91,32 +97,27 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get tagged image name
-        run: |
-          GCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
-          echo "TAGGED_IMAGE_NAME=${GCR_IMAGE_NAME_LOWERCASE}@${{ needs.build_and_push.outputs.image_digest }}" >> ${GITHUB_ENV}
-
       - uses: actions/checkout@v4
         
       - name: Test Preprocessing (Lopez CLI)
         working-directory: ./test
         run: |
           source ./test-IFTPipeline.jl-cli.sh && \
-          IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TAGGED_IMAGE_NAME }}" \
+          IFT="docker run -v `pwd`:/app -w /app --rm ${{ needs.build_and_push.outputs.tagged_image_name }}" \
           preprocess_lopez input_data/ne-greenland.20220914.terra.250m
   
       - name: Test Preprocessing CLI (Lopez with Tiling)
         working-directory: ./test
         run: |
           source ./test-IFTPipeline.jl-cli.sh && \
-          IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TAGGED_IMAGE_NAME }}" \
+          IFT="docker run -v `pwd`:/app -w /app --rm ${{ needs.build_and_push.outputs.tagged_image_name }}" \
           preprocess_lopez_tiling input_data/ne-greenland.20220914.terra.250m
 
       - name: Test Tracker CLI
         working-directory: ./test
         run: |
           source ./test-IFTPipeline.jl-cli.sh && \
-          IFT="docker run -v `pwd`:/app -w /app --rm ${{ env.TAGGED_IMAGE_NAME }}" \
+          IFT="docker run -v `pwd`:/app -w /app --rm ${{ needs.build_and_push.outputs.tagged_image_name }}" \
           track_lopez input_data/ne-greenland.2022091{3,4}.terra.250m/
     
       
