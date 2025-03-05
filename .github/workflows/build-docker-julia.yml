@@ -120,4 +120,20 @@ jobs:
           IFT="docker run -v `pwd`:/app -w /app --rm ${{ needs.build_and_push.outputs.tagged_image_name }}" \
           track_lopez input_data/ne-greenland.2022091{3,4}.terra.250m/
     
-      
+  test-cli:
+    runs-on: ubuntu-latest
+    needs: build_and_push
+    permissions:
+      packages: read
+    steps:
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}    
+      - name: Test CLI
+        run: |
+          docker run --rm ${{ needs.build_and_push.outputs.tagged_image_name }} \ 
+            --entrypoint "/bin/sh" \
+            -c "julia --project=/opt/IFTPipeline.jl /opt/IFTPipeline.jl/test/runtests.jl"
