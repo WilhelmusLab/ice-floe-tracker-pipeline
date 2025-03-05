@@ -114,6 +114,12 @@ Update your `~/.cylc/flow/global.cylc` file to include the following lines to us
 This will ensure that jobs from `cylc` are scheduled using `Slurm`.
 
 Oscar uses Apptainer rather than Docker, so include the line `IFT_INSTALL="Apptainer"` or `IFT_INSTALL="ApptainerLocal"` in your configuration file.
+To pull the container images, you may first need to authenticate to the GitHub Container Registry https://ghcr.io. On Oscar, run:
+```bash
+apptainer remote login --username your-github-username docker://ghcr.io
+```
+
+... then paste into the prompt a GitHub.com classic personal access token from with permission `read:packages`. 
 
 ## Development Use
 
