@@ -95,7 +95,9 @@ jobs:
         run: |
           GCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
           echo "TAGGED_IMAGE_NAME=${GCR_IMAGE_NAME_LOWERCASE}@${{ needs.build_and_push.outputs.image_digest }}" >> ${GITHUB_ENV}
-          
+
+      - uses: actions/checkout@v4
+        
       - name: Test Preprocessing (Lopez CLI)
         working-directory: ./test
         run: |
