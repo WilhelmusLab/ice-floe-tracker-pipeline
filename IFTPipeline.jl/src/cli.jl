@@ -51,7 +51,6 @@ function mkclipreprocess_single!(settings)
         "--output", "-o"
         help = "Path to output segmented image file (.tiff)"
         required = true
-        
     end
     return nothing
 end
@@ -73,14 +72,13 @@ function mkcli_preprocess_tiling_single!(settings)
         "--segmented", "-s"
         help = "Path to output segmented image file (.tiff)"
         required = true
-        
+
         "--labeled", "-l"
         help = "Path to output labeled image file (.tiff)"
         required = true
 
-
         # Tiling parameters
-        
+
         "--tile-rblocks"
         default = 8
         arg_type = Int
@@ -91,9 +89,8 @@ function mkcli_preprocess_tiling_single!(settings)
         arg_type = Int
         required = false
 
-
         # Ice labels thresholds
-        
+
         "--ice-labels-prelim-threshold"
         default = 110.0
         arg_type = Float64
@@ -119,9 +116,8 @@ function mkcli_preprocess_tiling_single!(settings)
         arg_type = Float64
         required = false
 
-
         # Adaptive histogram equalization parameters
-        
+
         "--adapthisteq-white-threshold"
         default = 25.5
         arg_type = Float64
@@ -137,9 +133,8 @@ function mkcli_preprocess_tiling_single!(settings)
         arg_type = Float64
         required = false
 
-
         # Gamma parameters
-        
+
         "--gamma"
         default = 1
         arg_type = Float64
@@ -155,9 +150,8 @@ function mkcli_preprocess_tiling_single!(settings)
         arg_type = Float64
         required = false
 
-
         # Unsharp mask parameters
-        
+
         "--unsharp-mask-radius"
         default = 10
         arg_type = Int
@@ -173,17 +167,15 @@ function mkcli_preprocess_tiling_single!(settings)
         arg_type = Float64
         required = false
 
-
         # Brighten parameters
-        
+
         "--brighten-factor"
-        default  = 0.1
+        default = 0.1
         arg_type = Float64
         required = false
 
-
         # Preliminary ice mask parameters
-        
+
         "--prelim-icemask-radius"
         default = 10
         arg_type = Int
@@ -199,9 +191,8 @@ function mkcli_preprocess_tiling_single!(settings)
         arg_type = Float64
         required = false
 
-
         # Main ice mask parameters
-        
+
         "--icemask-band-7-threshold"
         default = 5
         arg_type = Int
@@ -236,7 +227,6 @@ function mkcli_preprocess_tiling_single!(settings)
         default = 3
         arg_type = Int
         required = false
-
     end
     return nothing
 end
@@ -290,7 +280,17 @@ function mkcliextract_single!(settings)
         help = """Features to extract. Format: "feature1 feature2". For an extensive list of extractable features see https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.regionprops:~:text=The%20following%20properties%20can%20be%20accessed%20as%20attributes%20or%20keys"""
         nargs = '+'
         arg_type = String
-        default = ["label", "centroid", "area", "major_axis_length", "minor_axis_length", "convex_area", "bbox", "orientation", "perimeter"]
+        default = [
+            "label",
+            "centroid",
+            "area",
+            "major_axis_length",
+            "minor_axis_length",
+            "convex_area",
+            "bbox",
+            "orientation",
+            "perimeter",
+        ]
     end
     return nothing
 end
@@ -625,7 +625,7 @@ function mkclilandmask!(settings)
         "output",
         Dict(:help => "Output image directory", :required => true),
     ]
-    add_arg_table!(settings["landmask"], args...)
+    return add_arg_table!(settings["landmask"], args...)
 end
 
 function mkclilandmask_single!(settings)
@@ -667,9 +667,7 @@ function mkcli!(settings, common_args)
     return nothing
 end
 
-
 function main()
-
     settings = ArgParseSettings(; autofix_names=true)
 
     @add_arg_table! settings begin
@@ -719,7 +717,6 @@ function main()
     end
 
     command_common_args = []
-
 
     mkcli!(settings, command_common_args)
 

@@ -17,9 +17,7 @@
     truecolor_images = load_imgs(; input=input, image_type=:truecolor)
 
     lm_expected =
-        Gray.(
-            load(joinpath(pipelinedir, "expected", "generated_landmask.png"))
-        ) .> 0
+        Gray.(load(joinpath(pipelinedir, "expected", "generated_landmask.png"))) .> 0
 
     lm_raw = load(joinpath(input, "landmask.tiff"))
 
@@ -101,9 +99,7 @@
         minarea = "1"
         maxarea = "5"
         features = "area bbox centroid"
-        extraction_path = joinpath(
-            @__DIR__, "test_inputs", "feature_extraction"
-        )
+        extraction_path = joinpath(@__DIR__, "test_inputs", "feature_extraction")
         ispath(joinpath(extraction_path, "input")) &&
             rm(joinpath(extraction_path, "input"); recursive=true)
         input = mkpath(joinpath(extraction_path, "input"))

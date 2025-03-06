@@ -9,7 +9,12 @@ Given an input directory with a landmask file, create a land/soft ice mask objec
 - `landmask_fname`: name of the landmask file in `input`. Default is `"landmask.tiff"`
 - `outfile`: name of the serialized landmask object. Default is `"generated_landmask.jls"`
 """
-function landmask(; input::String, output::String, landmask_fname::String="landmask.tiff", outfile="generated_landmask.jls")
+function landmask(;
+    input::String,
+    output::String,
+    landmask_fname::String="landmask.tiff",
+    outfile="generated_landmask.jls",
+)
     @info "Looking for $landmask_fname in $input"
 
     lmpath = joinpath(input, landmask_fname)
@@ -25,7 +30,6 @@ function landmask(; input::String, output::String, landmask_fname::String="landm
     return nothing
 end
 
-
 """
     landmask_single(; input, output_non_dilated, output_dilated)
 
@@ -36,7 +40,9 @@ end
 - `output_non_dilated`: path to output file for non-dilated landmask
 - `output_dilated`: path to output file for dilated landmask
 """
-function landmask_single(; input::String, output_non_dilated::String, output_dilated::String)
+function landmask_single(;
+    input::String, output_non_dilated::String, output_dilated::String
+)
     @info "Using $input as landmask"
     img = load(input)
     @info "Landmask found at $input."

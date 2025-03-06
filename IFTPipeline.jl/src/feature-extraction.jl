@@ -51,7 +51,7 @@ function extractfeatures(
     floes::AbstractArray{<:Union{Integer,Bool}};
     minarea::Int64=350,
     maxarea::Int64=90000,
-    features::Union{Vector{Symbol},Vector{<:AbstractString}}
+    features::Union{Vector{Symbol},Vector{<:AbstractString}},
 )::DataFrame
     # assert the first area threshold is less than the second
     minarea >= maxarea &&
@@ -62,7 +62,7 @@ function extractfeatures(
     @debug "loaded $props"
 
     # filter by area using the area thresholds
-    return props[minarea.<=props.area.<=maxarea, :]
+    return props[minarea .<= props.area .<= maxarea, :]
 end
 
 function extractfeatures(;
@@ -100,7 +100,9 @@ function extractfeatures_single(;
     labeled_floes = Int.(load_labeled_img(input))
 
     @info "Extracting features from each floe: $features"
-    props = IFTPipeline.extractfeatures(labeled_floes; minarea=minarea, maxarea=maxarea, features=features)
+    props = IFTPipeline.extractfeatures(
+        labeled_floes; minarea=minarea, maxarea=maxarea, features=features
+    )
 
     @info "Extracted properties:"
     @info props
@@ -144,7 +146,7 @@ INT_TO_FIXEDPOINT_MAP = Dict(
     UInt32 => N0f32,
     Int32 => Q0f31,
     UInt64 => N0f64,
-    Int64 => Q0f63
+    Int64 => Q0f63,
 )
 
 """

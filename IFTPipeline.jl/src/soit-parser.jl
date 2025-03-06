@@ -11,11 +11,13 @@ The SOIT output file is a csv file with columns :Date, :sat1, :sat2, ... :satn, 
 function process_soit(passtimesdir::String)
     # check there is a file at passtimesdir starting with "passtimes_lat" with extension .csv
     pth = filter(x -> occursin(r"^passtimes_lat.*\.csv$", x), readdir(passtimesdir))
-    isempty(pth) && error("No csv file found at $passtimesdir starting with 'passtimes_lat'")
-    length(pth) > 1 && error("More than one csv file found at $passtimesdir starting with 'passtimes_lat'")
+    isempty(pth) &&
+        error("No csv file found at $passtimesdir starting with 'passtimes_lat'")
+    length(pth) > 1 &&
+        error("More than one csv file found at $passtimesdir starting with 'passtimes_lat'")
 
     data, cols = readdlm(joinpath(passtimesdir, pth[1]), ','; header=true)
-    df = DataFrame(data, vec(cols))[1:end-1, :]
+    df = DataFrame(data, vec(cols))[1:(end - 1), :]
 
     # filter out rows with value "" in the first column
     filter!(row -> row[1] != "", df)

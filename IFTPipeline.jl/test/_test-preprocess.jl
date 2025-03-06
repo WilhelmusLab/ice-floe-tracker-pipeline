@@ -30,7 +30,11 @@
         imgsdir = joinpath(test_data_dir, "input_pipeline")
 
         preprocess(;
-            truedir=imgsdir, fcdir=imgsdir, lmdir=imgsdir, passtimesdir=imgsdir, output=imgsdir
+            truedir=imgsdir,
+            fcdir=imgsdir,
+            lmdir=imgsdir,
+            passtimesdir=imgsdir,
+            output=imgsdir,
         )
 
         segfloes_outfile = joinpath(imgsdir, "segmented_floes.jls")
