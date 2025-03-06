@@ -1,4 +1,4 @@
-name: Build and PushContainer - Julia
+name: Build and Push Container - Julia
 on:
   push:
     branches:
