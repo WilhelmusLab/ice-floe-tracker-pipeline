@@ -20,7 +20,7 @@ jobs:
       attestations: write
       id-token: write
     outputs:
-      image_digest: ${{ steps.push.outputs.digest }}
+      tagged_image_name: ${{ steps.tagged_image_name.outputs.tagged_image_name }}
     steps:
       - uses: actions/checkout@v4
 
@@ -62,6 +62,12 @@ jobs:
           subject-name: ${{ env.GHCR_IMAGE_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+      
+      - name: Get tagged image name
+        id: tagged_image_name
+        run: |
+          GHCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GHCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
+          echo "tagged_image_name=${GHCR_IMAGE_NAME_LOWERCASE}@${{ steps.push.outputs.digest }}" >> ${GITHUB_OUTPUT}
 
   test:
     runs-on: ubuntu-latest
@@ -71,9 +77,8 @@ jobs:
 
       - name: Test SOIT
         run: |
-          GHCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GHCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
           docker run -v `pwd`:/app -w /app --rm \
-          ${GHCR_IMAGE_NAME_LOWERCASE}@${{ needs.build_and_push.outputs.image_digest }} \
+          ${{ needs.build_and_push.outputs.tagged_image_name }} \
           -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
           --startdate 2013-03-31 --enddate 2013-05-01 \
           --lat 76.0015 --lon -18.4315 \
