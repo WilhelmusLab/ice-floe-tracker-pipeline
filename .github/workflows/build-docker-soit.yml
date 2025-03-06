@@ -9,7 +9,7 @@ on:
     types: [published]
 
 env:
-  GCR_IMAGE_NAME: ghcr.io/${{ github.repository }}/soit
+  GHCR_IMAGE_NAME: ghcr.io/${{ github.repository }}/soit
 
 jobs:
   build_and_push:
@@ -42,7 +42,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.GCR_IMAGE_NAME }}
+            ${{ env.GHCR_IMAGE_NAME }}
             
       - name: Build and push Docker image
         id: push
@@ -59,7 +59,7 @@ jobs:
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: ${{ env.GCR_IMAGE_NAME }}
+          subject-name: ${{ env.GHCR_IMAGE_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
@@ -71,9 +71,9 @@ jobs:
 
       - name: Test SOIT
         run: |
-          GCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
+          GHCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GHCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
           docker run -v `pwd`:/app -w /app --rm \
-          ${GCR_IMAGE_NAME_LOWERCASE}@${{ needs.build_and_push.outputs.image_digest }} \
+          ${GHCR_IMAGE_NAME_LOWERCASE}@${{ needs.build_and_push.outputs.image_digest }} \
           -u ${{ secrets.SPACEUSER }} -p ${{ secrets.SPACEPSWD }} \
           --startdate 2013-03-31 --enddate 2013-05-01 \
           --lat 76.0015 --lon -18.4315 \

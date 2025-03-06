@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
   
 env:
-  GCR_IMAGE_NAME: ghcr.io/${{ github.repository }}/cli
+  GHCR_IMAGE_NAME: ghcr.io/${{ github.repository }}/cli
 
 jobs:
   build_and_push:
@@ -44,7 +44,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.GCR_IMAGE_NAME }}
+            ${{ env.GHCR_IMAGE_NAME }}
             
       - name: Build and push Docker image
         id: push
@@ -63,15 +63,15 @@ jobs:
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: ${{ env.GCR_IMAGE_NAME }}
+          subject-name: ${{ env.GHCR_IMAGE_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
       - name: Get tagged image name
         id: tagged_image_name
         run: |
-          GCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
-          echo "tagged_image_name=${GCR_IMAGE_NAME_LOWERCASE}@${{ steps.push.outputs.digest }}" >> ${GITHUB_OUTPUT}
+          GHCR_IMAGE_NAME_LOWERCASE=`echo ${{ env.GHCR_IMAGE_NAME }} | tr '[:upper:]' '[:lower:]'`
+          echo "tagged_image_name=${GHCR_IMAGE_NAME_LOWERCASE}@${{ steps.push.outputs.digest }}" >> ${GITHUB_OUTPUT}
 
 
   test-pipeline:
