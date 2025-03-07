@@ -121,9 +121,7 @@ end
 function get_ice_labels(
     falsecolor_imgs::Vector{Matrix{RGB{Float64}}}, landmask::AbstractArray{Bool}
 )
-    return [
-        IceFloeTracker.find_ice_labels(fc_img, landmask) for fc_img in falsecolor_imgs
-    ]
+    return [IceFloeTracker.find_ice_labels(fc_img, landmask) for fc_img in falsecolor_imgs]
 end
 
 """
@@ -146,9 +144,7 @@ function preprocess(
 
     # 2. Intermediate images
     @info "Finding ice labels"
-    ice_labels = IceFloeTracker.find_ice_labels(
-        falsecolor_image, landmask_imgs.dilated
-    )
+    ice_labels = IceFloeTracker.find_ice_labels(falsecolor_image, landmask_imgs.dilated)
 
     @info "Sharpening truecolor image"
     # a. apply imsharpen to truecolor image using non-dilated landmask
@@ -214,12 +210,15 @@ Preprocess and segment floes in all images in `truedir` and `fcdir` using the la
 - `passtimesdir`: path to SOIT file with satellite passtimes
 - `output`: output directory
 """
-function preprocess(; truedir::T, fcdir::T, lmdir::T, passtimesdir::T, output::T) where {T<:AbstractString}
-
+function preprocess(;
+    truedir::T, fcdir::T, lmdir::T, passtimesdir::T, output::T
+) where {T<:AbstractString}
     soitdf = process_soit(passtimesdir)
 
     # 1. Get references to images
-    falsecolor_refs, truecolor_refs = [mkfilenames(soitdf, colorspace) for colorspace in ["falsecolor", "truecolor"]]
+    falsecolor_refs, truecolor_refs = [
+        mkfilenames(soitdf, colorspace) for colorspace in ["falsecolor", "truecolor"]
+    ]
     landmask_imgs = deserialize(joinpath(lmdir, "generated_landmask.jls"))
     numimgs = length(truecolor_refs)
 
@@ -252,7 +251,10 @@ function preprocess(; truedir::T, fcdir::T, lmdir::T, passtimesdir::T, output::T
     @info "Serializing segmented floes/time deltas/image file names/pass times"
     serialize(joinpath(output, "segmented_floes.jls"), segmented_floes)
     serialize(joinpath(output, "timedeltas.jls"), getdeltat(soitdf.pass_time))
-    serialize(joinpath(output, "filenames.jls"), (truecolor=truecolor_refs, falsecolor=falsecolor_refs))
+    serialize(
+        joinpath(output, "filenames.jls"),
+        (truecolor=truecolor_refs, falsecolor=falsecolor_refs),
+    )
     serialize(joinpath(output, "passtimes.jls"), soitdf.pass_time)
     return nothing
 end
@@ -269,8 +271,9 @@ Preprocess and segment floes in a single view. Save the segmented floes to `outp
 - `landmask_dilated`: path to dilated landmask image
 - `output`: path to output file 
 """
-function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T) where {T<:AbstractString}
-
+function preprocess_single(;
+    truecolor::T, falsecolor::T, landmask::T, landmask_dilated::T, output::T
+) where {T<:AbstractString}
     @info "Processing images: $truecolor, $falsecolor, $landmask"
     truecolor_img = loadimg(; dir=dirname(truecolor), fname=basename(truecolor))
     falsecolor_img = loadimg(; dir=dirname(falsecolor), fname=basename(falsecolor))
@@ -292,7 +295,7 @@ function preprocess_single(; truecolor::T, falsecolor::T, landmask::T, landmask_
     labeled_floes = label_components(segmented_floes)
     _dtype = choose_dtype(maximum(labeled_floes))
     labeled_floes_cast = convert(Array{_dtype}, labeled_floes)
-    
+
     @info "Writing segmented floes to $output"
     save_labeled_img(labeled_floes_cast, output)
 
@@ -347,11 +350,10 @@ Preprocess and segment floes in a single view. Save the segmented floes to `segm
     - `icemask_n_clusters::Int=3`
 
 """
-function preprocess_tiling_single(
-    ; 
-    truecolor::T, 
-    falsecolor::T, 
-    landmask_dilated::T, 
+function preprocess_tiling_single(;
+    truecolor::T,
+    falsecolor::T,
+    landmask_dilated::T,
     segmented::T,
     labeled::T,
 
@@ -367,8 +369,8 @@ function preprocess_tiling_single(
     ice_labels_ratio_upper=0.75,
 
     # Adaptive histogram equalization parameters
-    adapthisteq_white_threshold=25.5, 
-    adapthisteq_entropy_threshold=4, 
+    adapthisteq_white_threshold=25.5,
+    adapthisteq_entropy_threshold=4,
     adapthisteq_white_fraction_threshold=0.4,
 
     # Gamma parameters
@@ -377,16 +379,16 @@ function preprocess_tiling_single(
     gamma_threshold=220,
 
     # Unsharp mask parameters
-    unsharp_mask_radius=10, 
-    unsharp_mask_amount=2.0, 
+    unsharp_mask_radius=10,
+    unsharp_mask_amount=2.0,
     unsharp_mask_factor=255.0,
 
     # Brighten parameters
     brighten_factor=0.1,
 
     # Preliminary ice mask parameters
-    prelim_icemask_radius=10, 
-    prelim_icemask_amount=2, 
+    prelim_icemask_radius=10,
+    prelim_icemask_amount=2,
     prelim_icemask_factor=0.5,
 
     # Main ice mask parameters
@@ -397,22 +399,18 @@ function preprocess_tiling_single(
     icemask_band_1_threshold_relaxed=190,
     icemask_possible_ice_threshold=75,
     icemask_n_clusters=3,
-
-    ) where {T<:AbstractString}
-
+) where {T<:AbstractString}
     @info "Processing images: $truecolor, $falsecolor, $landmask_dilated"
     truecolor_img = loadimg(; dir=dirname(truecolor), fname=basename(truecolor))
     falsecolor_img = loadimg(; dir=dirname(falsecolor), fname=basename(falsecolor))
 
     # TODO: make symmetric landmask saving/loading functions
-    landmask_dilated=BitMatrix(FileIO.load(landmask_dilated))
-    
+    landmask_dilated = BitMatrix(FileIO.load(landmask_dilated))
+
     # Invert the landmasks – in the tiling version of the code, 
     # the landmask is expected to be the other polarity compared with
     # the non-tiling version.
-    landmask = (
-        dilated=.!landmask_dilated,
-    )
+    landmask = (dilated=.!landmask_dilated,)
 
     @info "Remove alpha channel if it exists"
     rgb_truecolor_img = RGB.(truecolor_img)
@@ -420,9 +418,7 @@ function preprocess_tiling_single(
 
     @info "Get tile coordinates"
     tiles = IceFloeTracker.get_tiles(
-        rgb_truecolor_img; 
-        rblocks=tile_rblocks, 
-        cblocks=tile_cblocks
+        rgb_truecolor_img; rblocks=tile_rblocks, cblocks=tile_cblocks
     )
     @debug tiles
 
@@ -447,9 +443,7 @@ function preprocess_tiling_single(
 
     @info "Set gamma parameters"
     adjust_gamma_params = (
-        gamma=gamma,
-        gamma_factor=gamma_factor,
-        gamma_threshold=gamma_threshold,
+        gamma=gamma, gamma_factor=gamma_factor, gamma_threshold=gamma_threshold
     )
     @debug adjust_gamma_params
 
@@ -461,15 +455,13 @@ function preprocess_tiling_single(
 
     @info "Set unsharp mask params"
     unsharp_mask_params = (
-        radius=unsharp_mask_radius,
-        amount=unsharp_mask_amount,
-        factor=unsharp_mask_factor
+        radius=unsharp_mask_radius, amount=unsharp_mask_amount, factor=unsharp_mask_factor
     )
     @debug unsharp_mask_params
 
     @info "Set brighten factor"
     @debug brighten_factor
-    
+
     @info "Set preliminary ice masks params"
     prelim_icemask_params = (
         radius=prelim_icemask_radius,
@@ -477,7 +469,7 @@ function preprocess_tiling_single(
         factor=prelim_icemask_factor,
     )
     @debug prelim_icemask_params
-    
+
     @info "Set ice masks params"
     ice_masks_params = (
         band_7_threshold=icemask_band_7_threshold,
@@ -491,11 +483,10 @@ function preprocess_tiling_single(
     )
     @debug ice_masks_params
 
-    
     @info "Segment floes"
     segmented_floes = IceFloeTracker.preprocess_tiling(
-        n0f8.(rgb_falsecolor_img), 
-        n0f8.(rgb_truecolor_img), 
+        n0f8.(rgb_falsecolor_img),
+        n0f8.(rgb_truecolor_img),
         landmask,
         tiles,
         ice_labels_thresholds,
@@ -515,7 +506,7 @@ function preprocess_tiling_single(
     labeled_floes = label_components(segmented_floes)
     _dtype = choose_dtype(maximum(labeled_floes))
     labeled_floes_cast = convert(Array{_dtype}, labeled_floes)
-    
+
     @info "Write labeled floes to $labeled"
     save_labeled_img(labeled_floes_cast, labeled)
 

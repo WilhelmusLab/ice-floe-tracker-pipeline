@@ -7,8 +7,31 @@ module IFTPipeline
 using ArgParse
 using LoggingExtras
 using IceFloeTracker
-using IceFloeTracker: DataFrames, Dates, @dateformat_str, DataFrame, nrow, rename!, Not, select!, Date, Time, DateTime
-using IceFloeTracker: RGB, Gray, load, float64, imsharpen, getlatlon, pairfloes, add_passtimes!, addfloemasks!, addψs!, adduuid!, long_tracker
+using IceFloeTracker:
+    DataFrames,
+    Dates,
+    @dateformat_str,
+    DataFrame,
+    nrow,
+    rename!,
+    Not,
+    select!,
+    Date,
+    Time,
+    DateTime
+using IceFloeTracker:
+    RGB,
+    Gray,
+    load,
+    float64,
+    imsharpen,
+    getlatlon,
+    pairfloes,
+    add_passtimes!,
+    addfloemasks!,
+    addψs!,
+    adduuid!,
+    long_tracker
 using Folds
 using HDF5
 using TOML: parsefile
@@ -27,7 +50,8 @@ include("feature-extraction.jl")
 include("tracker.jl")
 include("h5.jl")
 
-export cache_vector, sharpen,
+export cache_vector,
+    sharpen,
     sharpen_gray,
     preprocess,
     preprocess_single,

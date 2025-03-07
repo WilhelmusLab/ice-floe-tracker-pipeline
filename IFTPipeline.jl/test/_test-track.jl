@@ -31,7 +31,7 @@ passtimes = deserialize(joinpath(data_path, "passtimes.dat"))
 
 # Keep floes with area >= 350 pixels
 for (i, prop) in enumerate(obj.props)
-    obj.props[i] = prop[prop[:, :area].>=350, :]
+    obj.props[i] = prop[prop[:, :area] .>= 350, :]
 end
 
 serialize(joinpath(temp, "segmented_floes.jls"), obj.imgs)
