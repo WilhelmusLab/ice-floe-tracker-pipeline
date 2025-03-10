@@ -139,7 +139,7 @@ function track_single(;
     adduuid!(props_)
 
     tracked_floes = long_tracker(props_, condition_thresholds, mc_thresholds)
-    FileIO.save(output, select!(tracked_floes, Not(:mask, :psi)))
+    FileIO.save(output, tracked_floes)
     return tracked_floes
 end
 
