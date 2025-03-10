@@ -645,6 +645,19 @@ function mkclilandmask_single!(settings)
     return nothing
 end
 
+function mkcli_get_rotation_single!(settings)
+    @add_arg_table! settings["get_rotation_single"] begin
+        "--input", "-i"
+        help = "Tracked floes CSV file with a 'satellite' column"
+        required = true
+
+        "--output", "-o"
+        help = "Tracked floes CSV file with rotations calculated"
+        required = true
+    end
+    return nothing
+end
+
 function mkcli!(settings, common_args)
     d = Dict(
         "landmask" => mkclilandmask!,
@@ -658,6 +671,7 @@ function mkcli!(settings, common_args)
         "makeh5files_single" => mkclimakeh5_single!,
         "track" => mkclitrack!,
         "track_single" => mkclitrack_single!,
+        "get_rotation_single" => mkcli_get_rotation_single!,
     )
 
     for t in keys(d)
@@ -713,6 +727,10 @@ function main()
 
         "track_single"
         help = "Pair ice floes in day k with ice floes in day k+1"
+        action = :command
+
+        "get_rotation_single"
+        help = "Get rotation of the ice floes"
         action = :command
     end
 
