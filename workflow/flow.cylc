@@ -360,6 +360,12 @@
     [[get_rotation]]
         script = """
         tracked_floes_with_satellites=${tracked_floes_file/.csv/.satellite.csv}
-        ${CSVJOIN} ${tracked_floes_file} ${all_overpass_time_file} "overpass time" ${tracked_floes_with_satellites}
-        ${IFT} get_rotation_single ${tracked_floes_with_satellites} ${rotation_tracked_floes_file}
+        ${CSVJOIN} \
+            ${tracked_floes_file} "passtime" \
+            ${all_overpass_time_file} "overpass time" \
+            ${tracked_floes_with_satellites} \
+            --on-is-utc
+        ${IFT} get_rotation_single \
+            -i ${tracked_floes_with_satellites} \
+            -o ${rotation_tracked_floes_file}
         """
