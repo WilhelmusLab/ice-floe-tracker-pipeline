@@ -49,6 +49,7 @@ include("preprocess.jl")
 include("feature-extraction.jl")
 include("tracker.jl")
 include("h5.jl")
+include("rotations.jl")
 
 export cache_vector,
     sharpen,
