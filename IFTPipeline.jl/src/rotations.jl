@@ -20,8 +20,8 @@ function get_rotation_single(; input::String, output::String)
             ),
         )
     end
-    @info results
     results_df = DataFrame(results)
+    @info results_df
 
     FileIO.save(output, results_df)
     return results_df
@@ -38,25 +38,44 @@ function get_rotation_measurements(
     filtered_df = subset(
         df, :ID => ByRow(==(row[:ID])), :date => ByRow(==(row[:date] - Dates.Day(1)))
     )
-    @info filtered_df
 
     results = []
     for comparison_row in eachrow(filtered_df)
-        rot = get_rotation_pair(row, comparison_row; column=mask_column)
+        theta_deg = get_rotation_pair(row, comparison_row; column=mask_column)
+        theta_rad = deg2rad(theta_deg)
+
+        dt = row[datetime_column] - comparison_row[datetime_column]
+        dt_sec = Float64(dt.value) / 1000.0
+        dt_hour = dt_sec / 3600.0
+        dt_day = dt_hour / 24.0
+
+        omega_deg_per_sec = (theta_deg) / (dt_sec)
+        omega_deg_per_hour = (theta_deg) / (dt_hour)
+        omega_deg_per_day = (theta_deg) / (dt_day)
+
+        omega_rad_per_sec = (theta_rad) / (dt_sec)
+        omega_rad_per_hour = (theta_rad) / (dt_hour)
+        omega_rad_per_day = (theta_rad) / (dt_day)
+
         push!(
             results,
             (
                 ID=(row.ID),
-                rot=rot,
+                theta_deg,
+                theta_rad,
+                dt_sec,
+                omega_deg_per_sec,
+                omega_deg_per_hour,
+                omega_deg_per_day,
+                omega_rad_per_sec,
+                omega_rad_per_hour,
+                omega_rad_per_day,
                 satellite1=comparison_row.satellite,
                 satellite2=row.satellite,
                 date1=comparison_row.date,
                 date2=row.date,
                 datetime1=comparison_row[datetime_column],
                 datetime2=row[datetime_column],
-                dt=convert(
-                    Dates.Second, row[datetime_column] - comparison_row[datetime_column]
-                ),
                 mask1=comparison_row[mask_column],
                 mask2=row[mask_column],
             ),
