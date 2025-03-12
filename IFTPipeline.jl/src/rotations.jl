@@ -8,20 +8,23 @@ function get_rotation_single(; input::String, output::String)
     pass_time_column = :passtime_parsed
     input_df[:, pass_time_column] = ZonedDateTime.(input_df[:, :passtime])
 
-    output_df = DataFrame()
-    rot = get_rotation_pair(input_df[1, :], input_df[2, :]; column=array_mask_column)
-    @info rot
+    results = []
+    for row in eachrow(input_df)
+        append!(
+            results,
+            get_rotation_measurements(
+                row,
+                input_df;
+                mask_column=array_mask_column,
+                datetime_column=pass_time_column,
+            ),
+        )
+    end
+    @info results
+    results_df = DataFrame(results)
 
-    next_measurements = get_rotation_measurements(
-        input_df[3, :],
-        input_df;
-        mask_column=array_mask_column,
-        datetime_column=pass_time_column,
-    )
-    @info next_measurements
-
-    FileIO.save(output, next_measurements)
-    return next_measurements
+    FileIO.save(output, results_df)
+    return results_df
 end
 
 function get_rotation_pair(row1::DataFrameRow, row2::DataFrameRow; column=:mask)
@@ -33,10 +36,7 @@ function get_rotation_measurements(
     row::DataFrameRow, df::DataFrame; mask_column, datetime_column
 )
     filtered_df = subset(
-        df,
-        :ID => ByRow(==(row[:ID])),
-        :satellite => ByRow(==(row[:satellite])),
-        :date => ByRow(==(row[:date] - Dates.Day(1))),
+        df, :ID => ByRow(==(row[:ID])), :date => ByRow(==(row[:date] - Dates.Day(1)))
     )
     @info filtered_df
 
@@ -62,7 +62,6 @@ function get_rotation_measurements(
             ),
         )
     end
-    results_df = DataFrame(results)
 
-    return results_df
+    return results
 end
