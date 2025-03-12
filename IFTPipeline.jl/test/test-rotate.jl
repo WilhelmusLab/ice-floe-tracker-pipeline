@@ -27,6 +27,6 @@ using Dates
         @test nrow(results) == 6
         @test results[1, :theta_deg] == 0
         @test results[2, :theta_deg] == 0
-        @test 35 < results[7, :theta_deg] < 50  # should be 45º
+        @test 35 < results[6, :theta_deg] < 50  # should be 45º
     end
 end
