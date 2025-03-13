@@ -67,7 +67,7 @@ function get_rotation_measurements(
                 ID=(row.ID),
                 theta_deg,
                 theta_rad,
-                dt_sec,
+                delta_time_sec=dt_sec,
                 omega_deg_per_sec,
                 omega_deg_per_hour,
                 omega_deg_per_day,
