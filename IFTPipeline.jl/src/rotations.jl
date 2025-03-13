@@ -1,6 +1,10 @@
 using DataFrames
 using TimeZones
+using Dates
 
+"""
+
+"""
 function get_rotation_single(; input::String, output::String)
     input_df = DataFrame(CSV.File(input))
     array_mask_column = :evaluated_mask
@@ -38,9 +42,9 @@ function get_rotation_measurements(
         theta_rad = deg2rad(theta_deg)
 
         dt = row[datetime_column] - comparison_row[datetime_column]
-        dt_sec = Float64(dt.value) / 1000.0
-        dt_hour = dt_sec / 3600.0
-        dt_day = dt_hour / 24.0
+        dt_sec = dt / Dates.Second(1)
+        dt_hour = dt / Dates.Hour(1)
+        dt_day = dt / Dates.Day(1)
 
         omega_deg_per_sec = (theta_deg) / (dt_sec)
         omega_deg_per_hour = (theta_deg) / (dt_hour)
