@@ -77,8 +77,8 @@ end
 function get_rotation_measurements(
     row1::DataFrameRow, row2::DataFrameRow; mask_column, time_column
 )
-    theta_deg = get_rotation(row1[mask_column], row2[mask_column])
-    theta_rad = deg2rad(theta_deg)
+    theta_rad = get_rotation(row1[mask_column], row2[mask_column])
+    theta_deg = rad2deg(theta_rad)
 
     dt = row2[time_column] - row1[time_column]
     dt_sec = dt / Dates.Second(1)
@@ -115,7 +115,22 @@ function get_rotation_measurements(
     )
 end
 
-function get_rotation(mask1, mask2)
-    (_, theta_deg) = IceFloeTracker.mismatch(mask1, mask2)
-    return theta_deg
+"""
+Get the angle in radians to rotate mask1 to mask2.
+"""
+function get_rotation(
+    mask1, mask2; mxshift::Tuple{Int64,Int64}=(100, 100), mxrot::Float64=Float64(pi)
+)
+    affine_map, _ = IceFloeTracker.Register.RegisterQD.qd_rigid(
+        IceFloeTracker.centered(mask1),
+        IceFloeTracker.centered(mask2),
+        mxshift,
+        mxrot;
+        print_interval=typemax(Int),
+    )
+    linear_map = affine_map.linear
+    cosθ = linear_map[1, 1]
+    sinθ = linear_map[2, 1]
+    θ = atan(sinθ, cosθ)
+    return θ
 end
