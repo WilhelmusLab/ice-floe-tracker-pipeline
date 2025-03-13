@@ -1,6 +1,10 @@
 using DataFrames
 using TimeZones
 using Dates
+using CSV
+
+# Base.tryparse(::Type{ZonedDateTime}, str) = ZonedDateTime
+# default_format(::Type{ZonedDateTime}) = Format("yyyy-mm-dd\\THH:MM:SS.sZ")
 
 """
   get_rotation_single(
@@ -33,22 +37,20 @@ Columns returned:
 - Original data
   - `mask<i>` – the binary mask used for the measurement
 """
-function get_rotation_single(; input::String, output::String)
+function get_rotation_single(;
+    input::String, output::String, mask_column=:mask, time_column=:passtime
+)
     input_df = DataFrame(CSV.File(input))
-    array_mask_column = :evaluated_mask
-    input_df[:, array_mask_column] = eval.(Meta.parse.(input_df[:, :mask]))
-    pass_time_column = :passtime_parsed
-    input_df[:, pass_time_column] = ZonedDateTime.(input_df[:, :passtime])
+
+    input_df[!, mask_column] = eval.(Meta.parse.(input_df[:, mask_column]))
+    input_df[!, time_column] = ZonedDateTime.(input_df[:, time_column])
 
     results = []
     for row in eachrow(input_df)
         append!(
             results,
             get_rotation_measurements(
-                row,
-                input_df;
-                mask_column=array_mask_column,
-                datetime_column=pass_time_column,
+                row, input_df; mask_column=mask_column, time_column=time_column
             ),
         )
     end
@@ -65,7 +67,7 @@ function get_rotation_pair(row1::DataFrameRow, row2::DataFrameRow; column=:mask)
 end
 
 function get_rotation_measurements(
-    row::DataFrameRow, df::DataFrame; mask_column, datetime_column
+    row::DataFrameRow, df::DataFrame; mask_column, time_column
 )
     filtered_df = subset(
         df, :ID => ByRow(==(row[:ID])), :date => ByRow(==(row[:date] - Dates.Day(1)))
@@ -76,7 +78,7 @@ function get_rotation_measurements(
         theta_deg = get_rotation_pair(row, comparison_row; column=mask_column)
         theta_rad = deg2rad(theta_deg)
 
-        dt = row[datetime_column] - comparison_row[datetime_column]
+        dt = row[time_column] - comparison_row[time_column]
         dt_sec = dt / Dates.Second(1)
         dt_hour = dt / Dates.Hour(1)
         dt_day = dt / Dates.Day(1)
@@ -106,8 +108,8 @@ function get_rotation_measurements(
                 satellite2=row.satellite,
                 date1=comparison_row.date,
                 date2=row.date,
-                datetime1=comparison_row[datetime_column],
-                datetime2=row[datetime_column],
+                datetime1=comparison_row[time_column],
+                datetime2=row[time_column],
                 mask1=comparison_row[mask_column],
                 mask2=row[mask_column],
             ),
