@@ -42,7 +42,7 @@ function get_rotation_single(;
 
     results = []
     for row in eachrow(input_df)
-        append!(
+        append!( # adds the 0 – n measurements from `get_rotation_measurements` to the results array
             results,
             get_rotation_measurements(
                 row, input_df; mask_column=mask_column, time_column=time_column
