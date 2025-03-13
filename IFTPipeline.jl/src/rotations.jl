@@ -7,18 +7,13 @@ using CSV
 # default_format(::Type{ZonedDateTime}) = Format("yyyy-mm-dd\\THH:MM:SS.sZ")
 
 """
-  get_rotation_single(
-    input::String,
-    output::String,
-)
-
 Make a CSV of pairwise rotations between floes detected on adjacent days. 
 
 Loads the floes from the `input` CSV file, and uses the columns:
 - `floe` ID
 - `satellite` name
-- `mask` – the binary mask
-- `overpass time` in ISO8601 format (with trailing Z or +00:00), e.g. 2022-09-11T09:21:00+00:00
+- `mask` – the binary mask (choose a column using argument `mask_column`)
+- `passtime` in ISO8601 format (with trailing Z or +00:00), e.g. 2022-09-11T09:21:00+00:00  (choose a column using argument `time_column`)
 - `date` of the overpass in YYYY-MM-DD format
 
 Returns a CSV with one row per floe comparison. 
