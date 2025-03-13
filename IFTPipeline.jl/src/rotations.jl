@@ -3,7 +3,35 @@ using TimeZones
 using Dates
 
 """
+  get_rotation_single(
+    input::String,
+    output::String,
+)
 
+Make a CSV of pairwise rotations between floes detected on adjacent days. 
+
+Loads the floes from the `input` CSV file, and uses the columns:
+- `floe` ID
+- `satellite` name
+- `mask` – the binary mask
+- `overpass time` in ISO8601 format (with trailing Z or +00:00), e.g. 2022-09-11T09:21:00+00:00
+- `date` of the overpass in YYYY-MM-DD format
+
+Returns a CSV with one row per floe comparison. 
+In the following, `i=1` means the earlier observation, `i=2` the later.
+
+Columns returned:
+- `ID` of the floe
+- Angle measures `theta_<deg,rad>` – angle between floe image in degrees or radians
+- Time measurements:
+  - `delta_time_sec` – number of seconds between overpass in the two measurements
+  - `omega_<deg,rad>_per_<sec,hour,day>` – mean angular velocity of rotation in degrees or radians per second hour or day.
+- Metadata 
+  - `satellite<i>` – which satellite measurement `i` was from
+  - `date<i>` – which date measurement `i` was taken
+  - `datetime<i>` – which UTC time measurement `i`'s overpass occurred
+- Original data
+  - `mask<i>` – the binary mask used for the measurement
 """
 function get_rotation_single(; input::String, output::String)
     input_df = DataFrame(CSV.File(input))
