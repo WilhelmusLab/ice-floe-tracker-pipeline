@@ -27,7 +27,7 @@ TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 [compat]
 ArgParse = "1.1"
 DataFrames = "1.7.0"
-Dates = "1.11.0"
+Dates = "1.10.9"
 Folds = "0.2"
 HDF5 = "0.16, 0.17"
 IceFloeTracker = "0.6.4"
