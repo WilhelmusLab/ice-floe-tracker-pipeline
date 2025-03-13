@@ -56,11 +56,6 @@ function get_rotation_single(;
     return results_df
 end
 
-function get_rotation_pair(row1::DataFrameRow, row2::DataFrameRow; column=:mask)
-    (_, rot) = IceFloeTracker.mismatch(row1[column], row2[column])
-    return rot
-end
-
 function get_rotation_measurements(
     measurement::DataFrameRow, df::DataFrame; mask_column, time_column
 )
@@ -82,7 +77,7 @@ end
 function get_rotation_measurements(
     row1::DataFrameRow, row2::DataFrameRow; mask_column, time_column
 )
-    theta_deg = get_rotation_pair(row1, row2; column=mask_column)
+    (_, theta_deg) = IceFloeTracker.mismatch(row1[mask_column], row2[mask_column])
     theta_rad = deg2rad(theta_deg)
 
     dt = row2[time_column] - row1[time_column]
