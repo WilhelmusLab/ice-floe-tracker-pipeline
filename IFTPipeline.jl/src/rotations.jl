@@ -8,18 +8,11 @@ function get_rotation_single(; input::String, output::String)
     pass_time_column = :passtime_parsed
     input_df[:, pass_time_column] = ZonedDateTime.(input_df[:, :passtime])
 
-    results = []
-    for row in eachrow(input_df)
-        append!(
-            results,
-            get_rotation_measurements(
-                row,
-                input_df;
-                mask_column=array_mask_column,
-                datetime_column=pass_time_column,
-            ),
-        )
-    end
+    results = [
+        get_rotation_measurements(
+            row, input_df; mask_column=array_mask_column, datetime_column=pass_time_column
+        ) for row in eachrow(input_df)
+    ]
     results_df = DataFrame(results)
     @info results_df
 
