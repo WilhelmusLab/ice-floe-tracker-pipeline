@@ -62,54 +62,60 @@ function get_rotation_pair(row1::DataFrameRow, row2::DataFrameRow; column=:mask)
 end
 
 function get_rotation_measurements(
-    row::DataFrameRow, df::DataFrame; mask_column, time_column
+    measurement::DataFrameRow, df::DataFrame; mask_column, time_column
 )
     filtered_df = subset(
-        df, :ID => ByRow(==(row[:ID])), :date => ByRow(==(row[:date] - Dates.Day(1)))
+        df,
+        :ID => ByRow(==(measurement[:ID])),
+        :date => ByRow(==(measurement[:date] - Dates.Day(1))),
     )
 
-    results = []
-    for comparison_row in eachrow(filtered_df)
-        theta_deg = get_rotation_pair(row, comparison_row; column=mask_column)
-        theta_rad = deg2rad(theta_deg)
-
-        dt = row[time_column] - comparison_row[time_column]
-        dt_sec = dt / Dates.Second(1)
-        dt_hour = dt / Dates.Hour(1)
-        dt_day = dt / Dates.Day(1)
-
-        omega_deg_per_sec = (theta_deg) / (dt_sec)
-        omega_deg_per_hour = (theta_deg) / (dt_hour)
-        omega_deg_per_day = (theta_deg) / (dt_day)
-
-        omega_rad_per_sec = (theta_rad) / (dt_sec)
-        omega_rad_per_hour = (theta_rad) / (dt_hour)
-        omega_rad_per_day = (theta_rad) / (dt_day)
-
-        push!(
-            results,
-            (
-                ID=(row.ID),
-                theta_deg,
-                theta_rad,
-                delta_time_sec=dt_sec,
-                omega_deg_per_sec,
-                omega_deg_per_hour,
-                omega_deg_per_day,
-                omega_rad_per_sec,
-                omega_rad_per_hour,
-                omega_rad_per_day,
-                satellite1=comparison_row.satellite,
-                satellite2=row.satellite,
-                date1=comparison_row.date,
-                date2=row.date,
-                datetime1=comparison_row[time_column],
-                datetime2=row[time_column],
-                mask1=comparison_row[mask_column],
-                mask2=row[mask_column],
-            ),
-        )
-    end
+    results = [
+        get_rotation_measurements(
+            earlier_measurement, measurement; mask_column, time_column
+        ) for earlier_measurement in eachrow(filtered_df)
+    ]
 
     return results
+end
+
+function get_rotation_measurements(
+    row1::DataFrameRow, row2::DataFrameRow; mask_column, time_column
+)
+    theta_deg = get_rotation_pair(row1, row2; column=mask_column)
+    theta_rad = deg2rad(theta_deg)
+
+    dt = row2[time_column] - row1[time_column]
+    dt_sec = dt / Dates.Second(1)
+    dt_hour = dt / Dates.Hour(1)
+    dt_day = dt / Dates.Day(1)
+
+    omega_deg_per_sec = (theta_deg) / (dt_sec)
+    omega_deg_per_hour = (theta_deg) / (dt_hour)
+    omega_deg_per_day = (theta_deg) / (dt_day)
+
+    omega_rad_per_sec = (theta_rad) / (dt_sec)
+    omega_rad_per_hour = (theta_rad) / (dt_hour)
+    omega_rad_per_day = (theta_rad) / (dt_day)
+
+    return (
+        ID=row1.ID,
+        theta_deg,
+        theta_rad,
+        delta_time_sec=dt_sec,
+        omega_deg_per_sec,
+        omega_deg_per_hour,
+        omega_deg_per_day,
+        omega_rad_per_sec,
+        omega_rad_per_hour,
+        omega_rad_per_day,
+        satellite1=row1.satellite,
+        satellite2=row2.satellite,
+        date1=row1.date,
+        date2=row2.date,
+        datetime1=row1[time_column],
+        datetime2=row2[time_column],
+        mask1=row1[mask_column],
+        mask2=row2[mask_column],
+    )
 end
