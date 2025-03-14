@@ -1,4 +1,5 @@
 using Dates
+using LinearAlgebra: dot, det, norm
 
 @testset "rotation" begin
     data_dir = joinpath(@__DIR__, "test_inputs", "rotation")
