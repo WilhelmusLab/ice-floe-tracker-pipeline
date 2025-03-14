@@ -749,7 +749,7 @@ using LinearAlgebra: dot, det, norm
                     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
                 ],
             )
-            test_mask_dictionary(masks; target_fraction_ok=0.7)
+            test_mask_dictionary(masks)
         end
         @testset "unambiguous joined rectangles" begin
             masks = Dict(
@@ -1204,7 +1204,7 @@ using LinearAlgebra: dot, det, norm
                     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
                 ],
             )
-            test_mask_dictionary(masks; target_fraction_ok=0.5)
+            test_mask_dictionary(masks)
         end
         @testset "larger images" begin
             masks = Dict(
@@ -2059,7 +2059,7 @@ using LinearAlgebra: dot, det, norm
                     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
                 ],
             )
-            test_mask_dictionary(masks; target_fraction_ok=0.78)
+            test_mask_dictionary(masks)
         end
     end
 end
