@@ -139,7 +139,7 @@ function makeh5files(;
 end
 
 function makeh5files_single(;
-    passtime::DateTime,
+    passtime::ZonedDateTime,
     iftversion::Union{String,Nothing}=nothing,
     truecolor::String,
     falsecolor::String,
@@ -148,7 +148,7 @@ function makeh5files_single(;
     output::String,
 )
     latlondata = getlatlon(truecolor)
-    ptsunix = Int64(Dates.datetime2unix(passtime))
+    ptsunix = Int64(Dates.datetime2unix(DateTime(passtime)))
     labeled_ = load_labeled_img(labeled)
 
     if isnothing(iftversion)

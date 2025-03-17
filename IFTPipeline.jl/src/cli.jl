@@ -4,6 +4,7 @@ using ArgParse
 using IceFloeTracker
 using IFTPipeline
 using Serialization
+using TimeZones
 
 function mkclipreprocess!(settings)
     @add_arg_table! settings["preprocess"] begin
@@ -318,7 +319,7 @@ function mkclimakeh5_single!(settings)
         "--passtime"
         help = "Satellite pass time"
         required = true
-        arg_type = DateTime
+        arg_type = ZonedDateTime
 
         "--truecolor"
         help = "Path to truecolor image"
