@@ -499,7 +499,7 @@ function mkclitrack_single!(settings)
         help = "Path to object with satellite pass times"
         required = true
         nargs = '+'
-        arg_type = DateTime
+        arg_type = ZonedDateTime
 
         "--latlon"
         help = "Path to geotiff image with latitude/longitude data"

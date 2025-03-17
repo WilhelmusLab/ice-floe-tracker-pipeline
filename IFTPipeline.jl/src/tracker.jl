@@ -42,7 +42,7 @@ end
     track_single(
         imgs::Array{String},
         props::Array{String},
-        passtimes::Array{DateTime},
+        passtimes::Array{ZonedDateTime},
         latlon::String,
         output::String,
         ...
@@ -65,7 +65,7 @@ Following are the default set of thresholds `condition_thresholds` used for floe
 function track_single(;
     imgs::Array{String},
     props::Array{String},
-    passtimes::Array{DateTime},
+    passtimes::Array{ZonedDateTime},
     latlon::String,
     output::String,
     dist::Array{Int}=[15, 30, 120],
