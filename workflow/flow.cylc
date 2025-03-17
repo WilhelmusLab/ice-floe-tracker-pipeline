@@ -308,7 +308,7 @@
         # Package intermediate and final outputs into HDF5 files
         script = """
         ${IFT} makeh5files_single \
-            --passtime "$(cat ${overpass_time_file} | tr -d 'Z\n\r')" \
+            --passtime "$(cat ${overpass_time_file} | tr -d '\n\r')" \
             --truecolor ${truecolor_file} \
             --falsecolor ${falsecolor_file} \
             --labeled ${labeled_file} \
@@ -330,7 +330,7 @@
                 --imgs ${images[@]} \
                 --props ${props[@]} \
                 --latlon ${landmasks[0]} \
-                --passtimes $(cat ${passtimes[@]} | tr 'Z\n\r' ' ') \
+                --passtimes $(cat ${passtimes[@]} | tr '\n\r' ' ') \
                 --output ${tracked_floes_file} \
                 --dist {{ TRACK_DIST | join(" ") }} \
                 --dt-thresh {{ TRACK_DT_THRESH | join(" ") }} \
