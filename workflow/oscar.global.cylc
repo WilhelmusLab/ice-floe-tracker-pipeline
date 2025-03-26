@@ -2,10 +2,10 @@
     [[localhost]]
         job runner = slurm
         global init-script = """
-            export CYLC_RUN_DIR=/shared/directory/cylc-run
+            export CYLC_RUN_DIR=/alternative/directory/cylc-run
         """
 
 [install]
     [[symlink dirs]]
         [[[localhost]]]
-            run = /shared/directory
+            run = /alternative/directory
