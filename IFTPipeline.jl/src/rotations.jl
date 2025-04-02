@@ -2,6 +2,8 @@ using DataFrames
 using TimeZones
 using Dates
 using CSV
+using IceFloeTracker.Register.RegisterQD: _abs2
+using Interpolations
 
 # Base.tryparse(::Type{ZonedDateTime}, str) = ZonedDateTime
 # default_format(::Type{ZonedDateTime}) = Format("yyyy-mm-dd\\THH:MM:SS.sZ")
@@ -75,9 +77,13 @@ function get_rotation_measurements(
 end
 
 function get_rotation_measurements(
-    row1::DataFrameRow, row2::DataFrameRow; mask_column, time_column
+    row1::DataFrameRow,
+    row2::DataFrameRow;
+    mask_column,
+    time_column,
+    rotation_function=get_rotation_shape_difference,
 )
-    theta_rad = get_rotation(row1[mask_column], row2[mask_column])
+    theta_rad = rotation_function(row1[mask_column], row2[mask_column])
     theta_deg = rad2deg(theta_rad)
 
     dt = row2[time_column] - row1[time_column]
@@ -117,20 +123,138 @@ end
 
 """
 Get the angle in radians to rotate mask1 to mask2.
+`mxrot` is set to a value larger than π radians by default to avoid a singular point at π 
+setting `presmoothed` to true in qd_rigid doesn't help either.
+
+- The results are often off by `mxrot` or `mxrot / 2.`
+- The first step of the algorithm finds the best fit `θ1 ∈ [-mxrot, mxrot]` and the second is in `θ2 ∈ [θ1 - mxrot / 2, θ1 + mxrot / 2]`
+- My guess is that in the cases where it's off, there's something happening at the limits of the rotation region, we're getting a spurious minimum, not due to the function but due to some artefact of the fitting algorithm. 
+- It looks like the issue is with the `ImageTransformation.warp` which is used in the `warp_and_intersect` function – it returns a bunch of nans when rotating at the `mxrot` value.
 """
-function get_rotation(
-    mask1, mask2; mxshift::Tuple{Int64,Int64}=(100, 100), mxrot::Float64=Float64(pi)
+function get_rotation_quaddirect(
+    mask1, mask2; mxshift::Tuple{Int64,Int64}=(100, 100), mxrot=π / 1
 )
+    fixed = IceFloeTracker.centered(mask1)
+    moving = IceFloeTracker.centered(mask2)
     affine_map, _ = IceFloeTracker.Register.RegisterQD.qd_rigid(
-        IceFloeTracker.centered(mask1),
-        IceFloeTracker.centered(mask2),
+        fixed,
+        moving,
         mxshift,
         mxrot;
-        print_interval=typemax(Int),
+        thresh=0.8 * sum(_abs2.(fixed[.!(isnan.(fixed))])),
+        # print_interval=typemax(Int),
     )
     linear_map = affine_map.linear
     cosθ = linear_map[1, 1]
     sinθ = linear_map[2, 1]
     θ = atan(sinθ, cosθ)
     return θ
+end
+
+greaterthan05(x) = x .> 0.5 # used for the image resize step and for binarizing images
+function imrotate_bin(x, r)
+    return greaterthan05(collect(imrotate(x, r, axes(x); method=BSpline(Constant()))))
+end
+function imrotate_bin_nocrop(x, r)
+    return greaterthan05(collect(imrotate(x, r; method=BSpline(Constant()))))
+end
+
+"""Pad images by zeros based on the size of the larger of the two images."""
+function pad_images(im1, im2)
+    max1 = maximum(size(im1))
+    max2 = maximum(size(im2))
+
+    n = Int64(ceil(maximum([max1, max2])))
+    im1_padded = collect(padarray(im1, Fill(0, (n, n), (n, n))))
+    im2_padded = collect(padarray(im2, Fill(0, (n, n), (n, n))))
+    return im1_padded, im2_padded
+end
+
+"""
+Align images by selecting and cropping so that r1, c1 and r2, c2 are the center.
+These values are expected to be the (integer) centroid of the image. These images should
+be already padded so that there is no danger of cutting into the floe shape.
+"""
+function crop_to_shared_centroid(im1, im2, r1, r2, c1, c2)
+    # if r1 == r2 && c1 == c2
+    #     return im1, im2
+    # end
+
+    n1, m1 = size(im1)
+    n2, m2 = size(im2)
+    new_halfn = minimum([minimum([r1, n1 - r1]), minimum([r2, n2 - r2])])
+    new_halfm = minimum([minimum([c1, m1 - c1]), minimum([c2, m2 - c2])])
+
+    # check notation: how does julia interpret start and end of array index?
+    im1_cropped = im1[
+        (1 + r1 - new_halfn):(r1 + new_halfn), (1 + c1 - new_halfm):(c1 + new_halfm)
+    ]
+    im2_cropped = im2[
+        (1 + r2 - new_halfn):(r2 + new_halfn), (1 + c2 - new_halfm):(c2 + new_halfm)
+    ]
+
+    # check new sizes: what happens if the new halfm is too big?
+
+    return im1_cropped, im2_cropped
+end
+
+"""
+Computes the shape difference between im_reference and im_target for each angle (degrees) in test_angles.
+The reference image is held constant, while the target image is rotated. The test_angles are interpreted
+as the angle of rotation from target to reference, so to find the best match, we rotate the reverse
+direction. A perfect match at angle A would imply im_target is the same shape as if im_reference was
+rotated by A degrees.
+"""
+function shape_difference_rotation(im_reference, im_target, test_angles)
+    shape_differences = Array{
+        NamedTuple{(:angle, :shape_difference),Tuple{Float64,Float64}}
+    }(
+        undef, length(test_angles)
+    )
+    # shape_differences = zeros((length(test_angles), 2))
+    init_props = regionprops_table(label_components(im_reference))[1, :] # assumption only one object in image!
+    idx = 1
+    for angle in test_angles
+        # shape_differences[idx, 1] = angle
+        # the angle is negated twice:
+        # - We want to find the angle by which the second image is rotated _back_ to match the first image
+        # - `imrotate` uses clockwise rotations, whereas we're interested in anti-clockwise
+        im_rotated = imrotate_bin(im_target, -(-angle))
+        rotated_props = regionprops_table(label_components(im_rotated))[1, :]
+        im1, im2 = crop_to_shared_centroid(
+            im_reference,
+            im_rotated,
+            init_props.row_centroid,
+            rotated_props.row_centroid,
+            init_props.col_centroid,
+            rotated_props.col_centroid,
+        )
+        # Check here that im1 and im2 sizes are the same
+        # Could also add check that the images are nonempty
+        # These checks could go inside the crop_to_shared_ccentroid function
+        if isequal.(prod(size(im1)), prod(size(im2)))
+            a_not_b = im1 .> 0 .&& isequal.(im2, 0)
+            b_not_a = im2 .> 0 .&& isequal.(im1, 0)
+            shape_difference = sum(a_not_b .|| b_not_a)
+            shape_differences[idx] = (; angle, shape_difference)
+            # display(angle), display(im1), display(im2), display(a_not_b), display(b_not_a)
+        else
+            print("Warning: shapes not equal\n")
+            print(angle, size(im1), size(im2), "\n")
+            # return im1, im2
+            shape_differences[idx] = (; angle, shape_difference=NaN)
+        end
+        idx += 1
+    end
+    return shape_differences
+end
+
+function get_rotation_shape_difference(
+    mask1,
+    mask2;
+    test_angles=sort(reverse(range(; start=-π, stop=π, step=π / 36)[1:(end - 1)]); by=abs),
+)
+    shape_differences = shape_difference_rotation(mask1, mask2, test_angles)
+    best_match = argmin((x) -> x.shape_difference, shape_differences)
+    return best_match.angle
 end
