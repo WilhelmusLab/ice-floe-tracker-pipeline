@@ -81,7 +81,7 @@ The `index` group contains the spatial coordinates in the source image coordinat
 function makeh5files(;
     pathtosampleimg::String, resdir::String, iftversion=IceFloeTracker.IFTVERSION
 )
-    latlondata = getlatlon(pathtosampleimg)
+    latlondata = latlon(pathtosampleimg)
 
     ptpath = joinpath(resdir, "passtimes.jls")
     passtimes = deserialize(ptpath)
@@ -110,14 +110,14 @@ function makeh5files(;
             attrs(file)["fname_falsecolor"] = falsecolor_refs[i]
             attrs(file)["fname_truecolor"] = truecolor_refs[i]
             attrs(file)["iftversion"] = string(iftversion)
-            attrs(file)["crs"] = latlondata["crs"]
+            attrs(file)["crs"] = latlondata[:crs]
             attrs(file)["reference"] = "https://doi.org/10.1016/j.rse.2019.111406"
             attrs(file)["contact"] = "mmwilhelmus@brown.edu"
 
             g = create_group(file, "index")
             g["time"] = ptsunix[i]
-            g["x"] = latlondata["X"]
-            g["y"] = latlondata["Y"]
+            g["x"] = latlondata[:X]
+            g["y"] = latlondata[:Y]
 
             g = create_group(file, "floe_properties")
             g["properties"] = Matrix(props[i])
@@ -147,7 +147,7 @@ function makeh5files_single(;
     props::String,
     output::String,
 )
-    latlondata = getlatlon(truecolor)
+    latlondata = latlon(truecolor)
     ptsunix = Int64(Dates.datetime2unix(DateTime(passtime)))
     labeled_ = load_labeled_img(labeled)
 
@@ -165,14 +165,14 @@ function makeh5files_single(;
         attrs(file)["fname_falsecolor"] = falsecolor
         attrs(file)["fname_truecolor"] = truecolor
         attrs(file)["iftversion"] = iftversion
-        attrs(file)["crs"] = latlondata["crs"]
+        attrs(file)["crs"] = latlondata[:crs]
         attrs(file)["reference"] = "https://doi.org/10.1016/j.rse.2019.111406"
         attrs(file)["contact"] = "mmwilhelmus@brown.edu"
 
         g = create_group(file, "index")
         g["time"] = ptsunix
-        g["x"] = latlondata["X"]
-        g["y"] = latlondata["Y"]
+        g["x"] = latlondata[:X]
+        g["y"] = latlondata[:Y]
 
         g = create_group(file, "floe_properties")
         @info nrow(props_)
