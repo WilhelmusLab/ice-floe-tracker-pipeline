@@ -1,11 +1,12 @@
 using Dates
 using LinearAlgebra: dot, det, norm
+using IFTPipeline: get_rotation_single, get_rotation_shape_difference
 
 @testset "rotation" begin
     data_dir = joinpath(@__DIR__, "test_inputs", "rotation")
     temp_dir = mkpath(joinpath(@__DIR__, "__temp__", "rotation-single"))
     @testset "normal case" begin
-        results = IFTPipeline.get_rotation_single(;
+        results = get_rotation_single(;
             input=joinpath(data_dir, "floes.tracked.normal.csv"),
             output=joinpath(temp_dir, "floes.tracked.normal.rotation.csv"),
         )
@@ -13,7 +14,7 @@ using LinearAlgebra: dot, det, norm
     end
 
     @testset "short case" begin
-        results = IFTPipeline.get_rotation_single(;
+        results = get_rotation_single(;
             input=joinpath(data_dir, "floes.tracked.short.csv"),
             output=joinpath(temp_dir, "floes.tracked.short.rotation.csv"),
         )
@@ -21,7 +22,7 @@ using LinearAlgebra: dot, det, norm
     end
 
     @testset "synthetic case" begin
-        results = IFTPipeline.get_rotation_single(;
+        results = get_rotation_single(;
             input=joinpath(data_dir, "floes.tracked.synthetic.csv"),
             output=joinpath(temp_dir, "floes.tracked.synthetic.rotation.csv"),
         )
@@ -41,7 +42,7 @@ using LinearAlgebra: dot, det, norm
             masks;
             precision_goal_degrees::Float64=10.0,
             target_fraction_ok::Float64=0.99, # TODO: Ideally this would be 1.0
-            rotation_function=IFTPipeline.get_rotation_shape_difference,
+            rotation_function=get_rotation_shape_difference,
             angle_aliases=[0.0],
         )
             results = []
