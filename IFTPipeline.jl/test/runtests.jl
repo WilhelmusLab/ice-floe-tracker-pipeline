@@ -18,7 +18,8 @@ using .IceFloeTracker:
     rename!,
     Dates,
     Not,
-    select!
+    select!,
+    latlon
 using ArgParse: @add_arg_table!, ArgParseSettings, add_arg_group!, parse_args
 using DelimitedFiles
 using Pkg
