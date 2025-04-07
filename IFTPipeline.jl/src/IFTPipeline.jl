@@ -25,7 +25,6 @@ using IceFloeTracker:
     load,
     float64,
     imsharpen,
-    getlatlon,
     pairfloes,
     add_passtimes!,
     addfloemasks!,
@@ -76,8 +75,7 @@ export cache_vector,
     mkcliextract!,
     mkclitrack!,
     mkfilenames,
-    makeh5files,
-    getlatlon
+    makeh5files
 
 export IceFloeTracker
 end

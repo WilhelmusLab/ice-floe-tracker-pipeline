@@ -8,7 +8,7 @@
 
         originalbbox = (latitude=[81, 79], longitude=[-22, -12])
 
-        latlondata = getlatlon(pathtosampleimg)
+        latlondata = latlon(pathtosampleimg)
 
         getcorners(m) = [m[1, 1], m[end, end]]
         latcorners = getcorners(latlondata["latitude"])
