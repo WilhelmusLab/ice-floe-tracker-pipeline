@@ -2,7 +2,6 @@ using DataFrames
 using TimeZones
 using Dates
 using CSV
-using IceFloeTracker.Register.RegisterQD: _abs2
 using Interpolations
 
 # Base.tryparse(::Type{ZonedDateTime}, str) = ZonedDateTime
@@ -119,36 +118,6 @@ function get_rotation_measurements(
         mask1=row1[mask_column],
         mask2=row2[mask_column],
     )
-end
-
-"""
-Get the angle in radians to rotate mask1 to mask2.
-`mxrot` is set to a value larger than π radians by default to avoid a singular point at π 
-setting `presmoothed` to true in qd_rigid doesn't help either.
-
-- The results are often off by `mxrot` or `mxrot / 2.`
-- The first step of the algorithm finds the best fit `θ1 ∈ [-mxrot, mxrot]` and the second is in `θ2 ∈ [θ1 - mxrot / 2, θ1 + mxrot / 2]`
-- My guess is that in the cases where it's off, there's something happening at the limits of the rotation region, we're getting a spurious minimum, not due to the function but due to some artefact of the fitting algorithm. 
-- It looks like the issue is with the `ImageTransformation.warp` which is used in the `warp_and_intersect` function – it returns a bunch of nans when rotating at the `mxrot` value.
-"""
-function get_rotation_quaddirect(
-    mask1, mask2; mxshift::Tuple{Int64,Int64}=(100, 100), mxrot=π / 1
-)
-    fixed = IceFloeTracker.centered(mask1)
-    moving = IceFloeTracker.centered(mask2)
-    affine_map, _ = IceFloeTracker.Register.RegisterQD.qd_rigid(
-        fixed,
-        moving,
-        mxshift,
-        mxrot;
-        thresh=0.8 * sum(_abs2.(fixed[.!(isnan.(fixed))])),
-        # print_interval=typemax(Int),
-    )
-    linear_map = affine_map.linear
-    cosθ = linear_map[1, 1]
-    sinθ = linear_map[2, 1]
-    θ = atan(sinθ, cosθ)
-    return θ
 end
 
 greaterthan05(x) = x .> 0.5 # used for the image resize step and for binarizing images
