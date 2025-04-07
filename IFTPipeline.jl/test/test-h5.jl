@@ -1,3 +1,5 @@
+using TimeZones: ZonedDateTime
+
 @testset "hdf5 export" begin
     @testset "normal case" begin
         testlisteq = (a, b) -> @test Set(a) == Set(b)
@@ -111,7 +113,7 @@
     @testset "empty props" begin
         example_data_dir = joinpath(test_data_dir, "cloudy")
         IFTPipeline.makeh5files_single(;
-            passtime=Dates.DateTime("2006-05-13T14:55:34"),
+            passtime=ZonedDateTime("2006-05-13T14:55:34Z"),
             truecolor=joinpath(example_data_dir, "truecolor.tiff"),
             falsecolor=joinpath(example_data_dir, "falsecolor.tiff"),
             labeled=joinpath(example_data_dir, "labeled.tiff"),
