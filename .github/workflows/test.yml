@@ -32,7 +32,10 @@ jobs:
       
       - name: Check registry
         if: always()
-        run: tar -zxvf ~/.julia/registries/General.tar.gz P/PyCall/{Compat,Deps,Package,Versions}.toml && cat P/PyCall/*
+        run: |
+          tar -zxvf ~/.julia/registries/General.tar.gz Registry.toml && cat Registry.toml | grep PyCall
+          tar -zxvf ~/.julia/registries/General.tar.gz P/PyCall/{Compat,Deps,Package,Versions}.toml && cat P/PyCall/*
+
       - uses: julia-actions/julia-buildpkg@v1
         with:
           project: IFTPipeline.jl
