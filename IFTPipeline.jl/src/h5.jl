@@ -81,7 +81,7 @@ The `index` group contains the spatial coordinates in the source image coordinat
 function makeh5files(;
     pathtosampleimg::String, resdir::String, iftversion=IceFloeTracker.IFTVERSION
 )
-    latlondata = getlatlon(pathtosampleimg)
+    latlondata = latlon(pathtosampleimg)
 
     ptpath = joinpath(resdir, "passtimes.jls")
     passtimes = deserialize(ptpath)
@@ -147,7 +147,7 @@ function makeh5files_single(;
     props::String,
     output::String,
 )
-    latlondata = getlatlon(truecolor)
+    latlondata = latlon(truecolor)
     ptsunix = Int64(Dates.datetime2unix(DateTime(passtime)))
     labeled_ = load_labeled_img(labeled)
 
