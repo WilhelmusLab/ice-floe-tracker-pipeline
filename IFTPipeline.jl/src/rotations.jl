@@ -159,7 +159,10 @@ function imrotate_bin_nocrop(x, r)
     return greaterthan05(collect(imrotate(x, r; method=BSpline(Constant()))))
 end
 
-"""Pad images by zeros based on the size of the larger of the two images."""
+# Functions used for the SD minimization
+"""
+Pad images by zeros based on the size of the larger of the two images.
+"""
 function pad_images(im1, im2)
     max1 = maximum(size(im1))
     max2 = maximum(size(im2))
@@ -171,14 +174,39 @@ function pad_images(im1, im2)
 end
 
 """
-Align images by selecting and cropping so that r1, c1 and r2, c2 are the center.
-These values are expected to be the (integer) centroid of the image. These images should
-be already padded so that there is no danger of cutting into the floe shape.
+Calculate the centroid of a binary image. If 'rounded', return the
+nearest integer.
 """
-function crop_to_shared_centroid(im1, im2, r1, r2, c1, c2)
-    # if r1 == r2 && c1 == c2
-    #     return im1, im2
-    # end
+function compute_centroid(im; rounded=false)
+    xi = 0
+    yi = 0
+    R = sum(im .> 0)
+    n, m = size(im)
+    for ii in range(1, n)
+        for jj in range(1, m)
+            if im[ii, jj] > 0
+                xi += ii
+                yi += jj
+            end
+        end
+    end
+
+    x0, y0 = sum(xi) / R, sum(yi) / R
+    if rounded
+        return round(Int32, x0), round(Int32, y0)
+    else
+        return x0, y0
+    end
+end
+
+"""
+Align images by selecting and cropping so that r1, c1 and r2, c2 are the center.
+These values are expected to be the (integer) centroid of the image. These images
+should already be padded so that there is no danger of cutting into the floe shape.
+"""
+function crop_to_shared_centroid(im1, im2)
+    r1, c1 = compute_centroid(im1; rounded=true)
+    r2, c2 = compute_centroid(im2; rounded=true)
 
     n1, m1 = size(im1)
     n2, m2 = size(im2)
@@ -193,8 +221,6 @@ function crop_to_shared_centroid(im1, im2, r1, r2, c1, c2)
         (1 + r2 - new_halfn):(r2 + new_halfn), (1 + c2 - new_halfm):(c2 + new_halfm)
     ]
 
-    # check new sizes: what happens if the new halfm is too big?
-
     return im1_cropped, im2_cropped
 end
 
@@ -206,6 +232,7 @@ direction. A perfect match at angle A would imply im_target is the same shape as
 rotated by A degrees.
 """
 function shape_difference_rotation(im_reference, im_target, test_angles)
+    imref_padded, imtarget_padded = pad_images(im_reference, im_target)
     shape_differences = Array{
         NamedTuple{(:angle, :shape_difference),Tuple{Float64,Float64}}
     }(
@@ -214,21 +241,13 @@ function shape_difference_rotation(im_reference, im_target, test_angles)
     # shape_differences = zeros((length(test_angles), 2))
     init_props = regionprops_table(label_components(im_reference))[1, :] # assumption only one object in image!
     idx = 1
+    # r_init, c_init = compute_centroid(imref_padded, rounded=true)
     for angle in test_angles
-        # shape_differences[idx, 1] = angle
-        # the angle is negated twice:
-        # - We want to find the angle by which the second image is rotated _back_ to match the first image
-        # - `imrotate` uses clockwise rotations, whereas we're interested in anti-clockwise
-        im_rotated = imrotate_bin(im_target, -(-angle))
-        rotated_props = regionprops_table(label_components(im_rotated))[1, :]
-        im1, im2 = crop_to_shared_centroid(
-            im_reference,
-            im_rotated,
-            init_props.row_centroid,
-            rotated_props.row_centroid,
-            init_props.col_centroid,
-            rotated_props.col_centroid,
-        )
+        # try rotating image back by angle
+        imtarget_rotated = imrotate_bin(imtarget_padded, -(-angle))
+
+        im1, im2 = crop_to_shared_centroid(imref_padded, imtarget_rotated)
+
         # Check here that im1 and im2 sizes are the same
         # Could also add check that the images are nonempty
         # These checks could go inside the crop_to_shared_ccentroid function
@@ -237,11 +256,9 @@ function shape_difference_rotation(im_reference, im_target, test_angles)
             b_not_a = im2 .> 0 .&& isequal.(im1, 0)
             shape_difference = sum(a_not_b .|| b_not_a)
             shape_differences[idx] = (; angle, shape_difference)
-            # display(angle), display(im1), display(im2), display(a_not_b), display(b_not_a)
         else
-            print("Warning: shapes not equal\n")
-            print(angle, size(im1), size(im2), "\n")
-            # return im1, im2
+            @warn("Warning: shapes not equal\n")
+            @warn(angle, size(im1), size(im2), "\n")
             shape_differences[idx] = (; angle, shape_difference=NaN)
         end
         idx += 1
