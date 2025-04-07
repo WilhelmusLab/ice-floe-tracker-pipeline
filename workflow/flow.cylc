@@ -6,7 +6,7 @@
 [scheduling]
     initial cycle point = {{ START }}
     final cycle point = {{ END }}
-    runahead limit = P0
+    runahead limit = P1
     [[graph]]
         R1 = """
             INIT
@@ -26,13 +26,13 @@
 
     [[queues]]
         [[[fetchdata]]]
-            limit = 4
+            limit = 1
             # Limit to 4 instances hitting the API at once. 
             # Values higher than this might lead to throttling.
             members = LOAD_IMAGE
         
         [[[preprocess]]]
-            limit = 2
+            limit = 1
             # Limit to 2 instances only due to memory constraints. 
             # Can be removed on a system with more memory or a scheduler.
             members = PREPROCESS
@@ -159,7 +159,7 @@
             labeled_props_file = ${img_prefix}labeled.props.csv
             overpass_time_file = ${img_prefix}overpass.txt
             hdf5_archive_file = ${img_prefix}results.h5
-            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite} "
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite} --cache-directory /project/ebseg/http_cache/"
     
     [[get_single_overpass_time<satellite>]]
         inherit = <satellite>
