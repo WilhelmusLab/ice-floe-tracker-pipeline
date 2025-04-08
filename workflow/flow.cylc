@@ -6,7 +6,7 @@
 [scheduling]
     initial cycle point = {{ START }}
     final cycle point = {{ END }}
-    runahead limit = P1
+    runahead limit = P0
     [[graph]]
         R1 = """
             INIT
@@ -26,13 +26,13 @@
 
     [[queues]]
         [[[fetchdata]]]
-            limit = 1
+            limit = 4
             # Limit to 4 instances hitting the API at once. 
             # Values higher than this might lead to throttling.
             members = LOAD_IMAGE
         
         [[[preprocess]]]
-            limit = 1
+            limit = 2
             # Limit to 2 instances only due to memory constraints. 
             # Can be removed on a system with more memory or a scheduler.
             members = PREPROCESS
