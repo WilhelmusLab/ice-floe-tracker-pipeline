@@ -367,5 +367,6 @@
             --on-is-utc
         ${IFT} get_rotation_single \
             -i ${tracked_floes_with_satellites} \
-            -o ${rotation_tracked_floes_file}
+            -o ${rotation_tracked_floes_file} \
+            -c "satellite"
         """
