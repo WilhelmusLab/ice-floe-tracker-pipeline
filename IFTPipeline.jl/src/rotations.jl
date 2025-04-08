@@ -39,7 +39,7 @@ function get_rotation_single(;
     input_df = DataFrame(CSV.File(input))
 
     input_df[!, mask_column] = eval.(Meta.parse.(input_df[:, mask_column]))
-    input_df[!, time_column] = ZonedDateTime.(input_df[:, time_column])
+    input_df[!, time_column] = ZonedDateTime.(String.(input_df[:, time_column]))
 
     results = []
     for row in eachrow(input_df)
