@@ -3,6 +3,7 @@ using TimeZones
 using Dates
 using CSV
 using Interpolations
+using OrderedCollections
 
 # Base.tryparse(::Type{ZonedDateTime}, str) = ZonedDateTime
 # default_format(::Type{ZonedDateTime}) = Format("yyyy-mm-dd\\THH:MM:SS.sZ")
@@ -15,7 +16,7 @@ Loads the floes from the `input` CSV file, and uses the columns:
 - `satellite` name
 - `mask` – the binary mask (choose a column using argument `mask_column`)
 - `passtime` in ISO8601 format (with trailing Z or +00:00), e.g. 2022-09-11T09:21:00+00:00  (choose a column using argument `time_column`)
-- `date` of the overpass in YYYY-MM-DD format
+
 
 Returns a CSV with one row per floe comparison. 
 In the following, `i=1` means the earlier observation, `i=2` the later.
@@ -24,29 +25,31 @@ Columns returned:
 - `ID` of the floe
 - Angle measures `theta_<deg,rad>` – angle between floe image in degrees or radians
 - Time measurements:
+  - `passtime<i>` – which UTC time measurement `i`'s overpass occurred
   - `delta_time_sec` – number of seconds between overpass in the two measurements
   - `omega_<deg,rad>_per_<sec,hour,day>` – mean angular velocity of rotation in degrees or radians per second hour or day.
-- Metadata 
-  - `satellite<i>` – which satellite measurement `i` was from
-  - `date<i>` – which date measurement `i` was taken
-  - `datetime<i>` – which UTC time measurement `i`'s overpass occurred
-- Original data
-  - `mask<i>` – the binary mask used for the measurement
+- Any columns listed in `additional_columns` will also be included like `<name><i>` in the output
+  - `mask<i>` – the binary mask used for the measurement is always last.
 """
 function get_rotation_single(;
-    input::String, output::String, mask_column=:mask, time_column=:passtime
+    input::String,
+    output::String,
+    mask_column=:mask,
+    time_column=:passtime,
+    additional_columns=[],
 )
     input_df = DataFrame(CSV.File(input))
 
     input_df[!, mask_column] = eval.(Meta.parse.(input_df[:, mask_column]))
     input_df[!, time_column] = ZonedDateTime.(String.(input_df[:, time_column]))
+    input_df[!, :_date] = Date.(input_df[:, time_column])
 
     results = []
     for row in eachrow(input_df)
         append!( # adds the 0 – n measurements from `get_rotation_measurements` to the results array
             results,
             get_rotation_measurements(
-                row, input_df; mask_column=mask_column, time_column=time_column
+                row, input_df; mask_column, time_column, additional_columns
             ),
         )
     end
@@ -58,17 +61,17 @@ function get_rotation_single(;
 end
 
 function get_rotation_measurements(
-    measurement::DataFrameRow, df::DataFrame; mask_column, time_column
+    measurement::DataFrameRow, df::DataFrame; mask_column, time_column, additional_columns
 )
     filtered_df = subset(
         df,
         :ID => ByRow(==(measurement[:ID])),
-        :date => ByRow(==(measurement[:date] - Dates.Day(1))),
+        :_date => ByRow(==(measurement[:_date] - Dates.Day(1))),
     )
 
     results = [
         get_rotation_measurements(
-            earlier_measurement, measurement; mask_column, time_column
+            earlier_measurement, measurement; mask_column, time_column, additional_columns
         ) for earlier_measurement in eachrow(filtered_df)
     ]
 
@@ -81,6 +84,7 @@ function get_rotation_measurements(
     mask_column,
     time_column,
     rotation_function=get_rotation_shape_difference,
+    additional_columns=[],
 )
     theta_rad = rotation_function(row1[mask_column], row2[mask_column])
     theta_deg = rad2deg(theta_rad)
@@ -98,26 +102,27 @@ function get_rotation_measurements(
     omega_rad_per_hour = (theta_rad) / (dt_hour)
     omega_rad_per_day = (theta_rad) / (dt_day)
 
-    return (
-        ID=row1.ID,
-        theta_deg,
-        theta_rad,
-        delta_time_sec=dt_sec,
-        omega_deg_per_sec,
-        omega_deg_per_hour,
-        omega_deg_per_day,
-        omega_rad_per_sec,
-        omega_rad_per_hour,
-        omega_rad_per_day,
-        satellite1=row1.satellite,
-        satellite2=row2.satellite,
-        date1=row1.date,
-        date2=row2.date,
-        datetime1=row1[time_column],
-        datetime2=row2[time_column],
-        mask1=row1[mask_column],
-        mask2=row2[mask_column],
-    )
+    result = OrderedDict([
+        "ID" => row1.ID,
+        "theta_deg" => theta_deg,
+        "theta_rad" => theta_rad,
+        String(time_column) * "1" => row1[time_column],
+        String(time_column) * "2" => row2[time_column],
+        "delta_time_sec" => dt_sec,
+        "omega_deg_per_sec" => omega_deg_per_sec,
+        "omega_deg_per_hour" => omega_deg_per_hour,
+        "omega_deg_per_day" => omega_deg_per_day,
+        "omega_rad_per_sec" => omega_rad_per_sec,
+        "omega_rad_per_hour" => omega_rad_per_hour,
+        "omega_rad_per_day" => omega_rad_per_day,
+    ])
+
+    for colname in hcat(additional_columns, [mask_column])
+        result[String(colname) * "1"] = row1[colname]
+        result[String(colname) * "2"] = row2[colname]
+    end
+
+    return result
 end
 
 greaterthan05(x) = x .> 0.5 # used for the image resize step and for binarizing images
