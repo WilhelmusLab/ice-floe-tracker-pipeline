@@ -117,7 +117,7 @@ function get_rotation_measurements(
         "omega_rad_per_day" => omega_rad_per_day,
     ])
 
-    for colname in hcat(additional_columns, [mask_column])
+    for colname in vcat(additional_columns, [mask_column])
         result[String(colname) * "1"] = row1[colname]
         result[String(colname) * "2"] = row2[colname]
     end
