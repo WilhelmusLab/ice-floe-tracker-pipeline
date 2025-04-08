@@ -159,7 +159,7 @@
             labeled_props_file = ${img_prefix}labeled.props.csv
             overpass_time_file = ${img_prefix}overpass.txt
             hdf5_archive_file = ${img_prefix}results.h5
-            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite} --cache-directory /project/ebseg/http_cache/"
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite}"
     
     [[get_single_overpass_time<satellite>]]
         inherit = <satellite>
