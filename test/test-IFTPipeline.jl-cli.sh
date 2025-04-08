@@ -185,6 +185,11 @@ track () {
         --latlon "${DATA_ROOT_SUBDIRS[1]/%/truecolor.tiff}" \
         --passtimes $(cat ${DATA_ROOT_SUBDIRS[@]/%/overpass.txt} | tr '\n' ' ') \
         --output ${DATA_ROOT}/paired.csv
+
+    ${IFT} get_rotation_single \
+        -i ${DATA_ROOT}/paired.csv \
+        -o ${DATA_ROOT}/paired.rotation.csv
+
 }
 
 
