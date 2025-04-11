@@ -1,5 +1,3 @@
-using Dates
-using LinearAlgebra: dot, det, norm
 using IFTPipeline: measure_rotation, get_rotation_shape_difference
 
 @testset "rotation" begin
