@@ -655,12 +655,6 @@ function mkcli_measure_rotation!(settings)
         "--output", "-o"
         help = "Tracked floes CSV file with rotations calculated"
         required = true
-
-        "--additional-columns", "-c"
-        help = """Additional columns to include in the output"""
-        nargs = '+'
-        arg_type = String
-        default = []
     end
     return nothing
 end
