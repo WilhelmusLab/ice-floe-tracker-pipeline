@@ -8,11 +8,11 @@
 
         originalbbox = (latitude=[81, 79], longitude=[-22, -12])
 
-        latlondata = getlatlon(pathtosampleimg)
+        latlondata = latlon(pathtosampleimg)
 
         getcorners(m) = [m[1, 1], m[end, end]]
-        latcorners = getcorners(latlondata["latitude"])
-        loncorners = getcorners(latlondata["longitude"])
+        latcorners = getcorners(latlondata[:latitude])
+        loncorners = getcorners(latlondata[:longitude])
 
         ptpath = joinpath(resdir, "passtimes.jls")
         passtimes = deserialize(ptpath)
@@ -48,7 +48,7 @@
             @test attrs(fid)["iftversion"] == string(IceFloeTracker.IFTVERSION)
             @test attrs(fid)["fname_falsecolor"] == falsecolor_refs[1]
             @test attrs(fid)["fname_truecolor"] == truecolor_refs[1]
-            @test attrs(fid)["crs"] == latlondata["crs"]
+            @test attrs(fid)["crs"] == latlondata[:crs]
 
             # groups
             testlisteq(keys(fid), ["floe_properties", "index"])
@@ -66,8 +66,8 @@
             y = read(g["y"])
 
             @test t == ptsunix[1]
-            @test x == latlondata["X"]
-            @test y == latlondata["Y"]
+            @test x == latlondata[:X]
+            @test y == latlondata[:Y]
 
             # check floe_properties group datasets
             g = fid["floe_properties"]
