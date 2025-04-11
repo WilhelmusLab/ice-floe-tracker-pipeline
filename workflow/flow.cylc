@@ -365,7 +365,7 @@
             ${all_overpass_time_file} "overpass time" \
             ${tracked_floes_with_satellites} \
             --on-is-utc
-        ${IFT} get_rotation_single \
+        ${IFT} measure_rotation \
             -i ${tracked_floes_with_satellites} \
             -o ${rotation_tracked_floes_file} \
             -c "satellite"

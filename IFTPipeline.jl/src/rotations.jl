@@ -5,9 +5,6 @@ using CSV
 using Interpolations
 using OrderedCollections
 
-# Base.tryparse(::Type{ZonedDateTime}, str) = ZonedDateTime
-# default_format(::Type{ZonedDateTime}) = Format("yyyy-mm-dd\\THH:MM:SS.sZ")
-
 """
 Make a CSV of pairwise rotations between floes detected on adjacent days. 
 
@@ -31,7 +28,7 @@ Columns returned:
 - Any columns listed in `additional_columns` will also be included like `<name><i>` in the output
   - `mask<i>` – the binary mask used for the measurement is always last.
 """
-function get_rotation_single(;
+function measure_rotation(;
     input::String, output::String, id_column=:ID, image_column=:mask, time_column=:passtime
 )
     input_df = DataFrame(CSV.File(input))

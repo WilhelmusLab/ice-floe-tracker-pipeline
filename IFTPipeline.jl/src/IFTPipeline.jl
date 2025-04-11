@@ -77,7 +77,7 @@ export cache_vector,
     mkclitrack!,
     mkfilenames,
     makeh5files,
-    get_rotation_single
+    measure_rotation
 
 export IceFloeTracker
 end

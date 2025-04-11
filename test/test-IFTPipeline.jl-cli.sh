@@ -186,7 +186,7 @@ track () {
         --passtimes $(cat ${DATA_ROOT_SUBDIRS[@]/%/overpass.txt} | tr '\n' ' ') \
         --output ${DATA_ROOT}/paired.csv
 
-    ${IFT} get_rotation_single \
+    ${IFT} measure_rotation \
         -i ${DATA_ROOT}/paired.csv \
         -o ${DATA_ROOT}/paired.rotation.csv
 
