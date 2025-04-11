@@ -28,6 +28,6 @@ using IFTPipeline: measure_rotation
         @test nrow(results) == 6
         @test results[1, :theta_deg] == 0
         @test results[2, :theta_deg] == 0
-        @test -47 < results[6, :theta_deg] < -43  # should be -45º
+        @test 43 < results[6, :theta_deg] < 47  # should be 45º (clockwise)
     end
 end
