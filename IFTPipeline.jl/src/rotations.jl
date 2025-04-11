@@ -1,9 +1,6 @@
 using DataFrames
 using TimeZones
-using Dates
 using CSV
-using Interpolations
-using OrderedCollections
 
 """
 Make a CSV of pairwise rotations between floes detected on adjacent days. 
