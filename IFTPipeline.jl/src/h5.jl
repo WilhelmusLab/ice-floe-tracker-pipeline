@@ -139,7 +139,7 @@ function makeh5files(;
 end
 
 function makeh5files_single(;
-    passtime::DateTime,
+    passtime::ZonedDateTime,
     iftversion::Union{String,Nothing}=nothing,
     truecolor::String,
     falsecolor::String,

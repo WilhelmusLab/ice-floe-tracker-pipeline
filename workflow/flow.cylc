@@ -22,7 +22,7 @@
             
             done[-P1D] => done
         """
-        R1/P0Y = done => tracking 
+        R1/P0Y = done => tracking => get_rotation
 
     [[queues]]
         [[[fetchdata]]]
@@ -50,6 +50,8 @@
             date=$(isodatetime "$CYLC_TASK_CYCLE_POINT" --print-format CCYY-MM-DD)
             date_without_dashes=${date//-/}
             all_overpass_time_file="overpass-times.csv"
+            tracked_floes_file="floes.tracked.csv"
+            rotation_tracked_floes_file="floes.tracked.rotation.csv"
             
             {% if IFT_INSTALL == "Inject" %}
                 IFT={{ IFT_COMMAND }}
@@ -85,6 +87,14 @@
                 {{ raise('COLORIZE_INSTALL not recognized.') }}
             {% endif %}
 
+            {% if CSVJOIN_INSTALL == "Inject" %}
+                CSVJOIN = {{ CSVJOIN_COMMAND }}
+            {% elif CSVJOIN_INSTALL == "Source" %}
+                CSVJOIN = "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@{{ CSVJOIN_VERSION }}#subdirectory=csvjoin csvjoin"
+            {% else %}
+                {{ raise('CSVJOIN_INSTALL not recognized.') }}
+            {% endif %}
+
             JULIA_DEBUG={{ JULIA_DEBUG }}
 
     [[done]]
@@ -105,6 +115,11 @@
         inherit = INIT
         script = """
             ${COLORIZE} --help
+        """
+    [[init_csvjoin]]
+        inherit = INIT
+        script = """
+            ${CSVJOIN} --help
         """
     [[init_iftp]]
         inherit = INIT
@@ -144,7 +159,7 @@
             labeled_props_file = ${img_prefix}labeled.props.csv
             overpass_time_file = ${img_prefix}overpass.txt
             hdf5_archive_file = ${img_prefix}results.h5
-            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite} "
+            fsdprocargs="--crs {{ CRS }} --bbox {{ BBOX }} --scale {{ SCALE }} --datetime ${date} --satellite ${satellite}"
     
     [[get_single_overpass_time<satellite>]]
         inherit = <satellite>
@@ -293,7 +308,7 @@
         # Package intermediate and final outputs into HDF5 files
         script = """
         ${IFT} makeh5files_single \
-            --passtime "$(cat ${overpass_time_file} | tr -d 'Z\n\r')" \
+            --passtime "$(cat ${overpass_time_file} | tr -d '\n\r')" \
             --truecolor ${truecolor_file} \
             --falsecolor ${falsecolor_file} \
             --labeled ${labeled_file} \
@@ -315,8 +330,8 @@
                 --imgs ${images[@]} \
                 --props ${props[@]} \
                 --latlon ${landmasks[0]} \
-                --passtimes $(cat ${passtimes[@]} | tr 'Z\n\r' ' ') \
-                --output floes.tracked.csv \
+                --passtimes $(cat ${passtimes[@]} | tr '\n\r' ' ') \
+                --output ${tracked_floes_file} \
                 --dist {{ TRACK_DIST | join(" ") }} \
                 --dt-thresh {{ TRACK_DT_THRESH | join(" ") }} \
                 --Sminimumarea {{ TRACK_SMINIMUMAREA }} \
@@ -341,3 +356,16 @@
         """
         [[[directives]]]
             --mem = 64G
+
+    [[get_rotation]]
+        script = """
+        tracked_floes_with_satellites=${tracked_floes_file/.csv/.satellite.csv}
+        ${CSVJOIN} \
+            ${tracked_floes_file} "passtime" \
+            ${all_overpass_time_file} "overpass time" \
+            ${tracked_floes_with_satellites} \
+            --on-is-utc
+        ${IFT} measure_rotation \
+            -i ${tracked_floes_with_satellites} \
+            -o ${rotation_tracked_floes_file}
+        """

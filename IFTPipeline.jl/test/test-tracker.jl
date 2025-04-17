@@ -1,11 +1,14 @@
 using Dates
+using TimeZones
 
 @testset "tracker" begin
     function run_tracker(;
         props_directory_name="floes-gte-350-px",
         data_dir=joinpath(@__DIR__, "test_inputs", "tracker-single"),
         temp_dir=mkpath(joinpath(@__DIR__, "__temp__", "tracker-single")),
-        passtimes=[Dates.DateTime("2000-01-01T00:00:00") + Dates.Day(i) for i in 1:6],
+        passtimes=[
+            TimeZones.ZonedDateTime("2000-01-01T00:00:00Z") + Dates.Day(i) for i in 1:6
+        ],
     )
         imgs = [joinpath(data_dir, "images", "labeled-$(i).tiff") for i in 0:5]
         latlon = imgs[1]
