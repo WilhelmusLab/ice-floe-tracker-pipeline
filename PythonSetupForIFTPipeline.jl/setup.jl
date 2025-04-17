@@ -5,4 +5,4 @@ using Pkg
 ENV["PYTHON"] = ""
 
 # Build PyCall with the new conda environment
-Pkg.build("PyCall")
+Pkg.add("PyCall")
