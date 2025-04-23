@@ -4,6 +4,7 @@ using ArgParse
 using IceFloeTracker
 using IFTPipeline
 using Serialization
+using TimeZones
 
 function mkclipreprocess!(settings)
     @add_arg_table! settings["preprocess"] begin
@@ -318,7 +319,7 @@ function mkclimakeh5_single!(settings)
         "--passtime"
         help = "Satellite pass time"
         required = true
-        arg_type = DateTime
+        arg_type = ZonedDateTime
 
         "--truecolor"
         help = "Path to truecolor image"
@@ -498,7 +499,7 @@ function mkclitrack_single!(settings)
         help = "Path to object with satellite pass times"
         required = true
         nargs = '+'
-        arg_type = DateTime
+        arg_type = ZonedDateTime
 
         "--latlon"
         help = "Path to geotiff image with latitude/longitude data"
@@ -645,6 +646,19 @@ function mkclilandmask_single!(settings)
     return nothing
 end
 
+function mkcli_measure_rotation!(settings)
+    @add_arg_table! settings["measure_rotation"] begin
+        "--input", "-i"
+        help = "Tracked floes CSV file with a 'satellite' column"
+        required = true
+
+        "--output", "-o"
+        help = "Tracked floes CSV file with rotations calculated"
+        required = true
+    end
+    return nothing
+end
+
 function mkcli!(settings, common_args)
     d = Dict(
         "landmask" => mkclilandmask!,
@@ -658,6 +672,7 @@ function mkcli!(settings, common_args)
         "makeh5files_single" => mkclimakeh5_single!,
         "track" => mkclitrack!,
         "track_single" => mkclitrack_single!,
+        "measure_rotation" => mkcli_measure_rotation!,
     )
 
     for t in keys(d)
@@ -713,6 +728,10 @@ function main()
 
         "track_single"
         help = "Pair ice floes in day k with ice floes in day k+1"
+        action = :command
+
+        "measure_rotation"
+        help = "Get rotation of the ice floes"
         action = :command
     end
 

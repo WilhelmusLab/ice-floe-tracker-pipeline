@@ -48,6 +48,7 @@ include("preprocess.jl")
 include("feature-extraction.jl")
 include("tracker.jl")
 include("h5.jl")
+include("rotation.jl")
 
 export cache_vector,
     sharpen,
@@ -75,7 +76,8 @@ export cache_vector,
     mkcliextract!,
     mkclitrack!,
     mkfilenames,
-    makeh5files
+    makeh5files,
+    measure_rotation
 
 export IceFloeTracker
 end
