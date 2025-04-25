@@ -33,14 +33,21 @@ Columns returned:
   - if available: `satellite<i>`.
 """
 function measure_rotation(;
-    input::String, output::String, id_column=:ID, image_column=:mask, time_column=:passtime
+    input::String,
+    output::String,
+    id_column=:ID,
+    image_column=:mask,
+    time_column=:passtime,
+    lookback_days::Int64=1,
 )
     input_df = DataFrame(CSV.File(input))
 
     input_df[!, image_column] = eval.(Meta.parse.(input_df[:, image_column]))
     input_df[!, time_column] = ZonedDateTime.(String.(input_df[:, time_column]))
 
-    results_df = get_rotation_measurements(input_df; id_column, image_column, time_column)
+    results_df = get_rotation_measurements(
+        input_df; id_column, image_column, time_column, lookback_days
+    )
     @info results_df
 
     FileIO.save(output, results_df)
