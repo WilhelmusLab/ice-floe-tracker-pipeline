@@ -188,7 +188,7 @@ track () {
 
     ${IFT} measure_rotation \
         -i ${DATA_ROOT}/paired.csv \
-        -o ${DATA_ROOT}/paired.rotation.csv
+        -o ${DATA_ROOT}/paired.rotation.csv \
         --lookback-days 1
 
 }
