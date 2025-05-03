@@ -655,6 +655,12 @@ function mkcli_measure_rotation!(settings)
         "--output", "-o"
         help = "Tracked floes CSV file with rotations calculated"
         required = true
+
+        "--lookback_days", "-l"
+        help = "Number of days into the past to measure rotations"
+        required = false
+        arg_type = Int64
+        default = 1
     end
     return nothing
 end
