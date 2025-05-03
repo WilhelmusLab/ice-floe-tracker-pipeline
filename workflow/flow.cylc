@@ -368,5 +368,5 @@
         ${IFT} measure_rotation \
             -i ${tracked_floes_with_satellites} \
             -o ${rotation_tracked_floes_file} \
-            -l ${ROTATION_LOOKBACK_DAYS}
+            -l {{ ROTATION_LOOKBACK_DAYS }}
         """
