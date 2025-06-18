@@ -1,7 +1,14 @@
 name = "IFTPipeline"
 uuid = "c895ed3e-1b7c-4ee4-8f26-b0074f8964c6"
-authors = ["Carlos Paniagua <cpaniaguam@gmail.com>"]
-version = "0.2.0"
+authors = [
+    "Carlos Paniagua <carlos_paniagua@brown.edu>",
+    "Timothy Divoll <bradford_roarr@brown.edu>",
+    "John Gerrard Holland <john_holland1@brown.edu>",
+    "Bradford Roarr <bradford_roarr@brown.edu>",
+    "Daniel Watkins <daniel_watkins@brown.edu>",
+    "Maria Isabel Restrepo <maria_restrepo@brown.edu>",
+]
+version = "0.2.1"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
@@ -30,7 +37,7 @@ DataFrames = "1.7.0"
 Dates = "1.10.9"
 Folds = "0.2"
 HDF5 = "0.16, 0.17"
-IceFloeTracker = "0.8.0"
+IceFloeTracker = "0.8.2"
 LoggingExtras = "1.0"
 Pkg = "1.9"
 PyCall = "1.96"
