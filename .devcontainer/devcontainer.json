@@ -7,7 +7,7 @@
 	
 	"features": {
 		"ghcr.io/julialang/devcontainer-features/julia:1": {
-			"channel": "lts"
+			"channel": "release"
 		},
 		"ghcr.io/devcontainers/features/python:1": {
 			"installTools": true,
