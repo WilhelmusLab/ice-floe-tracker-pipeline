@@ -1,0 +1,134 @@
+IFT: "docker run -v `pwd`:/app -w /app ghcr.io/wilhelmuslab/ice-floe-tracker-pipeline/cli:v2.3.1"
+FSDPROC: "pipx run --spec git+https://github.com/WilhelmusLab/ebseg@v1.0.1 fsdproc"
+PASS_TIME: "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@v2.3.1#subdirectory=satellite-overpass-identification-tool soit"
+COLORIZE: "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@v2.3.1#subdirectory=label-colorizer colorize"
+CSVJOIN: "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@v2.3.1#subdirectory=csvjoin csvjoin"
+
+#--------------------------------------------------
+# Date, Time, Location, Satellites
+#--------------------------------------------------
+START: "2019-03-20"
+END: "2019-03-21"
+LOCATION: "beaufort_sea"
+CRS: "EPSG:3413"
+# BBOX: "x_lower_left,y_lower_left,x_upper_right,y_upper_right"
+BBOX: "-2112500.0,-262500.0,-2012500.0,-162500.0"
+SCALE: 250
+CENTROID_LAT: 71.02795656503653
+CENTROID_LON: -129.11755440990464
+SATELLITES: ["aqua", "terra"]
+
+#--------------------------------------------------
+# Satellite Overpass Identification Tool
+#--------------------------------------------------
+# Username and password for Space-Track.org (don't commit!)
+SPACEUSER: ""
+SPACEPSWD: ""
+
+#--------------------------------------------------
+# Julia
+#--------------------------------------------------
+JULIA_DEBUG: ""
+
+#--------------------------------------------------
+# IFTPipeline.jl Command Line Interface
+#--------------------------------------------------
+
+#--------------------------------------------------
+# Buckley Floe Size Distribution Tool
+#--------------------------------------------------
+
+#--------------------------------------------------
+# Floe Colorizer
+#--------------------------------------------------
+
+#--------------------------------------------------
+# CSV Joiner
+#--------------------------------------------------
+
+#--------------------------------------------------
+# Preprocessing Options
+#--------------------------------------------------
+
+PREPROCESSING: "Lopez"
+
+# Lopez Preprocessing Options
+# for PREPROCESSING: "Lopez" or "LopezTiling"
+#--------------------------------------------------
+
+# Histogram Equalization Preprocessing Options
+# for PREPROCESSING: "LopezTiling"
+#--------------------------------------------------
+
+ICE_LABELS_PRELIM_THRESHOLD: 110.0
+ICE_LABELS_BAND_7_THRESHOLD: 200.0
+ICE_LABELS_BAND_2_THRESHOLD: 190.0
+ICE_LABELS_RATIO_LOWER: 0.0
+ICE_LABELS_RATIO_UPPER: 0.75
+TILE_RBLOCKS: 8
+TILE_CBLOCKS: 8
+ADAPTHISTEQ_WHITE_THRESHOLD: 25.5
+ADAPTHISTEQ_ENTROPY_THRESHOLD: 4.0
+ADAPTHISTEQ_WHITE_FRACTION_THRESHOLD: 0.4
+GAMMA: 1.0
+GAMMA_FACTOR: 1.0
+GAMMA_THRESHOLD: 220.0
+UNSHARP_MASK_RADIUS: 10
+UNSHARP_MASK_AMOUNT: 2.0
+UNSHARP_MASK_FACTOR: 255.0
+BRIGHTEN_FACTOR: 0.1
+PRELIM_ICEMASK_RADIUS: 10
+PRELIM_ICEMASK_AMOUNT: 2
+PRELIM_ICEMASK_FACTOR: 0.5
+ICEMASK_BAND_7_THRESHOLD: 5
+ICEMASK_BAND_2_THRESHOLD: 230
+ICEMASK_BAND_1_THRESHOLD: 240
+ICEMASK_BAND_7_THRESHOLD_RELAXED: 10
+ICEMASK_BAND_1_THRESHOLD_RELAXED: 190
+ICEMASK_POSSIBLE_ICE_THRESHOLD: 75
+ICEMASK_N_CLUSTERS: 3
+
+# Buckley Preprocessing Options
+# for PREPROCESSING: "Buckley"
+#--------------------------------------------------
+BUCKLEY_ITMAX: 8
+BUCKLEY_ITMIN: 3
+BUCKLEY_STEP: -1
+# KERNEL_TYPE: "diamond" or "ellipse"
+BUCKLEY_KERNEL_TYPE: "diamond"
+BUCKLEY_KERNEL_SIZE: 1
+
+#--------------------------------------------------
+# Feature Extraction
+#--------------------------------------------------
+MINFLOEAREA: 350
+MAXFLOEAREA: 90000
+
+#--------------------------------------------------
+# Tracking
+#--------------------------------------------------
+TRACK_DIST: [15, 30, 120]
+TRACK_DT_THRESH: [30, 100, 1300]
+TRACK_SMINIMUMAREA: 350
+TRACK_SAREARATIO: 0.18
+TRACK_SMAJAXISRATIO: 0.10
+TRACK_SMINAXISRATIO: 0.15
+TRACK_SCONVEXAREARATIO: 0.20
+TRACK_LMINIMUMAREA: 1200
+TRACK_LAREARATIO: 0.28
+TRACK_LMAJAXISRATIO: 0.10
+TRACK_LMINAXISRATIO: 0.12
+TRACK_LCONVEXAREARATIO: 0.14
+TRACK_MXROT: 10
+TRACK_PSI: 0.95
+TRACK_SZ: 16
+TRACK_COMP: 0.25
+TRACK_MM: 0.22
+TRACK_CORR: 0.68
+TRACK_LARGE_FLOE_AREA_MISMATCH_THRESHOLD: 0.236
+TRACK_SMALL_FLOE_AREA_MISMATCH_THRESHOLD: 0.18
+
+#--------------------------------------------------
+# Rotation
+#--------------------------------------------------
+ROTATION_LOOKBACK_DAYS: 1

@@ -17,3 +17,6 @@ trackplayground.jl
 *.simg
 
 runtime/
+
+.snakemake
+snake-work/
