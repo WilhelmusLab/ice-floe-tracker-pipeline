@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:debian
+FROM mcr.microsoft.com/devcontainers/base:noble
 
 RUN apt-get update
 RUN apt-get install -y software-properties-common
