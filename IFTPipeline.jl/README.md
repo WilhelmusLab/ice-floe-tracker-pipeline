@@ -30,8 +30,3 @@ To activate debug logging for the Ice Floe Tracker, call:
 ```bash
 JULIA_DEBUG="Main,IFTPipeline,IceFloeTracker" julia --project=IFTPipeline.jl IFTPipeline.jl/src/cli.jl ...
 ```
-
-## Troubleshooting
-
-If you encouter errors with `PyCall` or `Conda`, follow the instructions in 
-[../PythonSetupForIFTPipeline.jl](../PythonSetupForIFTPipeline.jl/) to reinitialize the Conda environment.

@@ -6,7 +6,6 @@ This repository contains the processing pipeline for IceFloeTracker.jl.
 The [workflow](./workflow/) directory includes instructions for running the workflow as a whole, in Cylc, and may be the only directory you need to interact with.
 
 The other directories include utilities and are intended for developers:
-- [PythonSetupForIFTPipeline.jl](./PythonSetupForIFTPipeline.jl/) – script to initialize a working Conda environment, in Julia
 - [IFTPipeline.jl](./IFTPipeline.jl/) – command line interface to the ice floe tracker by Lopez ([IceFloeTracker.jl](https://github.com/WilhelmusLab/IceFloeTracker.jl)), in Julia
 - [label-colorizer](./label-colorizer/) – command line tool to apply random colors to integer GEOTiff images, in Python 
 - [labeler](./labeler/) – command line tool to generate integer labels for contiguous regions in a binary TIFF image, in Python 

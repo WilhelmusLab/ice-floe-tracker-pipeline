@@ -7,13 +7,6 @@ ENV JULIA_CPU_TARGET=${JULIA_CPU_TARGET}
 #===========================================
 ENV TERM=xterm
 
-# Python environment build
-#===========================================
-ENV CONDA_JL_HOME=/opt/conda
-ENV JULIA_DEPOT_PATH=/opt/julia
-COPY ./PythonSetupForIFTPipeline.jl /opt/PythonSetupForIFTPipeline.jl
-RUN julia --project="/opt/PythonSetupForIFTPipeline.jl" "/opt/PythonSetupForIFTPipeline.jl/setup.jl"
-
 # IFT Pipeline package build
 #===========================================
 COPY ./IFTPipeline.jl /opt/IFTPipeline.jl
