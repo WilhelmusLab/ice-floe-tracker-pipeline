@@ -1,4 +1,5 @@
-IFT: "docker run -v `pwd`:/app -w /app ghcr.io/wilhelmuslab/ice-floe-tracker-pipeline/cli:v2.3.1"
+# IFT: "docker run -v `pwd`:/app -w /app ghcr.io/wilhelmuslab/ice-floe-tracker-pipeline/cli:v2.3.1"
+IFT: "julia --project=./IFTPipeline.jl -e 'using IFTPipeline; IFTPipeline.main()' --"
 FSDPROC: "pipx run --spec git+https://github.com/WilhelmusLab/ebseg@v1.0.1 fsdproc"
 PASS_TIME: "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@v2.3.1#subdirectory=satellite-overpass-identification-tool soit"
 COLORIZE: "pipx run --spec git+https://github.com/wilhelmuslab/ice-floe-tracker-pipeline@v2.3.1#subdirectory=label-colorizer colorize"

@@ -1,5 +1,26 @@
+import os
+from datetime import datetime, timedelta
+
 configfile: "workflow/config.yaml"
 workdir: "snake-work"
+
+# Generate list of dates between START and END
+def daterange(start_date, end_date):
+    start = datetime.strptime(start_date, "%Y-%m-%d")
+    end = datetime.strptime(end_date, "%Y-%m-%d")
+    for n in range(int((end - start).days) + 1):
+        yield (start + timedelta(n)).strftime("%Y%m%d")
+
+DATES = list(daterange(config["START"], config["END"]))
+SATELLITES = config["SATELLITES"]
+
+# Helper function to get date without dashes
+def date_without_dashes(date_str):
+    return date_str.replace("-", "")
+
+# ============================================================================
+# INIT RULES
+# ============================================================================
 
 rule init:
     input:
@@ -39,6 +60,9 @@ rule init_iftp:
     shell:
         "{config[IFT]} --help > {output}"
 
+# ============================================================================
+# OVERPASS TIME RULES
+# ============================================================================
 
 envvars:
     "SPACEUSER",
@@ -62,17 +86,365 @@ rule get_single_overpass_time:
     input:
         "overpass-times.csv"
     output:
-        "{date}-{satellite}-overpass.txt"
+        "{date}.{scale}m.{satellite}/overpass.txt"
     run:
-        
-        import csv; 
-        overpass_time = None
+        import csv
+        # Convert date format from YYYYMMDD to YYYY-MM-DD for matching
+        date_with_dashes = f"{wildcards.date[:4]}-{wildcards.date[4:6]}-{wildcards.date[6:8]}"
+        overpass_time = ""
         with open(input[0]) as f:
             csvfile = csv.reader(f)
             for row in csvfile:
-                if row and row[0] == wildcards.date and row[1] == wildcards.satellite:
+                if row and row[0] == date_with_dashes and row[1] == wildcards.satellite:
                     overpass_time = row[2]
                     break
         with open(output[0], "w") as f:
             f.write(overpass_time + "\n")
+
+# ============================================================================
+# IMAGE LOADING RULES
+# ============================================================================
+
+rule load_truecolor:
+    input:
+        "init-fsdproc.txt"
+    output:
+        "{date}.{scale}m.{satellite}/truecolor.tiff"
+    params:
+        date_with_dashes=lambda wc: f"{wc.date[:4]}-{wc.date[4:6]}-{wc.date[6:8]}"
+    shell:
+        "{config[FSDPROC]} load {output} --kind truecolor "
+        "--crs {config[CRS]} --bbox {config[BBOX]} --scale {wildcards.scale} "
+        "--datetime {params.date_with_dashes} --satellite {wildcards.satellite}"
+
+rule load_falsecolor:
+    input:
+        "init-fsdproc.txt"
+    output:
+        "{date}.{scale}m.{satellite}/falsecolor.tiff"
+    params:
+        date_with_dashes=lambda wc: f"{wc.date[:4]}-{wc.date[4:6]}-{wc.date[6:8]}"
+    shell:
+        "{config[FSDPROC]} load {output} --kind bands721 "
+        "--crs {config[CRS]} --bbox {config[BBOX]} --scale {wildcards.scale} "
+        "--datetime {params.date_with_dashes} --satellite {wildcards.satellite}"
+
+rule load_cloud:
+    input:
+        "init-fsdproc.txt"
+    output:
+        "{date}.{scale}m.{satellite}/cloud.tiff"
+    params:
+        date_with_dashes=lambda wc: f"{wc.date[:4]}-{wc.date[4:6]}-{wc.date[6:8]}"
+    shell:
+        "{config[FSDPROC]} load {output} --kind cloud "
+        "--crs {config[CRS]} --bbox {config[BBOX]} --scale {wildcards.scale} "
+        "--datetime {params.date_with_dashes} --satellite {wildcards.satellite}"
+
+rule load_landmask:
+    input:
+        "init-fsdproc.txt"
+    output:
+        "{date}.{scale}m.{satellite}/landmask.tiff"
+    params:
+        date_with_dashes=lambda wc: f"{wc.date[:4]}-{wc.date[4:6]}-{wc.date[6:8]}"
+    shell:
+        "{config[FSDPROC]} load {output} --kind landmask "
+        "--crs {config[CRS]} --bbox {config[BBOX]} --scale {wildcards.scale} "
+        "--datetime {params.date_with_dashes} --satellite {wildcards.satellite}"
+
+# ============================================================================
+# PREPROCESSING RULES
+# ============================================================================
+
+rule landmask_binarize:
+    input:
+        landmask="{date}.{scale}m.{satellite}/landmask.tiff",
+        init="init-IFTP.txt"
+    output:
+        binarized="{date}.{scale}m.{satellite}/landmask.binarized.tiff",
+        dilated="{date}.{scale}m.{satellite}/landmask.binarized.dilated.tiff"
+    shell:
+        "{config[IFT]} landmask_single "
+        "-i {input.landmask} "
+        "-o {output.binarized} "
+        "-d {output.dilated}"
+
+rule preprocess_lopez:
+    input:
+        truecolor="{date}.{scale}m.{satellite}/truecolor.tiff",
+        falsecolor="{date}.{scale}m.{satellite}/falsecolor.tiff",
+        landmask_binarized="{date}.{scale}m.{satellite}/landmask.binarized.tiff",
+        landmask_dilated="{date}.{scale}m.{satellite}/landmask.binarized.dilated.tiff",
+        init="init-IFTP.txt"
+    output:
+        labeled="{date}.{scale}m.{satellite}/labeled.lopez.tiff"
+    shell:
+        "{config[IFT]} preprocess_single "
+        "-t {input.truecolor} "
+        "-r {input.falsecolor} "
+        "-l {input.landmask_binarized} "
+        "-d {input.landmask_dilated} "
+        "-o {output.labeled}"
+
+rule preprocess_lopez_tiling:
+    input:
+        truecolor="{date}.{scale}m.{satellite}/truecolor.tiff",
+        falsecolor="{date}.{scale}m.{satellite}/falsecolor.tiff",
+        landmask_dilated="{date}.{scale}m.{satellite}/landmask.binarized.dilated.tiff",
+        init="init-IFTP.txt"
+    output:
+        labeled="{date}.{scale}m.{satellite}/labeled.lopeztiling.tiff",
+        segmented="{date}.{scale}m.{satellite}/segmented.lopeztiling.tiff"
+    shell:
+        "{config[IFT]} preprocess_tiling_single "
+        "-t {input.truecolor} "
+        "-r {input.falsecolor} "
+        "-d {input.landmask_dilated} "
+        "-l {output.labeled} "
+        "-s {output.segmented} "
+        "--tile-rblocks {config[TILE_RBLOCKS]} "
+        "--tile-cblocks {config[TILE_CBLOCKS]} "
+        "--ice-labels-prelim-threshold {config[ICE_LABELS_PRELIM_THRESHOLD]} "
+        "--ice-labels-band-7-threshold {config[ICE_LABELS_BAND_7_THRESHOLD]} "
+        "--ice-labels-band-2-threshold {config[ICE_LABELS_BAND_2_THRESHOLD]} "
+        "--ice-labels-ratio-lower {config[ICE_LABELS_RATIO_LOWER]} "
+        "--ice-labels-ratio-upper {config[ICE_LABELS_RATIO_UPPER]} "
+        "--adapthisteq-white-threshold {config[ADAPTHISTEQ_WHITE_THRESHOLD]} "
+        "--adapthisteq-entropy-threshold {config[ADAPTHISTEQ_ENTROPY_THRESHOLD]} "
+        "--adapthisteq-white-fraction-threshold {config[ADAPTHISTEQ_WHITE_FRACTION_THRESHOLD]} "
+        "--gamma {config[GAMMA]} "
+        "--gamma-factor {config[GAMMA_FACTOR]} "
+        "--gamma-threshold {config[GAMMA_THRESHOLD]} "
+        "--unsharp-mask-radius {config[UNSHARP_MASK_RADIUS]} "
+        "--unsharp-mask-amount {config[UNSHARP_MASK_AMOUNT]} "
+        "--unsharp-mask-factor {config[UNSHARP_MASK_FACTOR]} "
+        "--brighten-factor {config[BRIGHTEN_FACTOR]} "
+        "--prelim-icemask-radius {config[PRELIM_ICEMASK_RADIUS]} "
+        "--prelim-icemask-amount {config[PRELIM_ICEMASK_AMOUNT]} "
+        "--prelim-icemask-factor {config[PRELIM_ICEMASK_FACTOR]} "
+        "--icemask-band-7-threshold {config[ICEMASK_BAND_7_THRESHOLD]} "
+        "--icemask-band-2-threshold {config[ICEMASK_BAND_2_THRESHOLD]} "
+        "--icemask-band-1-threshold {config[ICEMASK_BAND_1_THRESHOLD]} "
+        "--icemask-band-7-threshold-relaxed {config[ICEMASK_BAND_7_THRESHOLD_RELAXED]} "
+        "--icemask-band-1-threshold-relaxed {config[ICEMASK_BAND_1_THRESHOLD_RELAXED]} "
+        "--icemask-possible-ice-threshold {config[ICEMASK_POSSIBLE_ICE_THRESHOLD]} "
+        "--icemask-n-clusters {config[ICEMASK_N_CLUSTERS]}"
+
+rule preprocess_buckley:
+    input:
+        truecolor="{date}.{scale}m.{satellite}/truecolor.tiff",
+        cloud="{date}.{scale}m.{satellite}/cloud.tiff",
+        landmask="{date}.{scale}m.{satellite}/landmask.tiff",
+        init="init-fsdproc.txt"
+    output:
+        labeled="{date}.{scale}m.{satellite}/labeled.buckley.tiff",
+        props="{date}.{scale}m.{satellite}/labeled.buckley.props.csv"
+    params:
+        workdir="{date}.{scale}m.{satellite}/labeled.buckley.work"
+    shell:
+        "mkdir -p {params.workdir} && "
+        "{config[FSDPROC]} process "
+        "{input.truecolor} "
+        "{input.cloud} "
+        "{input.landmask} "
+        "{params.workdir} "
+        "--itmax {config[BUCKLEY_ITMAX]} "
+        "--itmin {config[BUCKLEY_ITMIN]} "
+        "--step {config[BUCKLEY_STEP]} "
+        "--kernel-type {config[BUCKLEY_KERNEL_TYPE]} "
+        "--kernel-size {config[BUCKLEY_KERNEL_SIZE]} && "
+        "cp {params.workdir}/final.tif {output.labeled} && "
+        "cp {params.workdir}/props.csv {output.props}"
+
+# Main preprocess rule - selects method based on config
+# Use ruleorder or explicit input function to select preprocessing method
+def get_labeled_file(wildcards):
+    preprocessing = config.get("PREPROCESSING", "Lopez")
+    if preprocessing == "Lopez":
+        return f"{wildcards.date}.{wildcards.scale}m.{wildcards.satellite}/labeled.lopez.tiff"
+    elif preprocessing == "LopezTiling":
+        return f"{wildcards.date}.{wildcards.scale}m.{wildcards.satellite}/labeled.lopeztiling.tiff"
+    elif preprocessing == "Buckley":
+        return f"{wildcards.date}.{wildcards.scale}m.{wildcards.satellite}/labeled.buckley.tiff"
+    else:
+        raise ValueError(f"Unknown PREPROCESSING method: {preprocessing}")
+
+rule create_labeled_symlink:
+    input:
+        get_labeled_file
+    output:
+        "{date}.{scale}m.{satellite}/labeled.tiff"
+    shell:
+        "ln -sf $(basename {input}) {output}"
+
+# ============================================================================
+# FEATURE EXTRACTION RULES
+# ============================================================================
+
+rule extract_features:
+    input:
+        labeled="{date}.{scale}m.{satellite}/labeled.tiff",
+        init="init-IFTP.txt"
+    output:
+        props="{date}.{scale}m.{satellite}/labeled.props.csv"
+    shell:
+        "{config[IFT]} extractfeatures_single "
+        "--input {input.labeled} "
+        "--output {output.props} "
+        "--minarea {config[MINFLOEAREA]} "
+        "--maxarea {config[MAXFLOEAREA]}"
+
+rule colorize_labeled:
+    input:
+        labeled="{date}.{scale}m.{satellite}/labeled.tiff",
+        init="init-colorize.txt"
+    output:
+        colorized="{date}.{scale}m.{satellite}/labeled.colorized.tiff"
+    shell:
+        "{config[COLORIZE]} {input.labeled} {output.colorized}"
+
+# ============================================================================
+# EXPORT H5 RULE
+# ============================================================================
+
+rule export_h5:
+    input:
+        overpass="{date}.{scale}m.{satellite}/overpass.txt",
+        truecolor="{date}.{scale}m.{satellite}/truecolor.tiff",
+        falsecolor="{date}.{scale}m.{satellite}/falsecolor.tiff",
+        labeled="{date}.{scale}m.{satellite}/labeled.tiff",
+        props="{date}.{scale}m.{satellite}/labeled.props.csv",
+        init="init-IFTP.txt"
+    output:
+        h5="{date}.{scale}m.{satellite}/results.h5"
+    shell:
+        "{config[IFT]} makeh5files_single "
+        "--passtime \"$(cat {input.overpass} | tr -d '\\n\\r')\" "
+        "--truecolor {input.truecolor} "
+        "--falsecolor {input.falsecolor} "
+        "--labeled {input.labeled} "
+        "--props {input.props} "
+        "--output {output.h5}"
+
+# ============================================================================
+# TRACKING RULE
+# ============================================================================
+
+def get_all_labeled_files(wildcards):
+    return expand("{date}.{scale}m.{satellite}/labeled.tiff",
+                  date=DATES, scale=config["SCALE"], satellite=SATELLITES)
+
+def get_all_props_files(wildcards):
+    return expand("{date}.{scale}m.{satellite}/labeled.props.csv",
+                  date=DATES, scale=config["SCALE"], satellite=SATELLITES)
+
+def get_all_landmask_files(wildcards):
+    return expand("{date}.{scale}m.{satellite}/landmask.tiff",
+                  date=DATES, scale=config["SCALE"], satellite=SATELLITES)
+
+def get_all_overpass_files(wildcards):
+    return expand("{date}.{scale}m.{satellite}/overpass.txt",
+                  date=DATES, scale=config["SCALE"], satellite=SATELLITES)
+
+rule tracking:
+    input:
+        labeled=get_all_labeled_files,
+        props=get_all_props_files,
+        landmasks=get_all_landmask_files,
+        passtimes=get_all_overpass_files,
+        init="init-IFTP.txt"
+    output:
+        tracked="floes.tracked.csv"
+    params:
+        dist=" ".join(map(str, config.get("TRACK_DIST", [15, 30]))),
+        dt_thresh=" ".join(map(str, config.get("TRACK_DT_THRESH", [0, 1])))
+    run:
+        import subprocess
+        
+        # Build command
+        labeled_files = " ".join(input.labeled)
+        props_files = " ".join(input.props)
+        landmask = input.landmasks[0]  # Use first landmask for latlon
+        
+        # Read all passtimes
+        passtimes = []
+        for pt_file in input.passtimes:
+            with open(pt_file) as f:
+                passtimes.append(f.read().strip())
+        passtimes_str = " ".join(passtimes)
+        
+        cmd = (
+            f"{config['IFT']} track_single "
+            f"--imgs {labeled_files} "
+            f"--props {props_files} "
+            f"--latlon {landmask} "
+            f"--passtimes {passtimes_str} "
+            f"--output {output.tracked} "
+            f"--dist {params.dist} "
+            f"--dt-thresh {params.dt_thresh} "
+            f"--Sminimumarea {config['TRACK_SMINIMUMAREA']} "
+            f"--Sarearatio {config['TRACK_SAREARATIO']} "
+            f"--Smajaxisratio {config['TRACK_SMAJAXISRATIO']} "
+            f"--Sminaxisratio {config['TRACK_SMINAXISRATIO']} "
+            f"--Sconvexarearatio {config['TRACK_SCONVEXAREARATIO']} "
+            f"--Lminimumarea {config['TRACK_LMINIMUMAREA']} "
+            f"--Larearatio {config['TRACK_LAREARATIO']} "
+            f"--Lmajaxisratio {config['TRACK_LMAJAXISRATIO']} "
+            f"--Lminaxisratio {config['TRACK_LMINAXISRATIO']} "
+            f"--Lconvexarearatio {config['TRACK_LCONVEXAREARATIO']} "
+            f"--mxrot {config['TRACK_MXROT']} "
+            f"--psi {config['TRACK_PSI']} "
+            f"--sz {config['TRACK_SZ']} "
+            f"--comp {config['TRACK_COMP']} "
+            f"--mm {config['TRACK_MM']} "
+            f"--corr {config['TRACK_CORR']} "
+            f"--large-floe-area {config['TRACK_LARGE_FLOE_AREA_MISMATCH_THRESHOLD']} "
+            f"--small-floe-area {config['TRACK_SMALL_FLOE_AREA_MISMATCH_THRESHOLD']}"
+        )
+        shell(cmd)
+
+# ============================================================================
+# ROTATION RULE
+# ============================================================================
+
+rule get_rotation:
+    input:
+        tracked="floes.tracked.csv",
+        overpass_times="overpass-times.csv",
+        init_csvjoin="init-csvjoin.txt",
+        init_ift="init-IFTP.txt"
+    output:
+        tracked_with_satellites="floes.tracked.satellite.csv",
+        rotation="floes.tracked.rotation.csv"
+    shell:
+        "{config[CSVJOIN]} "
+        "{input.tracked} passtime "
+        "{input.overpass_times} 'overpass time' "
+        "{output.tracked_with_satellites} "
+        "--on-is-utc && "
+        "{config[IFT]} measure_rotation "
+        "-i {output.tracked_with_satellites} "
+        "-o {output.rotation} "
+        "-l {config[ROTATION_LOOKBACK_DAYS]}"
+
+# ============================================================================
+# AGGREGATE RULES
+# ============================================================================
+
+rule preprocess_all:
+    input:
+        expand("{date}.{scale}m.{satellite}/labeled.props.csv",
+               date=DATES, scale=config["SCALE"], satellite=SATELLITES),
+        expand("{date}.{scale}m.{satellite}/labeled.colorized.tiff",
+               date=DATES, scale=config["SCALE"], satellite=SATELLITES)
+
+rule export_all_h5:
+    input:
+        expand("{date}.{scale}m.{satellite}/results.h5",
+               date=DATES, scale=config["SCALE"], satellite=SATELLITES)
+
+rule all:
+    input:
+        "floes.tracked.rotation.csv"
         
