@@ -1,6 +1,9 @@
 [![Build Status](https://github.com/WilhelmusLab/ice-floe-tracker-pipeline/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/WilhelmusLab/ice-floe-tracker-pipeline/actions/workflows/test.yml?query=branch%3Amain) [![Coverage](https://codecov.io/gh/WilhelmusLab/ice-floe-tracker-pipeline/branch/main/graph/badge.svg)](https://codecov.io/gh/WilhelmusLab/ice-floe-tracker-pipeline)
 # Ice Floe Tracker Pipeline
 
+> [!IMPORTANT]
+> This workflow has been superseded by the [workflow in the IceFloeTracker.jl repository](https://github.com/WilhelmusLab/IceFloeTracker.jl/tree/main/workflow).
+
 This repository contains the processing pipeline for IceFloeTracker.jl.
 
 The [workflow](./workflow/) directory includes instructions for running the workflow as a whole, in Cylc, and may be the only directory you need to interact with.
